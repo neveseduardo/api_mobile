@@ -6,8 +6,8 @@ import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Icon } from "@iconify/react";
 import "@/styles/global.css";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
@@ -32,21 +32,21 @@ export default function TabLayout() {
 				name="index"
 				options={{
 					title: 'Home',
-					tabBarIcon: ({ color }) => <Icon icon="ic:outline-home" height={28} width={28} color={color} />,
+					tabBarIcon: ({ color }) => <Ionicons name="home" size={25} color={color} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="products"
 				options={{
 					title: 'Produtos',
-					tabBarIcon: ({ color }) => <Icon icon="ic:baseline-menu-book" height={28} width={28} color={color} />,
+					tabBarIcon: ({ color }) => <Ionicons name="list" size={25} color={color} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="user"
 				options={{
 					title: 'Dados pessoais',
-					tabBarIcon: ({ color }) => <Icon icon="ic:outline-person" height={28} width={28} color={color} />,
+					tabBarIcon: ({ color }) => <Ionicons name="person" size={25} color={color} />,
 				}}
 			/>
 		</Tabs>

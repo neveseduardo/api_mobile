@@ -1,35 +1,73 @@
 import { useState } from 'react';
-import { TextInput, Button } from 'react-native';
-import { router } from 'expo-router';
+import { View, Text } from 'react-native';
+import { Href, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import Button from '@/components/ui/Button';
+import TextInput from '@/components/ui/TextInput';
+import PasswordInput from '@/components/ui/PasswordInput';
+import { ThemedText } from '../../components/ThemedText';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
+	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [cpassword, setCPassword] = useState('');
 
-	const handleRegister = () => {
-		router.replace('/(auth)/login');
+	const handleLogin = () => {
+		router.replace("/(tabs)" as Href);
 	};
 
 	return (
-		<ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-			<ThemedText>Register</ThemedText>
-			<TextInput
-				placeholder="Email"
-				value={email}
-				onChangeText={setEmail}
-				style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-			/>
-			<TextInput
-				placeholder="Password"
-				value={password}
-				onChangeText={setPassword}
-				secureTextEntry
-				style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
-			/>
-			<Button title="Register" onPress={handleRegister} />
-			<Button title="Back to Login" onPress={() => router.back()} />
+		<ThemedView className="flex-1 items-center p-8">
+			<View className='flex flex-col gap-5 w-full'>
+				<View className="w-full flex justify-center items-center h-[200px]">
+					<View className='w-[70px] h-[70px] bg-primary-500 rounded-full flex justify-center items-center'>
+						<Ionicons name="lock-closed-outline" size={32} className='text-gray-500 dark:text-white' />
+					</View>
+				</View>
+
+				<View className="w-full flex flex-row gap-2 items-center">
+					<ThemedText className='text-white text-2xl'>Cadastre-se</ThemedText>
+				</View>
+
+				<View className="w-full">
+					<ThemedText className='text-white'>Insira os dados solicitados abaixo para registrar-se no aplicativo.</ThemedText>
+				</View>
+
+				<View className="flex flex-col gap-4 w-full">
+					<TextInput
+						placeholder="Nome"
+						value={name}
+						onChangeText={setName}
+					/>
+					<TextInput
+						keyboardType="email-address"
+						placeholder="Email"
+						value={email}
+						onChangeText={setEmail}
+					/>
+					<PasswordInput
+						placeholder="Senha"
+						value={password}
+						onChangeText={setPassword}
+						secureTextEntry
+					/>
+					<PasswordInput
+						placeholder="Confirmar senha"
+						value={cpassword}
+						onChangeText={setCPassword}
+						secureTextEntry
+					/>
+
+					<Button onPress={handleLogin} color='primary' className='w-full'>
+						<Text className='text-white'>REGISTRAR</Text>
+					</Button>
+					<Button onPress={() => router.push('/(auth)/login')} className='w-full'>
+						<Text className='text-white'>LOGIN</Text>
+					</Button>
+				</View>
+			</View>
 		</ThemedView>
 	);
 }

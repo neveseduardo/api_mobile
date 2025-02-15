@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { TextInput, Button, StyleSheet, View } from 'react-native';
+import { View, Text } from 'react-native';
 import { Href, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import Button from '@/components/ui/Button';
+import TextInput from '@/components/ui/TextInput';
+import PasswordInput from '@/components/ui/PasswordInput';
+import { ThemedText } from '../../components/ThemedText';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function LoginScreen() {
 	const [email, setEmail] = useState('');
@@ -13,39 +17,44 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<ThemedView className="flex-1 items-center justify-center p-4">
-			<View className="text-2xl w-full">
-				AQUI TAILWIND
+		<ThemedView className="flex-1 items-center p-8">
+			<View className='flex flex-col gap-5 w-full'>
+				<View className="w-full flex justify-center items-center h-[200px]">
+					<View className='w-[70px] h-[70px] bg-primary-500 rounded-full flex justify-center items-center'>
+						<Ionicons name="lock-closed-outline" size={32} className='text-gray-500 dark:text-white' />
+					</View>
+				</View>
+
+				<View className="w-full flex flex-row gap-2 items-center">
+					<ThemedText className='text-white text-2xl'>Autenticação</ThemedText>
+				</View>
+
+				<View className="w-full">
+					<ThemedText className='text-white'>Insira os dados solicitados abaixo para autenticar no aplicativo.</ThemedText>
+				</View>
+
+				<View className="flex flex-col gap-4 w-full">
+					<TextInput
+						keyboardType="email-address"
+						placeholder="Email"
+						value={email}
+						onChangeText={setEmail}
+					/>
+					<PasswordInput
+						placeholder="Senha"
+						value={password}
+						onChangeText={setPassword}
+						secureTextEntry
+					/>
+
+					<Button onPress={handleLogin} color='primary' className='w-full'>
+						<Text className='text-white'>ENTRAR</Text>
+					</Button>
+					<Button onPress={() => router.push('/(auth)/register')} className='w-full'>
+						<Text className='text-white'>REGISTRAR</Text>
+					</Button>
+				</View>
 			</View>
-
-			<View className="flex flex-col gap-4">
-				<TextInput
-					placeholder="Email"
-					value={email}
-					onChangeText={setEmail}
-				/>
-				<TextInput
-					placeholder="Password"
-					value={password}
-					onChangeText={setPassword}
-					secureTextEntry
-				/>
-
-				<Button title="Login" onPress={handleLogin} />
-				<Button title="Register" onPress={() => router.push('/(auth)/register')} />
-			</View>
-
-
-
-
 		</ThemedView>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-});
