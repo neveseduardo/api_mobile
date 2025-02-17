@@ -12,6 +12,7 @@ interface CustomTextInputProps extends TextInputProps {
 	iconRight?: string;
 	error?: boolean;
 	errorMessage?: string;
+	disabled?: boolean;
 }
 
 const TextInput = ({
@@ -24,6 +25,7 @@ const TextInput = ({
 	error = false,
 	errorMessage,
 	style,
+	disabled = false,
 	...rest
 }: CustomTextInputProps) => {
 	return (
@@ -32,7 +34,8 @@ const TextInput = ({
 				className={clsx(
 					'w-full flex-row items-center h-[40px] bg-white border border-gray-300 rounded focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600',
 					error && 'border-red-500',
-					className
+					disabled && 'opacity-50',
+					className,
 				)}
 			>
 				{iconLeft && (
@@ -41,16 +44,17 @@ const TextInput = ({
 					</View>
 				)}
 				<RNTextInput
-					autoComplete='off'
+					autoComplete="off"
 					placeholder={placeholder}
 					value={value}
-					onChangeText={onChangeText}
+					onChangeText={disabled ? undefined : onChangeText}
 					className={clsx(
 						'flex-1 h-full px-4 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500',
 						iconLeft && 'ml-2',
-						iconRight && 'mr-2'
+						iconRight && 'mr-2',
 					)}
 					style={style}
+					editable={!disabled}
 					{...rest}
 				/>
 				{iconRight && (

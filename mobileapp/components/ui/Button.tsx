@@ -10,6 +10,7 @@ interface ButtonProps extends TouchableOpacityProps {
 	circular?: boolean;
 	children?: React.ReactNode;
 	className?: string;
+	disabled?: boolean;
 }
 
 const Button = ({
@@ -21,6 +22,7 @@ const Button = ({
 	textStyle,
 	children,
 	className,
+	disabled = false,
 	...rest
 }: ButtonProps) => {
 	const colorClasses = {
@@ -29,21 +31,23 @@ const Button = ({
 		success: 'bg-green-500',
 		warning: 'bg-yellow-500',
 		danger: 'bg-red-500',
-		default: 'bg-gray-800',
+		default: 'bg-gray-200 dark:bg-gray-800',
 	}[color];
 
 	const buttonClasses = clsx(
 		colorClasses,
 		circular ? 'rounded-full p-3' : 'rounded py-2 px-4',
 		'flex justify-center items-center w-fit h-[40px]',
-		className
+		disabled && 'opacity-50',
+		className,
 	);
 
 	return (
 		<TouchableOpacity
-			onPress={onPress}
+			onPress={disabled ? undefined : onPress}
 			className={buttonClasses}
 			style={style}
+			disabled={disabled}
 			{...rest}
 		>
 			{children ? (

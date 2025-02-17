@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig, AxiosError } from 'axios';
+import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
 const http: AxiosInstance = axios.create({
 	baseURL: process.env.EXPO_PUBLIC_API_URL ?? '/',

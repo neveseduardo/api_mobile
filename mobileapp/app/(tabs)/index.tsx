@@ -1,12 +1,14 @@
-import React from 'react';
 import { StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useAuth } from '../../contexts/AuthContext';
 
 const HomeScreen = () => {
+	const { userData } = useAuth();
+
 	return (
 		<ThemedView style={styles.container}>
-			<ThemedText>HomeScreen</ThemedText>
+			<ThemedText>HomeScreen {userData?.email ?? 'Sem email'}</ThemedText>
 		</ThemedView>
 	);
 };

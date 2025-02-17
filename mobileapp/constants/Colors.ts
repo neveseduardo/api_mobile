@@ -35,7 +35,7 @@ export const Colors = {
 			700: '#1d4ed8',
 			800: '#1e40af',
 			900: '#1e3a8a',
-			950: '#172554'
+			950: '#172554',
 		},
 		primaryRed: {
 			50: '#fef2f2',
@@ -48,7 +48,7 @@ export const Colors = {
 			700: '#b91c1c',
 			800: '#991b1b',
 			900: '#7f1d1d',
-			950: '#450a0a'
+			950: '#450a0a',
 		},
 		primaryGreen: {
 			50: '#f0fdf4',
@@ -61,7 +61,7 @@ export const Colors = {
 			700: '#15803d',
 			800: '#166534',
 			900: '#14532d',
-			950: '#052e16'
+			950: '#052e16',
 		},
 	},
 	classes: {
@@ -71,5 +71,5 @@ export const Colors = {
 		warning: 'bg-yellow-500',
 		danger: 'bg-red-500',
 		default: 'bg-gray-800',
-	}
+	},
 };

@@ -1,10 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: [
-		"./app/**/*.{js,jsx,ts,tsx}",
-		"./components/**/*.{js,jsx,ts,tsx}",
+		'./app/**/*.{js,jsx,ts,tsx}',
+		'./components/**/*.{js,jsx,ts,tsx}',
 	],
-	presets: [require("nativewind/preset")],
+	presets: [require('nativewind/preset')],
 	theme: {
 		extend: {
 			colors: {
@@ -19,7 +19,7 @@ module.exports = {
 					700: '#1d4ed8',
 					800: '#1e40af',
 					900: '#1e3a8a',
-					950: '#172554'
+					950: '#172554',
 				},
 				info: {
 					50: '#f0f9ff',
@@ -32,7 +32,7 @@ module.exports = {
 					700: '#0369a1',
 					800: '#075985',
 					900: '#0c4a6e',
-					950: '#082f49'
+					950: '#082f49',
 				},
 				success: {
 					50: '#f0fdf4',
@@ -45,7 +45,7 @@ module.exports = {
 					700: '#15803d',
 					800: '#166534',
 					900: '#14532d',
-					950: '#052e16'
+					950: '#052e16',
 				},
 				warning: {
 					50: '#fffbeb',
@@ -58,7 +58,7 @@ module.exports = {
 					700: '#b45309',
 					800: '#92400e',
 					900: '#78350f',
-					950: '#451a03'
+					950: '#451a03',
 				},
 				danger: {
 					50: '#fef2f2',
@@ -71,10 +71,10 @@ module.exports = {
 					700: '#b91c1c',
 					800: '#991b1b',
 					900: '#7f1d1d',
-					950: '#450a0a'
-				}
-			}
+					950: '#450a0a',
+				},
+			},
 		},
 	},
 	plugins: [],
-}
+};
