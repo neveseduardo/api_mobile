@@ -10,8 +10,8 @@ interface CustomTextInputProps extends TextInputProps {
 	className?: string;
 	iconLeft?: string;
 	iconRight?: string;
-	error?: boolean;
-	errorMessage?: string;
+	error?: boolean; // Indica se há um erro
+	errorMessage?: string; // Mensagem de erro a ser exibida
 	disabled?: boolean;
 }
 
@@ -32,15 +32,15 @@ const TextInput = ({
 		<View className="w-full">
 			<View
 				className={clsx(
-					'w-full flex-row items-center h-[40px] bg-white border border-gray-300 rounded focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600',
-					error && 'border-red-500',
+					'w-full flex-row items-center h-[40px] bg-white border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600',
+					error && 'border-red-500 dark:border-red-500',
 					disabled && 'opacity-50',
 					className,
 				)}
 			>
 				{iconLeft && (
 					<View className="ml-2">
-						<Ionicons icon={iconLeft} size={32} color="green" />
+						<Ionicons name={iconLeft as 'search'} size={20} color={error ? 'red' : 'gray'} />
 					</View>
 				)}
 				<RNTextInput
@@ -59,13 +59,15 @@ const TextInput = ({
 				/>
 				{iconRight && (
 					<View className="mr-2">
-						<Ionicons icon={iconLeft} size={32} color="green" />
+						<Ionicons name={iconRight as 'search'} size={20} color={error ? 'red' : 'gray'} />
 					</View>
 				)}
 			</View>
 
 			{error && errorMessage && (
-				<Text className="mt-1 text-sm text-red-500">{errorMessage}</Text>
+				<View className="flex flex-row items-center mt-1">
+					<Text className="ml-1 text-sm text-red-500">{errorMessage}</Text>
+				</View>
 			)}
 		</View>
 	);

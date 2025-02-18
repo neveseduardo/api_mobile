@@ -6,7 +6,7 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import '@/styles/global.css';
+import '@/assets/styles/global.css';
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();

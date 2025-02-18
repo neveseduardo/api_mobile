@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '@/contexts/AuthContext';
-import '@/styles/global.css';
+import '@/assets/styles/global.css';
 
 export default function AuthLayout() {
 	const colorScheme = useColorScheme();

@@ -37,7 +37,7 @@ const PasswordInput = ({
 			<View
 				className={clsx(
 					'w-full flex-row items-center h-[40px] bg-white border border-gray-300 rounded focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600',
-					error && 'border-red-500',
+					error && 'border-red-500 dark:border-red-500',
 					disabled && 'opacity-50',
 					className,
 				)}
