@@ -9,15 +9,15 @@ import { ThemedText } from '@/components/ThemedText';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthHeader from '@/components/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import { z } from 'zod';
 
 const loginSchema = z.object({
-	email: z.string().email('Email inválido').nonempty('Email é obrigatório'),
-	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres').nonempty('Senha é obrigatória'),
+	email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
+	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
 });
+
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
