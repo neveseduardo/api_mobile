@@ -2,12 +2,12 @@ import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axio
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const HttpClient: AxiosInstance = axios.create({
+const AxiosHttpClient: AxiosInstance = axios.create({
 	baseURL: process.env.EXPO_PUBLIC_API_URL ?? '/',
 	timeout: 3 * 60 * 1000,
 });
 
-HttpClient.interceptors.request.use(async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+AxiosHttpClient.interceptors.request.use(async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
 	if (config.headers['Content-Type'] !== 'multipart/form-data') {
 		config.headers['Content-Type'] = 'application/json';
 		config.headers['Accept'] = 'application/json';
@@ -24,4 +24,4 @@ HttpClient.interceptors.request.use(async (config: InternalAxiosRequestConfig): 
 	return Promise.reject(error);
 });
 
-export default HttpClient;
+export { AxiosHttpClient };
