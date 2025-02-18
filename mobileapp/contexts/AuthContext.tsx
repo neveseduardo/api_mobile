@@ -4,12 +4,14 @@ import { AuthAdapter } from '@/core/adapters/AuthAdapter';
 import { AuthService } from '@/core/services/AuthService';
 import { AxiosHttpClient } from '@/core/services/AxiosHttpClient';
 import { IUser } from '@/core/ports/IUser';
+import { Href, router } from 'expo-router';
 
 interface AuthContextType {
 	access_token: string;
 	refresh_token: string;
 	userData: IUser | null;
 	login: (username: string, password: string) => Promise<any>;
+	register: (name: string, email: string, cpf: string, password: string) => Promise<any>;
 	logout: () => Promise<any>;
 }
 
@@ -22,6 +24,7 @@ const defaultValue: AuthContextType = {
 	refresh_token: '',
 	userData: null,
 	login: async () => { },
+	register: async () => { },
 	logout: async () => { },
 };
 
@@ -73,6 +76,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
+	const register = async (name: string, email: string, cpf: string, password: string) => {
+		try {
+			await adapter.register({ name, email, cpf, password });
+		} catch (error) {
+			console.error('Erro ao fazer login:', error);
+			throw error;
+		}
+	};
+
 	const logout = async () => {
 		try {
 			await adapter.logout();
@@ -96,6 +108,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				access_token,
 				refresh_token,
 				userData,
+				register,
 				login,
 				logout,
 			}}

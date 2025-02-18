@@ -8,11 +8,14 @@ import PasswordInput from '@/components/ui/PasswordInput';
 import { ThemedText } from '@/components/ThemedText';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthHeader from '@/components/auth/AuthHeader';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function LoginScreen() {
-	const [email, setEmail] = useState('email@email.com');
+	const [email, setEmail] = useState('email@email2.com');
 	const [password, setPassword] = useState('Senh@123');
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState('');
+
 	const { login } = useAuth();
 
 	const handleLogin = async () => {
@@ -24,8 +27,12 @@ export default function LoginScreen() {
 			if (accessToken && user) {
 				router.replace('/(tabs)' as Href);
 			}
-		} catch (error) {
-			console.error(error, email, password);
+		} catch (error: any) {
+			if (error.response.status === 401) {
+				console.error('Não autorizado');
+
+				setError('Usuário ou senha inválidos. Tente novamente!');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -38,6 +45,15 @@ export default function LoginScreen() {
 					title="Authenticação"
 					description="Insira os dados solicitados abaixo para autenticar no aplicativo."
 				/>
+
+				{
+					error && (
+						<View className="flex flex-row items-center w-full gap-2 p-2 bg-red-200 rounded">
+							<Ionicons name="information-circle-outline" size={20} className="text-red-500" />
+							<Text className="text-red-500">{error}</Text>
+						</View>
+					)
+				}
 
 
 				<View className="flex flex-col w-full gap-4">

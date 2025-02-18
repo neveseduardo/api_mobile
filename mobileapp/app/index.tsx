@@ -1,7 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import { useEffect } from 'react';
+import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 
 const SplashScreen = () => {
@@ -14,18 +12,9 @@ const SplashScreen = () => {
 	}, []);
 
 	return (
-		<ThemedView darkColor="#fff" style={styles.container}>
-			<ThemedText darkColor="#333">{APPNAME}</ThemedText>
-		</ThemedView>
+		<View className="bg-[#151718] flex-1 justify-center items-center">
+			<Text className="text-white">{APPNAME}</Text>
+		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-});
-
 export default SplashScreen;

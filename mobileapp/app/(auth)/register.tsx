@@ -6,9 +6,7 @@ import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
 import PasswordInput from '@/components/ui/PasswordInput';
 import { ThemedText } from '@/components/ThemedText';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthService } from '@/services/AuthService';
 import AuthHeader from '@/components/auth/AuthHeader';
 
 export default function LoginScreen() {
@@ -19,17 +17,16 @@ export default function LoginScreen() {
 	const [cpassword, setCPassword] = useState('Senh@123');
 	const [loading, setLoading] = useState(false);
 
-	const { login } = useAuth();
+	const { register, login } = useAuth();
 
 	const handleLogin = async () => {
 		try {
 			setLoading(true);
 
-			await AuthService.register({ name, email, cpf, password });
+			await register(name, email, cpf, password);
+			const { accessToken } = await login(email, password);
 
-			const { access_token, userData } = await login(email, password);
-
-			if (access_token && userData) {
+			if (accessToken) {
 				router.replace('/(tabs)' as Href);
 			}
 		} catch (error) {

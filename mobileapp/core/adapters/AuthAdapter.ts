@@ -8,6 +8,13 @@ export interface IAuthadapter {
 	logout: () => Promise<any>,
 }
 
+/**
+ * A função do adapter é adaptar o retorno das requisições para o que de fato vai entrar na aplicação
+ * Caso algum dados na aplicação esteja inconsistente, o provável culpado é esse componente adapter ou o servidor
+ *
+ * @class AuthAdapter
+ * @implements IAuthAdapter
+ */
 export class AuthAdapter implements IAuthadapter {
 	private service: IAuthService;
 
@@ -15,6 +22,16 @@ export class AuthAdapter implements IAuthadapter {
 		this.service = service;
 	}
 
+	/**
+	 * Função que autentica no servidor e retorna os tokens de autenticação
+	 * Os tokens devem ser salvos em asyncStorage e utilzados para fazer as requisições do sistema
+	 *
+	 * @param payload
+	 * @returns {
+	 * 	accessToken: string,
+	 * 	refreshToken: string
+	 * }
+	 */
 	async login(payload: any): Promise<{ accessToken: string, refreshToken: string }> {
 		try {
 			const response = await this.service.login({
@@ -39,7 +56,12 @@ export class AuthAdapter implements IAuthadapter {
 	}
 
 
-
+	/**
+	 * Função requisita os dados do usuário logado
+	 * Esta função precisa de um token de autenticação valido, senão retorna erro 401 (Não autorizado!)
+	 *
+	 * @returns user: IUser
+	 */
 	async userData() {
 		try {
 			const { data } = await this.service.userData();
@@ -50,8 +72,8 @@ export class AuthAdapter implements IAuthadapter {
 
 			const user: IUser = {
 				id: data.id,
-				email: data.name,
-				name: data.email,
+				email: data.email,
+				name: data.name,
 			};
 
 			return user;
@@ -66,6 +88,6 @@ export class AuthAdapter implements IAuthadapter {
 	}
 
 	async logout() {
-		//
+		await this.service.logout();
 	}
 }
