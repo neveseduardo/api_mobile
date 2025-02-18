@@ -53,18 +53,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const login = async (username: string, password: string) => {
 		try {
-			const { access_token, refresh_token } = await AuthService.signin(username, password);
-			const user = await AuthService.user();
+			const { data: { accessToken, refreshToken } } = await AuthService.login({ Email: username, Password: password });
 
-			setAccessToken(access_token);
-			setRefreshToken(refresh_token);
-			setUserData(user as UserData);
+			await AsyncStorage.setItem('access_token', accessToken);
+			await AsyncStorage.setItem('refresh_token', refreshToken);
 
-			await AsyncStorage.setItem('access_token', access_token);
-			await AsyncStorage.setItem('refresh_token', refresh_token);
+			setAccessToken(accessToken);
+			setRefreshToken(refreshToken);
+
+			const { data: user } = await AuthService.userData();
+
+			setUserData(user);
 			await AsyncStorage.setItem('userData', JSON.stringify(user));
 
-			return { access_token, userData };
+			return { accessToken, user };
 		} catch (error) {
 			console.error('Erro ao fazer login:', error);
 			throw error;

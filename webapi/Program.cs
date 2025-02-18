@@ -22,11 +22,11 @@ if (app.Environment.IsDevelopment())
     app.UseCustomSwagger();
 }
 
+app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapCustomControllerRoutes();
-app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseHttpsRedirection();
 app.MapControllers();
 app.MapRazorPages();

@@ -88,5 +88,18 @@
 			"export default $1Navigator;"
 		],
 		"description": "React Navigation Stack Navigator"
-	}
+	},
+	"consoleLog": {
+		"prefix": "clg",
+		"body": [
+			"// eslint-disable-next-line no-console",
+			"console.log('$1');",
+		],
+		"description": "Displays a message in the console"
+	},
+	"consoleError": {
+		"prefix": "cer",
+		"body": "console.error(${1:error});",
+		"description": "Displays a message in the console and also includes a stack trace from where the method was called"
+	},
 }

@@ -6,8 +6,8 @@ import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
 import PasswordInput from '@/components/ui/PasswordInput';
 import { ThemedText } from '@/components/ThemedText';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '@/contexts/AuthContext';
+import AuthHeader from '@/components/auth/AuthHeader';
 
 export default function LoginScreen() {
 	const [email, setEmail] = useState('email@email.com');
@@ -18,9 +18,10 @@ export default function LoginScreen() {
 	const handleLogin = async () => {
 		try {
 			setLoading(true);
-			const { access_token, userData } = await login(email, password);
 
-			if (access_token && userData) {
+			const { accessToken, user } = await login(email, password);
+
+			if (accessToken && user) {
 				router.replace('/(tabs)' as Href);
 			}
 		} catch (error) {
@@ -31,21 +32,13 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<ThemedView className="items-center flex-1 p-8">
+		<ThemedView className="items-center justify-center flex-1 p-8 bg-gray">
 			<View className="flex flex-col w-full gap-5">
-				<View className="w-full flex justify-center items-center h-[200px]">
-					<View className="w-[70px] h-[70px] bg-primary-500 rounded-full flex justify-center items-center">
-						<Ionicons name="lock-closed-outline" size={32} className="text-white" />
-					</View>
-				</View>
+				<AuthHeader
+					title="Authenticação"
+					description="Insira os dados solicitados abaixo para autenticar no aplicativo."
+				/>
 
-				<View className="flex flex-row items-center w-full gap-2">
-					<ThemedText className="text-2xl text-white">Autenticação</ThemedText>
-				</View>
-
-				<View className="w-full">
-					<ThemedText className="text-white">Insira os dados solicitados abaixo para autenticar no aplicativo.</ThemedText>
-				</View>
 
 				<View className="flex flex-col w-full gap-4">
 					<TextInput

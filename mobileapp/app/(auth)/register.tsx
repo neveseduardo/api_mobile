@@ -9,9 +9,11 @@ import { ThemedText } from '@/components/ThemedText';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/services/AuthService';
+import AuthHeader from '@/components/auth/AuthHeader';
 
 export default function LoginScreen() {
 	const [name, setName] = useState('Username');
+	const [cpf, setCPF] = useState('085.195.580-03');
 	const [email, setEmail] = useState('email@email.com');
 	const [password, setPassword] = useState('Senh@123');
 	const [cpassword, setCPassword] = useState('Senh@123');
@@ -23,7 +25,7 @@ export default function LoginScreen() {
 		try {
 			setLoading(true);
 
-			await AuthService.signup({ name, email, password });
+			await AuthService.register({ name, email, cpf, password });
 
 			const { access_token, userData } = await login(email, password);
 
@@ -38,21 +40,12 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<ThemedView className="items-center flex-1 p-8">
+		<ThemedView className="items-center justify-center flex-1 p-8 bg-gray-500">
 			<View className="flex flex-col w-full gap-5">
-				<View className="w-full flex justify-center items-center h-[200px]">
-					<View className="w-[70px] h-[70px] bg-primary-500 rounded-full flex justify-center items-center">
-						<Ionicons name="lock-closed-outline" size={32} className="text-gray-500 dark:text-white" />
-					</View>
-				</View>
-
-				<View className="flex flex-row items-center w-full gap-2">
-					<ThemedText className="text-2xl text-white">Cadastre-se</ThemedText>
-				</View>
-
-				<View className="w-full">
-					<ThemedText className="text-white">Insira os dados solicitados abaixo para registrar-se no aplicativo.</ThemedText>
-				</View>
+				<AuthHeader
+					title="Cadastre-se"
+					description="Insira os dados solicitados abaixo para registrar-se no aplicativo."
+				/>
 
 				<View className="flex flex-col w-full gap-4">
 					<TextInput
@@ -61,6 +54,13 @@ export default function LoginScreen() {
 						placeholder="Nome"
 						value={name}
 						onChangeText={setName}
+						disabled={loading}
+					/>
+					<TextInput
+						returnKeyType="next"
+						placeholder="CPF"
+						value={cpf}
+						onChangeText={setCPF}
 						disabled={loading}
 					/>
 					<TextInput
@@ -100,7 +100,7 @@ export default function LoginScreen() {
 						className="w-full"
 						disabled={loading}
 					>
-						<Text className="text-white">LOGIN</Text>
+						<ThemedText>LOGIN</ThemedText>
 					</Button>
 				</View>
 			</View>
