@@ -7,7 +7,7 @@ using WebApi.Database;
 using WebApi.Helpers;
 using WebApi.Models;
 
-namespace WebApi.Repositories;
+namespace WebApi.Repositories.Web;
 
 public class WebAuthenticationRepository : IWebAuthenticationRepository
 {
@@ -20,27 +20,27 @@ public class WebAuthenticationRepository : IWebAuthenticationRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<User?> ValidateUserAsync(string email, string password)
+    public async Task<Administrator?> ValidateAdministratorAsync(string email, string password)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+        var administrator = await _dbContext.Administrators.FirstOrDefaultAsync(x => x.Email == email);
 
-        if (user == null || !PasswordHelper.VerifyPassword(password, user.Password))
+        if (administrator == null || !PasswordHelper.VerifyPassword(password, administrator.Password))
         {
             return null;
         }
 
-        return user;
+        return administrator;
     }
 
-    public async Task<bool> SignInAsync(HttpContext httpContext, User user)
+    public async Task<bool> SignInAsync(HttpContext httpContext, Administrator administrator)
     {
         try
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.NameIdentifier, administrator.Id.ToString()),
+                new Claim(ClaimTypes.Name, administrator.Name),
+                new Claim(ClaimTypes.Email, administrator.Email)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -60,7 +60,7 @@ public class WebAuthenticationRepository : IWebAuthenticationRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao criar sessão de login para o usuário: {@User}", user);
+            _logger.LogError(ex, "Erro ao criar sessão de login para o usuário: {@Administrator}", administrator);
             return false;
         }
     }

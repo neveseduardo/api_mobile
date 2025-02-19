@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApi.Models;
-using WebApi.Repositories;
+using WebApi.Repositories.Api;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,25 +15,25 @@ namespace WebApi.Controllers.Api;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
-[Route("api/v1/clientes")]
-public class ApiCustomersController : ControllerBase
+[Route("api/v1/usuarios")]
+public class ApiUsersController : ControllerBase
 {
-    private readonly ICustomerRepository _customerRepository;
-    private readonly ILogger<ApiCustomersController> _logger;
+    private readonly IApiUserRepository _userRepository;
+    private readonly ILogger<ApiUsersController> _logger;
 
-    public ApiCustomersController(ICustomerRepository customerRepository, ILogger<ApiCustomersController> logger)
+    public ApiUsersController(IApiUserRepository userRepository, ILogger<ApiUsersController> logger)
     {
-        _customerRepository = customerRepository;
+        _userRepository = userRepository;
         _logger = logger;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomers()
+    public async Task<ActionResult<IEnumerable<UserViewModel>>> GetUsers()
     {
         _logger.LogInformation("Obter todos os clientes.");
 
-        var customers = await _customerRepository.GetAllCustomersAsync();
-        var viewModels = customers.Select(c => new CustomerViewModel
+        var users = await _userRepository.GetAllUsersAsync();
+        var viewModels = users.Select(c => new UserViewModel
         {
             Id = c.Id,
             Name = c.Name,
@@ -45,30 +45,30 @@ public class ApiCustomersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CustomerViewModel>> GetCustomer(int id)
+    public async Task<ActionResult<UserViewModel>> GetUser(int id)
     {
         _logger.LogInformation($"Obter cliente com ID: {id}");
 
-        var customer = await _customerRepository.GetCustomerByIdAsync(id);
-        if (customer == null)
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
         {
             _logger.LogWarning($"Cliente com ID {id} não encontrado.");
             return NotFound();
         }
 
-        var viewModel = new CustomerViewModel
+        var viewModel = new UserViewModel
         {
-            Id = customer.Id,
-            Name = customer.Name,
-            Email = customer.Email,
-            Cpf = customer.Cpf,
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Cpf = user.Cpf,
         };
 
         return Ok(viewModel);
     }
 
     [HttpPost]
-    public async Task<ActionResult<CustomerViewModel>> CreateCustomer([FromBody] CreateCustomerDto dto)
+    public async Task<ActionResult<UserViewModel>> CreateUser([FromBody] CreateUserDto dto)
     {
         _logger.LogInformation("Criar um novo cliente.");
 
@@ -78,28 +78,28 @@ public class ApiCustomersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var customer = new Customer
+        var User = new User
         {
             Name = dto.Name,
             Email = dto.Email,
             Password = PasswordHelper.HashPassword(dto.Password),
         };
 
-        await _customerRepository.AddCustomerAsync(customer);
+        await _userRepository.AddUserAsync(User);
 
-        var viewModel = new CustomerViewModel
+        var viewModel = new UserViewModel
         {
-            Name = customer.Name,
-            Email = customer.Email,
-            Cpf = customer.Cpf,
+            Name = User.Name,
+            Email = User.Email,
+            Cpf = User.Cpf,
         };
 
-        _logger.LogInformation($"Cliente criado com ID: {customer.Id}");
-        return CreatedAtAction(nameof(GetCustomer), new { id = customer.Id }, viewModel);
+        _logger.LogInformation($"Cliente criado com ID: {User.Id}");
+        return CreatedAtAction(nameof(GetUser), new { id = User.Id }, viewModel);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCustomer(int id, [FromBody] UpdateCustomerDto dto)
+    public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto dto)
     {
         _logger.LogInformation($"Atualizar cliente com ID: {id}");
 
@@ -109,36 +109,36 @@ public class ApiCustomersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var customer = await _customerRepository.GetCustomerByIdAsync(id);
-        if (customer == null)
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
         {
             _logger.LogWarning($"Cliente com ID {id} não encontrado.");
             return NotFound();
         }
 
-        customer.Name = dto.Name;
-        customer.Email = dto.Email;
-        customer.Cpf = dto.Cpf;
+        user.Name = dto.Name;
+        user.Email = dto.Email;
+        user.Cpf = dto.Cpf;
 
-        await _customerRepository.UpdateCustomerAsync(customer);
+        await _userRepository.UpdateUserAsync(user);
 
         _logger.LogInformation($"Cliente com ID {id} atualizado com sucesso.");
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCustomer(int id)
+    public async Task<IActionResult> DeleteUser(int id)
     {
         _logger.LogInformation($"Excluir cliente com ID: {id}");
 
-        var customer = await _customerRepository.GetCustomerByIdAsync(id);
-        if (customer == null)
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
         {
             _logger.LogWarning($"Cliente com ID {id} não encontrado.");
             return NotFound();
         }
 
-        await _customerRepository.DeleteCustomerAsync(id);
+        await _userRepository.DeleteUserAsync(id);
 
         _logger.LogInformation($"Cliente com ID {id} excluído com sucesso.");
         return NoContent();

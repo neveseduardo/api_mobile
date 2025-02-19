@@ -1,5 +1,6 @@
 using WebApi.Database;
-using WebApi.Repositories;
+using WebApi.Repositories.Api;
+using WebApi.Repositories.Web;
 using WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +12,8 @@ builder.Services.AddMvc();
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddTransient<IApiAuthenticationRepository, ApiAuthenticationRepository>();
 builder.Services.AddTransient<IWebAuthenticationRepository, WebAuthenticationRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IApiUserRepository, ApiUserRepository>();
+builder.Services.AddScoped<IApiAdministratorRepository, ApiAdministratorRepository>();
 builder.Services.AddCustomSwagger();
 
 var app = builder.Build();

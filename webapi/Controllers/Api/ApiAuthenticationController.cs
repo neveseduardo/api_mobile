@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Repositories;
+using WebApi.Repositories.Api;
 using WebApi.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
@@ -20,7 +20,7 @@ public class ApiAuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> AuthenticateCustomer([FromBody] LoginDto dto)
+    public async Task<IActionResult> AuthenticateUser([FromBody] LoginDto dto)
     {
         try
         {
@@ -34,15 +34,15 @@ public class ApiAuthenticationController : ControllerBase
                 return BadRequest("Invalid client request");
             }
 
-            var customer = await _authRepository.ValidateCustomerAsync(dto.Email, dto.Password);
+            var user = await _authRepository.ValidateUserAsync(dto.Email, dto.Password);
 
-            if (customer == null)
+            if (user == null)
             {
                 return Unauthorized();
             }
 
-            var accessToken = _authRepository.CreateToken(customer);
-            var refreshToken = _authRepository.CreateRefreshToken(customer);
+            var accessToken = _authRepository.CreateToken(user);
+            var refreshToken = _authRepository.CreateRefreshToken(user);
 
             return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
         }
@@ -75,22 +75,22 @@ public class ApiAuthenticationController : ControllerBase
                 return Unauthorized("Refresh token inválido ou expirado");
             }
 
-            var customerIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var UserIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            if (customerIdClaim == null || !int.TryParse(customerIdClaim, out int customerId))
+            if (UserIdClaim == null || !int.TryParse(UserIdClaim, out int UserId))
             {
                 return Unauthorized("Token inválido");
             }
 
-            var customer = await _authRepository.GetCustomerAsync(customerId);
+            var user = await _authRepository.GetUserAsync(UserId);
 
-            if (customer == null)
+            if (user == null)
             {
                 return NotFound("Usuário não encontrado");
             }
 
-            var newAccessToken = _authRepository.CreateToken(customer);
-            var newRefreshToken = _authRepository.CreateRefreshToken(customer);
+            var newAccessToken = _authRepository.CreateToken(user);
+            var newRefreshToken = _authRepository.CreateRefreshToken(user);
 
             return Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
         }
@@ -113,24 +113,24 @@ public class ApiAuthenticationController : ControllerBase
         return Ok(new { Message = "Logout realizado com sucesso" });
     }
 
-    [HttpGet("customer")]
+    [HttpGet("usuario")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> GetCustomerData()
+    public async Task<IActionResult> GetUserData()
     {
-        var customerIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        if (customerIdClaim == null || !int.TryParse(customerIdClaim, out int customerId))
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized(new { Message = "Token inválido" });
         }
 
-        var customer = await _authRepository.GetCustomerAsync(customerId);
+        var user = await _authRepository.GetUserAsync(userId);
 
-        if (customer == null)
+        if (user == null)
         {
             return NotFound(new { Message = "Usuário não encontrado" });
         }
 
-        return Ok(customer);
+        return Ok(user);
     }
 }

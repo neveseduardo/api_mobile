@@ -13,6 +13,10 @@ public class ApplicationDbContext : DbContext
         _configuration = configuration;
     }
 
+    public DbSet<User> Users { get; set; }
+    public DbSet<Administrator> Administrators { get; set; }
+    public DbSet<Address> Addresses { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -28,6 +32,11 @@ public class ApplicationDbContext : DbContext
         }
     }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<Customer> Customers { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+        modelBuilder.Entity<Administrator>().HasIndex(u => u.Email).IsUnique();
+    }
 }

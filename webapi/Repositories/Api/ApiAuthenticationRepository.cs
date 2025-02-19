@@ -8,7 +8,7 @@ using WebApi.Models;
 using WebApi.Database;
 using WebApi.Models.Dto;
 
-namespace WebApi.Repositories;
+namespace WebApi.Repositories.Api;
 
 public class ApiAuthenticationRepository : IApiAuthenticationRepository
 {
@@ -23,19 +23,19 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         _logger = logger;
     }
 
-    public async Task<Customer?> ValidateCustomerAsync(string email, string password)
+    public async Task<User?> ValidateUserAsync(string email, string password)
     {
-        var customer = await _dbContext.Customers.FirstOrDefaultAsync(x => x.Email == email);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
 
-        if (customer == null || !PasswordHelper.VerifyPassword(password, customer.Password))
+        if (user == null || !PasswordHelper.VerifyPassword(password, user.Password))
         {
             return null;
         }
 
-        return customer;
+        return user;
     }
 
-    public string CreateToken(Customer customer)
+    public string CreateToken(User user)
     {
         try
         {
@@ -52,7 +52,7 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
                 Audience = jwtSettings["Audience"],
                 SigningCredentials = credentials,
                 Expires = DateTime.UtcNow.AddHours(1),
-                Subject = GenerateClaims(customer)
+                Subject = GenerateClaims(user)
             };
 
             var token = handler.CreateToken(tokenDescriptor);
@@ -80,7 +80,7 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         }
     }
 
-    public string CreateRefreshToken(Customer customer)
+    public string CreateRefreshToken(User user)
     {
         try
         {
@@ -97,7 +97,7 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
                 Audience = jwtSettings["Audience"],
                 SigningCredentials = credentials,
                 Expires = DateTime.UtcNow.AddDays(7),
-                Subject = GenerateClaims(customer)
+                Subject = GenerateClaims(user)
             };
 
             var token = handler.CreateToken(tokenDescriptor);
@@ -139,16 +139,16 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         }
     }
 
-    private ClaimsIdentity GenerateClaims(Customer customer)
+    private ClaimsIdentity GenerateClaims(User user)
     {
         try
         {
             var ci = new ClaimsIdentity();
 
-            ci.AddClaim(new Claim(ClaimTypes.NameIdentifier, customer.Id.ToString()));
-            ci.AddClaim(new Claim(ClaimTypes.Name, customer.Name));
-            ci.AddClaim(new Claim(ClaimTypes.GivenName, customer.Name));
-            ci.AddClaim(new Claim(ClaimTypes.Email, customer.Email));
+            ci.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            ci.AddClaim(new Claim(ClaimTypes.Name, user.Name));
+            ci.AddClaim(new Claim(ClaimTypes.GivenName, user.Name));
+            ci.AddClaim(new Claim(ClaimTypes.Email, user.Email));
 
             return ci;
         }
@@ -159,20 +159,20 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         }
     }
 
-    public async Task<dynamic?> GetCustomerAsync(int id)
+    public async Task<dynamic?> GetUserAsync(int id)
     {
-        var customer = await _dbContext.Customers.FindAsync(id);
+        var user = await _dbContext.Users.FindAsync(id);
 
-        if (customer == null)
+        if (user == null)
         {
             return null;
         }
 
         return new
         {
-            customer.Id,
-            customer.Name,
-            customer.Email,
+            user.Id,
+            user.Name,
+            user.Email,
         };
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models.Dto;
-using WebApi.Repositories;
+using WebApi.Repositories.Web;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -37,15 +37,15 @@ public class WebAuthenticationController : Controller
             }
 
 
-            var user = await _repository.ValidateUserAsync(loginDto.email, loginDto.password);
+            var administrator = await _repository.ValidateAdministratorAsync(loginDto.email, loginDto.password);
 
-            if (user == null)
+            if (administrator == null)
             {
                 ModelState.AddModelError(string.Empty, "Usuário ou senha inválidos.");
                 return View("Index", loginDto);
             }
 
-            var isAuthenticated = await _repository.SignInAsync(HttpContext, user);
+            var isAuthenticated = await _repository.SignInAsync(HttpContext, administrator);
 
             if (!isAuthenticated)
             {

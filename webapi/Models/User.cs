@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApi.Models;
@@ -8,23 +7,32 @@ namespace WebApi.Models;
 public class User
 {
     [Key]
-    public int Id { get; init; }
+    public int Id { get; set; }
 
-    [Required(ErrorMessage = "Preenchimento do Campo 'nome' Obrigatório!")]
     [Display(Name = "Nome")]
-    public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
+    public string Name { get; set; } = null!;
 
-    [Required(ErrorMessage = "Preenchimento do Campo 'email' Obrigatório!")]
-    [Display(Name = "E-mail")]
-    public string Email { get; set; } = "";
+    [Display(Name = "Email")]
+    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
+    public string Email { get; set; } = null!;
 
-    [Required(ErrorMessage = "Preenchimento do Campo 'senha' Obrigatório!")]
     [Display(Name = "Senha")]
-    public string Password { get; set; } = "";
+    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
+    public string Password { get; set; } = null!;
 
-    public string[] Roles { get; set; } = [];
+    [Display(Name = "CPF")]
+    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
+    public string Cpf { get; set; } = null!;
 
-    public string CreatedAt { get; set; } = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}";
 
-    public string UpdatedAt { get; set; } = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}";
+    [Display(Name = "AddressId")]
+    [ForeignKey("address")]
+    public Nullable<int> AddressId { get; set; }
+
+    public Address? address { get; set; }
+
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 }
