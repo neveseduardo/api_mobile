@@ -8,29 +8,70 @@ import PasswordInput from '@/components/ui/PasswordInput';
 import { ThemedText } from '@/components/ThemedText';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthHeader from '@/components/auth/AuthHeader';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { isCPF } from '@/utils/methods';
+
+const formSchema = z.object({
+	name: z.string().min(1, 'Campo obrigatório'),
+	email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
+	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+	cpassword: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+	cpf: z.string()
+		.min(11, 'O CPF deve ter 11 caracteres')
+		.max(14, 'O CPF deve ter no máximo 14 caracteres')
+		.refine(isCPF, { message: 'CPF inválido' }),
+}).refine((data) => data.password === data.cpassword, {
+	message: 'As senhas devem ser iguais',
+	path: ['cpassword'],
+});
+
+type InnerFormData = z.infer<typeof formSchema>;
+
+const cpfMask = [/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/];
 
 export default function LoginScreen() {
-	const [name, setName] = useState('Username');
-	const [cpf, setCPF] = useState('085.195.580-03');
-	const [email, setEmail] = useState('email@email.com');
-	const [password, setPassword] = useState('Senh@123');
-	const [cpassword, setCPassword] = useState('Senh@123');
+
+	const { control, handleSubmit, formState: { errors } } = useForm<InnerFormData>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			name: 'Jhon Due',
+			email: 'email@email.com',
+			cpf: '737.425.159-93',
+			password: 'Senh@123',
+			cpassword: 'Senh@123',
+		},
+	});
+
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState('');
 
 	const { register, login } = useAuth();
 
-	const handleLogin = async () => {
+	const onSubmit = async (data: InnerFormData) => {
 		try {
 			setLoading(true);
 
-			await register(name, email, cpf, password);
-			const { accessToken } = await login(email, password);
+			await register(
+				data.name,
+				data.email,
+				data.cpf,
+				data.password,
+			);
 
-			if (accessToken) {
+			const { accessToken, user } = await login(data.email, data.password);
+
+			if (accessToken && user) {
 				router.replace('/(tabs)' as Href);
 			}
-		} catch (error) {
-			console.error(error, email, password);
+		} catch (error: any) {
+			console.error('Erro de Authenticação', error);
+			if (error?.response?.status === 401) {
+				setError('Usuário ou senha inválidos. Tente novamente!');
+			}
+			setError('Erro! Não conseguimos conectar com o servidor.');
 		} finally {
 			setLoading(false);
 		}
@@ -40,56 +81,114 @@ export default function LoginScreen() {
 		<ThemedView className="items-center justify-center flex-1 p-8 bg-gray-500">
 			<View className="flex flex-col w-full gap-5">
 				<AuthHeader
+					icon="lock-closed-outline"
 					title="Cadastre-se"
 					description="Insira os dados solicitados abaixo para registrar-se no aplicativo."
 				/>
 
+				{!!error && (
+					<View className="flex flex-row items-center w-full gap-2 p-2 bg-red-200 rounded">
+						<Ionicons name="information-circle-outline" size={20} className="text-red-500" />
+						<Text className="text-red-500">{error}</Text>
+					</View>
+				)}
+
 				<View className="flex flex-col w-full gap-4">
-					<TextInput
-						autoCapitalize="words"
-						returnKeyType="next"
-						placeholder="Nome"
-						value={name}
-						onChangeText={setName}
-						disabled={loading}
+					<Controller
+						control={control}
+						name="name"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<TextInput
+								autoCapitalize="characters"
+								returnKeyType="next"
+								placeholder="name"
+								value={value}
+								onChangeText={onChange}
+								onBlur={onBlur}
+								disabled={loading}
+								error={!!errors.name}
+								errorMessage={errors.name?.message}
+							/>
+						)}
 					/>
-					<TextInput
-						returnKeyType="next"
-						placeholder="CPF"
-						value={cpf}
-						onChangeText={setCPF}
-						disabled={loading}
+
+					<Controller
+						control={control}
+						name="email"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<TextInput
+								keyboardType="email-address"
+								returnKeyType="next"
+								placeholder="Email"
+								value={value}
+								onChangeText={onChange}
+								onBlur={onBlur}
+								disabled={loading}
+								error={!!errors.email}
+								errorMessage={errors.email?.message}
+							/>
+						)}
 					/>
-					<TextInput
-						keyboardType="email-address"
-						returnKeyType="next"
-						placeholder="Email"
-						value={email}
-						onChangeText={setEmail}
-						disabled={loading}
+
+					<Controller
+						control={control}
+						name="cpf"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<TextInput
+								returnKeyType="next"
+								placeholder="CPF"
+								value={value}
+								onChangeText={onChange}
+								onBlur={onBlur}
+								disabled={loading}
+								error={!!errors.cpf}
+								errorMessage={errors.cpf?.message}
+								mask={cpfMask}
+							/>
+						)}
 					/>
-					<PasswordInput
-						placeholder="Senha"
-						returnKeyType="next"
-						value={password}
-						onChangeText={setPassword}
-						disabled={loading}
+
+					<Controller
+						control={control}
+						name="password"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<PasswordInput
+								placeholder="Senha"
+								returnKeyType="next"
+								value={value}
+								onChangeText={onChange}
+								onBlur={onBlur}
+								disabled={loading}
+								error={!!errors.password}
+								errorMessage={errors.password?.message}
+							/>
+						)}
 					/>
-					<PasswordInput
-						placeholder="Confirmar senha"
-						returnKeyType="done"
-						value={cpassword}
-						onChangeText={setCPassword}
-						disabled={loading}
+
+					<Controller
+						control={control}
+						name="cpassword"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<PasswordInput
+								placeholder="Confirmar Senha"
+								returnKeyType="done"
+								value={value}
+								onChangeText={onChange}
+								onBlur={onBlur}
+								disabled={loading}
+								error={!!errors.cpassword}
+								errorMessage={errors.cpassword?.message}
+							/>
+						)}
 					/>
 
 					<Button
-						onPress={handleLogin}
+						onPress={handleSubmit(onSubmit)}
 						color="primary"
 						className="w-full"
 						disabled={loading}
 					>
-						<Text className="text-white">REGISTRAR</Text>
+						<Text className="text-white">FINALIZAR</Text>
 					</Button>
 
 					<Button

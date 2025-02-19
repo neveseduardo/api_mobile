@@ -4,16 +4,17 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { View } from 'react-native';
 
 interface AuthHeaderProps {
+	icon: string,
 	title: string,
 	description: string,
 }
 
-const AuthHeader = ({ title, description }: AuthHeaderProps) => {
+const AuthHeader = ({ title, description, icon }: AuthHeaderProps) => {
 	return (
 		<ThemedView>
 			<View className="w-full flex justify-center items-center h-[200px]">
 				<View className="w-[70px] h-[70px] bg-primary-500 rounded-full flex justify-center items-center">
-					<Ionicons name="lock-closed-outline" size={32} className="text-white" />
+					<Ionicons name={icon as 'search'} size={32} className="text-white" />
 				</View>
 			</View>
 

@@ -13,16 +13,16 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-const loginSchema = z.object({
+const formSchema = z.object({
 	email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
 	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type InnerFormData = z.infer<typeof formSchema>;
 
 export default function LoginScreen() {
-	const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
-		resolver: zodResolver(loginSchema),
+	const { control, handleSubmit, formState: { errors } } = useForm<InnerFormData>({
+		resolver: zodResolver(formSchema),
 		defaultValues: {
 			email: 'email@email.com',
 			password: 'Senh@123',
@@ -34,7 +34,7 @@ export default function LoginScreen() {
 
 	const { login } = useAuth();
 
-	const onSubmit = async (data: LoginFormData) => {
+	const onSubmit = async (data: InnerFormData) => {
 		try {
 			setLoading(true);
 
@@ -44,10 +44,11 @@ export default function LoginScreen() {
 				router.replace('/(tabs)' as Href);
 			}
 		} catch (error: any) {
-			if (error.response.status === 401) {
-				console.error('Não autorizado');
+			console.error('Erro de Authenticação', error);
+			if (error?.response?.status === 401) {
 				setError('Usuário ou senha inválidos. Tente novamente!');
 			}
+			setError('Erro! Não conseguimos conectar com o servidor.');
 		} finally {
 			setLoading(false);
 		}
@@ -57,11 +58,12 @@ export default function LoginScreen() {
 		<ThemedView className="items-center justify-center flex-1 p-8 bg-gray">
 			<View className="flex flex-col w-full gap-5">
 				<AuthHeader
+					icon="lock-closed-outline"
 					title="Authenticação"
 					description="Insira os dados solicitados abaixo para autenticar no aplicativo."
 				/>
 
-				{error && (
+				{!!error && (
 					<View className="flex flex-row items-center w-full gap-2 p-2 bg-red-200 rounded">
 						<Ionicons name="information-circle-outline" size={20} className="text-red-500" />
 						<Text className="text-red-500">{error}</Text>
@@ -114,7 +116,7 @@ export default function LoginScreen() {
 					</Button>
 
 					<Button
-						onPress={() => router.push('/(auth)/register')}
+						onPress={() => router.push('/(auth)/postalcode')}
 						className="w-full"
 						disabled={loading}
 					>

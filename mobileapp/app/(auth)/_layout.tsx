@@ -14,6 +14,8 @@ export default function AuthLayout() {
 				<Stack initialRouteName="login">
 					<Stack.Screen name="login" options={{ headerShown: false }} />
 					<Stack.Screen name="register" options={{ headerShown: false }} />
+					<Stack.Screen name="postalcode" options={{ headerShown: false }} />
+					<Stack.Screen name="address" options={{ headerShown: false }} />
 				</Stack>
 				<StatusBar style="auto" />
 			</ThemeProvider>

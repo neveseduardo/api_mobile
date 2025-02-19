@@ -1,5 +1,6 @@
 import React from 'react';
-import { TextInput as RNTextInput, TextInputProps, View, Text } from 'react-native';
+import { TextInputProps, View, Text } from 'react-native';
+import MaskInput from 'react-native-mask-input';
 import clsx from 'clsx';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -10,9 +11,10 @@ interface CustomTextInputProps extends TextInputProps {
 	className?: string;
 	iconLeft?: string;
 	iconRight?: string;
-	error?: boolean; // Indica se há um erro
-	errorMessage?: string; // Mensagem de erro a ser exibida
+	error?: boolean;
+	errorMessage?: string;
 	disabled?: boolean;
+	mask?: (string | RegExp)[];
 }
 
 const TextInput = ({
@@ -26,6 +28,7 @@ const TextInput = ({
 	errorMessage,
 	style,
 	disabled = false,
+	mask,
 	...rest
 }: CustomTextInputProps) => {
 	return (
@@ -43,11 +46,16 @@ const TextInput = ({
 						<Ionicons name={iconLeft as 'search'} size={20} color={error ? 'red' : 'gray'} />
 					</View>
 				)}
-				<RNTextInput
+				<MaskInput
 					autoComplete="off"
 					placeholder={placeholder}
 					value={value}
-					onChangeText={disabled ? undefined : onChangeText}
+					onChangeText={(masked: any, unmasked: any) => {
+						if (onChangeText) {
+							onChangeText(masked);
+						}
+					}}
+					mask={mask}
 					className={clsx(
 						'flex-1 h-full px-4 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500',
 						iconLeft && 'ml-2',
