@@ -10,6 +10,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { AxiosHttpClient } from '../../core/services/AxiosHttpClient';
+import { AddressService } from '../../core/services/AddressService';
+import { AddressAdapter } from '../../core/adapters/AddressAdapter';
 
 const loginSchema = z.object({
 	cep: z.string().min(1, 'Campo obrigatório!!'),
@@ -45,14 +48,27 @@ export default function LoginScreen() {
 			estado: (estado ?? '') as string,
 		},
 	});
-
+	const client = AxiosHttpClient;
+	const service = new AddressService(client);
+	const adapter = new AddressAdapter(service);
 	const [loading, setLoading] = useState(false);
 
 	const onSubmit = async (data: LoginFormData) => {
 		try {
-			await new Promise(resolve => setTimeout(resolve, 600));
+			const response = await adapter.create({
+				cep: data.cep,
+				logradouro: data.logradouro,
+				numero: data.numero,
+				complemento: data.complemento,
+				bairro: data.bairro,
+				cidade: data.cidade,
+				estado: data.estado,
+			});
 
-			router.push('/(auth)/register');
+			router.push({
+				pathname: '/(auth)/register',
+				params: { addressId: response.addressId },
+			});
 		} catch (error: any) {
 			console.error(error);
 		} finally {

@@ -83,7 +83,7 @@ export class AuthAdapter implements IAuthadapter {
 
 	}
 
-	async register(data: { name: string, cpf: string, email: string, password: string }) {
+	async register(data: { name: string, cpf: string, email: string, password: string, addressId?: number }) {
 		//
 	}
 

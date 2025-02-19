@@ -11,7 +11,7 @@ interface AuthContextType {
 	refresh_token: string;
 	userData: IUser | null;
 	login: (username: string, password: string) => Promise<any>;
-	register: (name: string, email: string, cpf: string, password: string) => Promise<any>;
+	register: (name: string, email: string, cpf: string, password: string, addressId?: number) => Promise<any>;
 	logout: () => Promise<any>;
 }
 
@@ -76,9 +76,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
-	const register = async (name: string, email: string, cpf: string, password: string) => {
+	const register = async (name: string, email: string, cpf: string, password: string, addressId?: number) => {
 		try {
-			await adapter.register({ name, email, cpf, password });
+			await adapter.register({ name, email, cpf, password, addressId });
 		} catch (error) {
 			console.error('Erro ao fazer login:', error);
 			throw error;

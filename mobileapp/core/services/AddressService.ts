@@ -18,4 +18,8 @@ export class AddressService implements IAddressService {
 		const API_URL = process.env.EXPO_PUBLIC_IBGE_URL ?? '';
 		return this.client.get(`${API_URL}/localidades/estados`);
 	}
+
+	async create(data: any): Promise<any> {
+		return this.client.post('/enderecos', data);
+	}
 };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text } from 'react-native';
-import { Href, router } from 'expo-router';
+import { Href, router, useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
@@ -33,7 +33,6 @@ type InnerFormData = z.infer<typeof formSchema>;
 const cpfMask = [/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/];
 
 export default function LoginScreen() {
-
 	const { control, handleSubmit, formState: { errors } } = useForm<InnerFormData>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -45,6 +44,9 @@ export default function LoginScreen() {
 		},
 	});
 
+	const router = useRouter();
+	const params = useLocalSearchParams();
+	const { addressId } = params;
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 
@@ -59,6 +61,7 @@ export default function LoginScreen() {
 				data.email,
 				data.cpf,
 				data.password,
+				!isNaN(Number(addressId)) ? Number(addressId) : undefined,
 			);
 
 			const { accessToken, user } = await login(data.email, data.password);

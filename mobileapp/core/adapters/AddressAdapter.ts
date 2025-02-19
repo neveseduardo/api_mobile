@@ -7,7 +7,8 @@ export interface IAddressAdapter {
 		cidade: string,
 		estado: string,
 	}>,
-	estados: () => Promise<any[]>
+	estados: () => Promise<any[]>,
+	create: (data: any) => Promise<{ addressId: number }>
 }
 
 export class AddressAdapter implements IAddressAdapter {
@@ -44,6 +45,17 @@ export class AddressAdapter implements IAddressAdapter {
 		try {
 			const response = await this.service.estados();
 			return response.data;
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	}
+
+	async create(data: any) {
+		try {
+			const response = await this.service.create(data);
+
+			return { addressId: response.data.Id };
 		} catch (error) {
 			console.error(error);
 			throw error;
