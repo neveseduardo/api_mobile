@@ -159,20 +159,96 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         }
     }
 
-    public async Task<dynamic?> GetUserAsync(int id)
+    public async Task<User?> GetUserAsync(int id)
     {
-        var user = await _dbContext.Users.FindAsync(id);
-
-        if (user == null)
+        try
         {
-            return null;
+            var user = await _dbContext.Users
+            .Include(u => u.address)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao capturar dados de usuário");
+            throw;
         }
 
-        return new
+    }
+
+    public async Task<User> CreateUserAsync(User user)
+    {
+        try
         {
-            user.Id,
-            user.Name,
-            user.Email,
-        };
+            _dbContext.Users.Add(user);
+
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao criar usuário");
+            throw;
+        }
+    }
+
+    public async Task<bool> FindUserByEmailAsync(string Email)
+    {
+        try
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == Email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao capturar usuário eplo email");
+            throw;
+        }
+    }
+
+    public async Task<Address?> CreateAddressAndBindUser(Address address, int id)
+    {
+        try
+        {
+            address.CreatedAt = DateTime.UtcNow;
+            address.UpdatedAt = DateTime.UtcNow;
+
+            _dbContext.Addresses.Add(address);
+
+            await _dbContext.SaveChangesAsync();
+
+            var user = await _dbContext.Users
+                .AsNoTracking()
+                .Include(u => u.address)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user != null)
+            {
+                user.AddressId = address.Id;
+                _dbContext.Entry(user).State = EntityState.Modified;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return address;
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao cadastrar endereco");
+            throw;
+        }
     }
 }

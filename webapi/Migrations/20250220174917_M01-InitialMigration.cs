@@ -34,12 +34,12 @@ namespace webapi.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Logradouro = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Cep = table.Column<string>(type: "TEXT", nullable: false),
-                    Cidade = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Estado = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Pais = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Numero = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Logradouro = table.Column<string>(type: "TEXT", nullable: true),
+                    Cep = table.Column<string>(type: "TEXT", nullable: true),
+                    Cidade = table.Column<string>(type: "TEXT", nullable: true),
+                    Estado = table.Column<string>(type: "TEXT", nullable: true),
+                    Pais = table.Column<string>(type: "TEXT", nullable: true),
+                    Numero = table.Column<string>(type: "TEXT", nullable: true),
                     Complemento = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)

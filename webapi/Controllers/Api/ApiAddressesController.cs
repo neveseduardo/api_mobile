@@ -29,22 +29,25 @@ public class ApiAddressesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AddressViewModel>>> GetAddresses()
     {
-        _logger.LogInformation("Obter todos os endereços.");
-
         var addresses = await _addressRepository.GetAllAddressesAsync();
         var viewModels = addresses.Select(a => new AddressViewModel
         {
             Id = a.Id,
-            Logradouro = a.Logradouro,
-            Cep = a.Cep,
-            Cidade = a.Cidade,
-            Estado = a.Estado,
-            Pais = a.Pais,
-            Numero = a.Numero,
+            Logradouro = a.Logradouro!,
+            Cep = a.Cep!,
+            Cidade = a.Cidade!,
+            Estado = a.Estado!,
+            Pais = a.Pais!,
+            Numero = a.Numero!,
             Complemento = a.Complemento
         }).ToList();
 
-        return Ok(viewModels);
+        return StatusCode(200, new
+        {
+            success = true,
+            message = "Dados retornados com sucesso",
+            data = viewModels,
+        });
     }
 
     [HttpGet("{id}")]
@@ -62,16 +65,21 @@ public class ApiAddressesController : ControllerBase
         var viewModel = new AddressViewModel
         {
             Id = address.Id,
-            Logradouro = address.Logradouro,
-            Cep = address.Cep,
-            Cidade = address.Cidade,
-            Estado = address.Estado,
-            Pais = address.Pais,
-            Numero = address.Numero,
+            Logradouro = address.Logradouro!,
+            Cep = address.Cep!,
+            Cidade = address.Cidade!,
+            Estado = address.Estado!,
+            Pais = address.Pais!,
+            Numero = address.Numero!,
             Complemento = address.Complemento
         };
 
-        return Ok(viewModel);
+        return StatusCode(200, new
+        {
+            success = true,
+            message = "Dados retornados com sucesso",
+            data = viewModel,
+        }); ;
     }
 
     [HttpPost]
@@ -111,7 +119,13 @@ public class ApiAddressesController : ControllerBase
         };
 
         _logger.LogInformation($"Endereço criado com ID: {address.Id}");
-        return CreatedAtAction(nameof(GetAddress), new { id = address.Id }, viewModel);
+
+        return StatusCode(201, new
+        {
+            success = true,
+            message = "Endereço criado com sucesso!",
+            data = viewModel,
+        });
     }
 
     [HttpPut("{id}")]
@@ -132,18 +146,24 @@ public class ApiAddressesController : ControllerBase
             return NotFound();
         }
 
-        address.Logradouro = dto.Logradouro;
-        address.Cep = dto.Cep;
-        address.Cidade = dto.Cidade;
-        address.Estado = dto.Estado;
-        address.Pais = dto.Pais;
-        address.Numero = dto.Numero;
+        address.Logradouro = dto.Logradouro!;
+        address.Cep = dto.Cep!;
+        address.Cidade = dto.Cidade!;
+        address.Estado = dto.Estado!;
+        address.Pais = dto.Pais!;
+        address.Numero = dto.Numero!;
         address.Complemento = dto.Complemento;
 
         await _addressRepository.UpdateAddressAsync(address);
 
         _logger.LogInformation($"Endereço com ID {id} atualizado com sucesso.");
-        return NoContent();
+
+        return StatusCode(200, new
+        {
+            success = true,
+            message = "Dados atualizados com sucesso",
+            data = Array.Empty<object>(),
+        });
     }
 
     [HttpDelete("{id}")]
@@ -161,6 +181,12 @@ public class ApiAddressesController : ControllerBase
         await _addressRepository.DeleteAddressAsync(id);
 
         _logger.LogInformation($"Endereço com ID {id} excluído com sucesso.");
-        return NoContent();
+
+        return StatusCode(200, new
+        {
+            success = true,
+            message = "Objeto deletado com sucesso",
+            data = Array.Empty<object>(),
+        });
     }
 }

@@ -30,7 +30,7 @@ public class ApiUsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserViewModel>>> GetUsers()
     {
-        _logger.LogInformation("Obter todos os clientes.");
+        _logger.LogInformation("Obter todos os usuários.");
 
         var users = await _userRepository.GetAllUsersAsync();
         var viewModels = users.Select(c => new UserViewModel

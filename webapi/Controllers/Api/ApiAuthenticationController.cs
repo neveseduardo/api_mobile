@@ -4,6 +4,10 @@ using WebApi.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Models.ViewModels;
+using WebApi.Models;
+using WebApi.Helpers;
+using System.Text.Json;
 
 namespace WebApi.Controllers.Api;
 
@@ -44,7 +48,12 @@ public class ApiAuthenticationController : ControllerBase
             var accessToken = _authRepository.CreateToken(user);
             var refreshToken = _authRepository.CreateRefreshToken(user);
 
-            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+            return StatusCode(200, new
+            {
+                success = true,
+                message = "Login efetuado com sucesso!",
+                data = new { AccessToken = accessToken, RefreshToken = refreshToken },
+            });
         }
         catch (Exception ex)
         {
@@ -92,7 +101,12 @@ public class ApiAuthenticationController : ControllerBase
             var newAccessToken = _authRepository.CreateToken(user);
             var newRefreshToken = _authRepository.CreateRefreshToken(user);
 
-            return Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
+            return StatusCode(200, new
+            {
+                success = true,
+                message = "Login efetuado com sucesso!",
+                data = new { AccessToken = newAccessToken, RefreshToken = newRefreshToken },
+            });
         }
         catch (Exception ex)
         {
@@ -117,20 +131,154 @@ public class ApiAuthenticationController : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetUserData()
     {
-        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        try
         {
-            return Unauthorized(new { Message = "Token inválido" });
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { Message = "Token inválido" });
+            }
+
+            var user = await _authRepository.GetUserAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(new { Message = "Usuário não encontrado" });
+            }
+
+            _logger.LogInformation($"Dados do viewModel: {JsonSerializer.Serialize(user)}");
+
+            var viewModel = new UserViewModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Cpf = user.Cpf,
+                address = user.address
+            };
+
+
+            return Ok(viewModel);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao carregar dados de usuário");
+            throw;
         }
 
-        var user = await _authRepository.GetUserAsync(userId);
+    }
 
-        if (user == null)
+    [HttpPost("register")]
+    public async Task<ActionResult<UserViewModel>> CreateUser([FromBody] CreateUserDto dto)
+    {
+        try
         {
-            return NotFound(new { Message = "Usuário não encontrado" });
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Erros de validação encontrados ao criar cliente.");
+                return StatusCode(422, new
+                {
+                    success = false,
+                    message = "Formulário inválido!",
+                    data = ModelState,
+                });
+            }
+
+            var existingUser = await _authRepository.FindUserByEmailAsync(dto.Email);
+
+            if (existingUser)
+            {
+                return StatusCode(422, new
+                {
+                    success = false,
+                    message = "Já existe um usuário com este email.",
+                    data = Array.Empty<object>(),
+                });
+            }
+
+            var user = new User
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Cpf = dto.Cpf,
+                Password = PasswordHelper.HashPassword(dto.Password),
+            };
+
+            await _authRepository.CreateUserAsync(user);
+
+            var viewModel = new UserViewModel
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Cpf = user.Cpf,
+            };
+
+            _logger.LogInformation($"Cliente criado com ID: {user.Id}");
+
+            return StatusCode(201, new
+            {
+                success = true,
+                message = "Usuário cadastrado com sucesso",
+                data = viewModel,
+            });
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao criar usuário");
+            throw;
         }
 
-        return Ok(user);
+    }
+
+    [HttpPost("endereco/{id}")]
+    public async Task<ActionResult<AddressViewModel>> CreateAddressAndBindUser([FromBody] CreateAddressDto dto, int id)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(422, new
+                {
+                    success = false,
+                    message = "Formulário inválido!",
+                    data = ModelState,
+                });
+            }
+
+            var address = new Address
+            {
+                Cep = dto.Cep,
+                Logradouro = dto.Logradouro,
+                Numero = dto.Numero,
+                Cidade = dto.Cidade,
+                Estado = dto.Estado,
+                Pais = dto.Pais,
+            };
+
+            await _authRepository.CreateAddressAndBindUser(address, id);
+
+            var viewModel = new AddressViewModel
+            {
+                Id = address.Id,
+                Cep = address.Cep,
+                Logradouro = address.Logradouro,
+                Numero = address.Numero,
+                Cidade = address.Cidade,
+                Estado = address.Estado,
+                Pais = address.Pais,
+            };
+            return StatusCode(201, new
+            {
+                success = true,
+                message = "Endereço criado e vinculado com sucesso",
+                data = viewModel,
+            });
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao cadastrar endereço");
+            throw;
+        }
     }
 }

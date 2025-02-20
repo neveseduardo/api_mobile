@@ -9,24 +9,15 @@ public class User
     [Key]
     public int Id { get; set; }
 
-    [Display(Name = "Nome")]
-    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
-    public string Name { get; set; } = null!;
+    public string Name { get; set; } = "";
 
-    [Display(Name = "Email")]
-    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
-    public string Email { get; set; } = null!;
+    public string Email { get; set; } = "";
 
-    [Display(Name = "Senha")]
-    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
-    public string Password { get; set; } = null!;
+    public string Password { get; set; } = "";
 
-    [Display(Name = "CPF")]
-    [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
-    public string Cpf { get; set; } = null!;
+    public string Cpf { get; set; } = "";
 
 
-    [Display(Name = "AddressId")]
     [ForeignKey("address")]
     public Nullable<int> AddressId { get; set; }
 

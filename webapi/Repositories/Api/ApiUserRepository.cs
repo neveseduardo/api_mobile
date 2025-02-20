@@ -9,7 +9,6 @@ namespace WebApi.Repositories.Api;
 public class ApiUserRepository : IApiUserRepository
 {
     private readonly ApplicationDbContext _context;
-
     public ApiUserRepository(ApplicationDbContext context)
     {
         _context = context;
@@ -51,13 +50,13 @@ public class ApiUserRepository : IApiUserRepository
         }
     }
 
-    public async Task UpdateUserAsync(User User)
+    public async Task UpdateUserAsync(User user)
     {
         try
         {
-            User.UpdatedAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
 
-            _context.Entry(User).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
         }

@@ -13,6 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddTransient<IApiAuthenticationRepository, ApiAuthenticationRepository>();
 builder.Services.AddTransient<IWebAuthenticationRepository, WebAuthenticationRepository>();
 builder.Services.AddScoped<IApiUserRepository, ApiUserRepository>();
+builder.Services.AddScoped<IApiAddressRepository, ApiAddressRepository>();
 builder.Services.AddScoped<IApiAdministratorRepository, ApiAdministratorRepository>();
 builder.Services.AddCustomSwagger();
 
