@@ -29,7 +29,7 @@ export default function TabLayout() {
 					name="index"
 					options={{
 						title: 'Home',
-						tabBarIcon: ({ color }) => <Ionicons name="home" size={20} color={color} />,
+						tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={20} color={color} />,
 					}}
 				/>
 				<Tabs.Screen
@@ -40,17 +40,24 @@ export default function TabLayout() {
 					}}
 				/>
 				<Tabs.Screen
-					name="products"
+					name="schedules"
 					options={{
-						title: 'Produtos',
-						tabBarIcon: ({ color }) => <Ionicons name="list" size={20} color={color} />,
+						title: 'Agendamentos',
+						tabBarIcon: ({ color }) => <Ionicons name="calendar-clear-outline" size={20} color={color} />,
+					}}
+				/>
+				<Tabs.Screen
+					name="units"
+					options={{
+						title: 'Unidades',
+						tabBarIcon: ({ color }) => <Ionicons name="business-outline" size={20} color={color} />,
 					}}
 				/>
 				<Tabs.Screen
 					name="user"
 					options={{
-						title: 'Dados pessoais',
-						tabBarIcon: ({ color }) => <Ionicons name="person" size={20} color={color} />,
+						title: 'Perfil',
+						tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={20} color={color} />,
 					}}
 				/>
 			</Tabs>

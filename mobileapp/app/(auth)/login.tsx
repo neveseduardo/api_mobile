@@ -116,7 +116,7 @@ export default function LoginScreen() {
 					</Button>
 
 					<Button
-						onPress={() => router.push('/(auth)/postalcode')}
+						onPress={() => router.push('/(auth)/register')}
 						className="w-full"
 						disabled={loading}
 					>

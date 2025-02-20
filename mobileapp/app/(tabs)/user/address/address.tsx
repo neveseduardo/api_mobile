@@ -1,18 +1,16 @@
 import { useState } from 'react';
 import { View, Text } from 'react-native';
-import { Href, router, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
-import { ThemedText } from '@/components/ThemedText';
 import AuthHeader from '@/components/auth/AuthHeader';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosHttpClient } from '@/core/services/AxiosHttpClient';
+import { AddressService } from '@/core/services/AddressService';
+import { AddressAdapter } from '@/core/adapters/AddressAdapter';
 import { z } from 'zod';
-import { AxiosHttpClient } from '../../core/services/AxiosHttpClient';
-import { AddressService } from '../../core/services/AddressService';
-import { AddressAdapter } from '../../core/adapters/AddressAdapter';
 
 const loginSchema = z.object({
 	cep: z.string().min(1, 'Campo obrigatório!!'),
@@ -66,7 +64,7 @@ export default function LoginScreen() {
 			});
 
 			router.push({
-				pathname: '/(auth)/register',
+				pathname: '/user',
 				params: { addressId: response.addressId },
 			});
 		} catch (error: any) {
@@ -213,18 +211,7 @@ export default function LoginScreen() {
 						className="w-full"
 						disabled={loading}
 					>
-						<View className="flex flex-row items-center gap-2">
-							<Text className="text-white">DADOS PESSOAIS</Text>
-							<Ionicons name="arrow-forward" color="#ffffff" />
-						</View>
-					</Button>
-
-					<Button
-						onPress={() => router.push('/(auth)/login')}
-						className="w-full"
-						disabled={loading}
-					>
-						<ThemedText>LOGIN</ThemedText>
+						<Text className="text-white">CADASTRAR ENDEREÇO</Text>
 					</Button>
 				</View>
 			</View>

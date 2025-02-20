@@ -42,7 +42,7 @@ export default function PostalCodeScreen() {
 			const addressData = await adapter.search(data.cep);
 
 			router.push({
-				pathname: '(auth)/address' as RelativePathString,
+				pathname: '/(tabs)/user/address/address' as RelativePathString,
 				params: { ...addressData, cep: data.cep },
 			});
 		} catch (error: any) {
@@ -89,14 +89,6 @@ export default function PostalCodeScreen() {
 							<Text className="text-white">ENDEREÇO</Text>
 							<Ionicons name="arrow-forward" color="#ffffff" />
 						</View>
-					</Button>
-
-					<Button
-						onPress={() => router.replace('/(auth)/login')}
-						className="w-full"
-						disabled={loading}
-					>
-						<ThemedText>LOGIN</ThemedText>
 					</Button>
 				</View>
 			</View>

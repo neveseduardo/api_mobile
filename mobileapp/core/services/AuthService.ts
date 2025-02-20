@@ -13,7 +13,7 @@ export class AuthService implements IAuthService {
 	}
 
 	async userData() {
-		return this.client.get('/auth/customer');
+		return this.client.get('/auth/usuario');
 	}
 
 	async register(data: any) {
