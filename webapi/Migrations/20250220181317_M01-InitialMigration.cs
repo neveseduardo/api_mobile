@@ -17,9 +17,9 @@ namespace webapi.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Password = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
@@ -34,8 +34,9 @@ namespace webapi.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Logradouro = table.Column<string>(type: "TEXT", nullable: true),
+                    Logradouro = table.Column<string>(type: "TEXT", nullable: false),
                     Cep = table.Column<string>(type: "TEXT", nullable: true),
+                    Bairro = table.Column<string>(type: "TEXT", nullable: true),
                     Cidade = table.Column<string>(type: "TEXT", nullable: true),
                     Estado = table.Column<string>(type: "TEXT", nullable: true),
                     Pais = table.Column<string>(type: "TEXT", nullable: true),

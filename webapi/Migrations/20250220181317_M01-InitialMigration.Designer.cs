@@ -11,7 +11,7 @@ using WebApi.Database;
 namespace webapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250220174917_M01-InitialMigration")]
+    [Migration("20250220181317_M01-InitialMigration")]
     partial class M01InitialMigration
     {
         /// <inheritdoc />
@@ -25,6 +25,9 @@ namespace webapi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Bairro")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Cep")
                         .HasColumnType("TEXT");
@@ -42,6 +45,7 @@ namespace webapi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Logradouro")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Numero")
@@ -73,12 +77,10 @@ namespace webapi.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdatedAt")

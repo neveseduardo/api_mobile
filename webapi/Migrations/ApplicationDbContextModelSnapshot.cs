@@ -23,6 +23,9 @@ namespace webapi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Bairro")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Cep")
                         .HasColumnType("TEXT");
 
@@ -39,6 +42,7 @@ namespace webapi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Logradouro")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Numero")
@@ -70,12 +74,10 @@ namespace webapi.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdatedAt")
