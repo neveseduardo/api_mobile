@@ -33,12 +33,13 @@ public class ApiAddressesController : ControllerBase
         var viewModels = addresses.Select(a => new AddressViewModel
         {
             Id = a.Id,
-            Logradouro = a.Logradouro!,
-            Cep = a.Cep!,
-            Cidade = a.Cidade!,
-            Estado = a.Estado!,
-            Pais = a.Pais!,
-            Numero = a.Numero!,
+            Logradouro = a.Logradouro,
+            Cep = a.Cep,
+            Bairro = a.Bairro,
+            Cidade = a.Cidade,
+            Estado = a.Estado,
+            Pais = a.Pais,
+            Numero = a.Numero,
             Complemento = a.Complemento
         }).ToList();
 
@@ -65,12 +66,13 @@ public class ApiAddressesController : ControllerBase
         var viewModel = new AddressViewModel
         {
             Id = address.Id,
-            Logradouro = address.Logradouro!,
-            Cep = address.Cep!,
-            Cidade = address.Cidade!,
-            Estado = address.Estado!,
-            Pais = address.Pais!,
-            Numero = address.Numero!,
+            Logradouro = address.Logradouro,
+            Cep = address.Cep,
+            Bairro = address.Bairro,
+            Cidade = address.Cidade,
+            Estado = address.Estado,
+            Pais = address.Pais,
+            Numero = address.Numero,
             Complemento = address.Complemento
         };
 
@@ -97,6 +99,7 @@ public class ApiAddressesController : ControllerBase
         {
             Logradouro = dto.Logradouro,
             Cep = dto.Cep,
+            Bairro = dto.Bairro,
             Cidade = dto.Cidade,
             Estado = dto.Estado,
             Pais = dto.Pais,
@@ -111,6 +114,7 @@ public class ApiAddressesController : ControllerBase
             Id = address.Id,
             Logradouro = address.Logradouro,
             Cep = address.Cep,
+            Bairro = address.Bairro,
             Cidade = address.Cidade,
             Estado = address.Estado,
             Pais = address.Pais,
@@ -146,12 +150,13 @@ public class ApiAddressesController : ControllerBase
             return NotFound();
         }
 
-        address.Logradouro = dto.Logradouro!;
-        address.Cep = dto.Cep!;
-        address.Cidade = dto.Cidade!;
-        address.Estado = dto.Estado!;
-        address.Pais = dto.Pais!;
-        address.Numero = dto.Numero!;
+        address.Logradouro = dto.Logradouro;
+        address.Cep = dto.Cep;
+        address.Bairro = dto.Bairro;
+        address.Cidade = dto.Cidade;
+        address.Estado = dto.Estado;
+        address.Pais = dto.Pais;
+        address.Numero = dto.Numero;
         address.Complemento = dto.Complemento;
 
         await _addressRepository.UpdateAddressAsync(address);
