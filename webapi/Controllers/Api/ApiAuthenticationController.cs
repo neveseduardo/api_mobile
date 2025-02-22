@@ -159,7 +159,12 @@ public class ApiAuthenticationController : ControllerBase
             };
 
 
-            return Ok(viewModel);
+            return StatusCode(200, new
+            {
+                success = true,
+                message = "Login efetuado com sucesso!",
+                data = viewModel,
+            }); ;
         }
         catch (System.Exception ex)
         {

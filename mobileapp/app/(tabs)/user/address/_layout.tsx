@@ -12,7 +12,7 @@ export default function AddressLayout() {
 			<Stack initialRouteName="index">
 				<Stack.Screen name="index" options={{ headerShown: true, headerTitle: 'Meus endereços' }} />
 				<Stack.Screen name="postalcode" options={{ headerShown: true, headerTitle: 'Buscar CEP' }} />
-				<Stack.Screen name="address" options={{ headerShown: true, headerTitle: 'Cadastrar endereço' }} />
+				<Stack.Screen name="create" options={{ headerShown: true, headerTitle: 'Cadastrar endereço' }} />
 			</Stack>
 			<StatusBar style="auto" />
 		</ThemeProvider>

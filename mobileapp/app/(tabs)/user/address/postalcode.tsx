@@ -4,14 +4,12 @@ import { RelativePathString, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
-import { ThemedText } from '@/components/ThemedText';
 import AuthHeader from '@/components/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosHttpClient } from '@/core/services/AxiosHttpClient';
-import { AddressService } from '@/core/services/AddressService';
-import { AddressAdapter } from '@/core/adapters/AddressAdapter';
+import { AxiosHttpClient } from '@/services/AxiosHttpClient';
+import { useAddressService } from '@/services/AddressService';
 import { z } from 'zod';
 
 const cepSchema = z.object({
@@ -32,17 +30,16 @@ export default function PostalCodeScreen() {
 		},
 	});
 	const client = AxiosHttpClient;
-	const service = new AddressService(client);
-	const adapter = new AddressAdapter(service);
+	const { service } = useAddressService(client);
 
 	const [loading, setLoading] = useState(false);
 
 	const onSubmit = async (data: CepFormData) => {
 		try {
-			const addressData = await adapter.search(data.cep);
+			const addressData = await service.search(data.cep);
 
 			router.push({
-				pathname: '/(tabs)/user/address/address' as RelativePathString,
+				pathname: '/(tabs)/user/address/create' as RelativePathString,
 				params: { ...addressData, cep: data.cep },
 			});
 		} catch (error: any) {

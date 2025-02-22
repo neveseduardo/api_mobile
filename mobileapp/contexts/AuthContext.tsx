@@ -1,10 +1,8 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthAdapter } from '@/core/adapters/AuthAdapter';
-import { AuthService } from '@/core/services/AuthService';
-import { AxiosHttpClient } from '@/core/services/AxiosHttpClient';
-import { IUser } from '@/core/ports/IUser';
-import { Href, router } from 'expo-router';
+import { useAuthService } from '@/services/AuthService';
+import { AxiosHttpClient } from '@/services/AxiosHttpClient';
+import { IUser } from '@/services/IUser';
 
 interface AuthContextType {
 	access_token: string;
@@ -35,8 +33,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [refresh_token, setRefreshToken] = useState<string>(defaultValue.refresh_token);
 	const [userData, setUserData] = useState<IUser | null>(defaultValue.userData);
 	const client = AxiosHttpClient;
-	const service = new AuthService(client);
-	const adapter = new AuthAdapter(service);
+	const { service } = useAuthService(client);
 
 	useEffect(() => {
 		const loadAuthData = async () => {
@@ -56,7 +53,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const login = async (username: string, password: string) => {
 		try {
-			const { accessToken, refreshToken } = await adapter.login({ username, password });
+			const { accessToken, refreshToken } = await service.login({ username, password });
 
 			await AsyncStorage.setItem('access_token', accessToken);
 			await AsyncStorage.setItem('refresh_token', refreshToken);
@@ -64,30 +61,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			setAccessToken(accessToken);
 			setRefreshToken(refreshToken);
 
-			const user = await adapter.userData();
+			const user = await service.userData();
 
 			setUserData(user);
 			await AsyncStorage.setItem('userData', JSON.stringify(user));
 
 			return { accessToken, user };
 		} catch (error) {
-			console.error('Erro ao fazer login:', error);
+			console.error(error);
 			throw error;
 		}
 	};
 
 	const register = async (name: string, email: string, cpf: string, password: string, addressId?: number) => {
 		try {
-			await adapter.register({ name, email, cpf, password, addressId });
+			await service.register({ name, email, cpf, password, addressId });
 		} catch (error) {
-			console.error('Erro ao fazer login:', error);
+			console.error(error);
 			throw error;
 		}
 	};
 
 	const logout = async () => {
 		try {
-			await adapter.logout();
+			await service.logout();
 
 			setAccessToken('');
 			setRefreshToken('');
@@ -97,7 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			await AsyncStorage.removeItem('refresh_token');
 			await AsyncStorage.removeItem('userData');
 		} catch (error) {
-			console.error('Erro ao fazer logout:', error);
+			console.error(error);
 			throw error;
 		}
 	};
