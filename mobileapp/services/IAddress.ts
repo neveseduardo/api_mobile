@@ -1,4 +1,5 @@
 export interface IAddress {
+	id: number,
 	cep: string,
 	logradouro: string,
 	bairro: string,

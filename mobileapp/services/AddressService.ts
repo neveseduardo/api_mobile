@@ -1,3 +1,4 @@
+import { IAddress } from './IAddress';
 import { HttpClient } from './IHttpClient';
 
 interface IAddressService {
@@ -8,7 +9,8 @@ interface IAddressService {
 		estado: string,
 	}>,
 	estados: () => Promise<any[]>,
-	createAndBindUser: (data: any, id: number) => Promise<{ addressId: number }>
+	createAndBindUser: (data: any, id: number) => Promise<{ addressId: number }>,
+	getAddresses: (id: number) => Promise<IAddress[]>,
 }
 
 class AddressService implements IAddressService {
@@ -72,12 +74,27 @@ class AddressService implements IAddressService {
 	 */
 	async createAndBindUser(data: any, id: number) {
 		try {
-			const response = await this.client.post(`/auth/endereco/${id}`, data);
+			const response = await this.client.post(`/auth/usuarios/${id}/enderecos`, data);
 
 			return { addressId: response.data.Id };
 		} catch (error) {
 			console.error(error);
 			throw error;
+		}
+	}
+
+	async getAddresses(id: number) {
+		try {
+			const response = await this.client.get(`/auth/usuarios/${id}/enderecos`);
+
+			if (Array.isArray(response?.data?.data)) {
+				return response?.data?.data as IAddress[];
+			}
+
+			return [];
+		} catch (error) {
+			console.error(error);
+			throw 'Erro ao pegar lista de endereços';
 		}
 	}
 };
