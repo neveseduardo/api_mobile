@@ -260,15 +260,17 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         }
     }
 
-    public async Task<List<UserAddress>> GetUserAddresses(int userId)
+    public async Task<List<Address?>> GetUserAddresses(int userId)
     {
         try
         {
-            var userAddresses = await _context.UserAddresses
+            var addresses = await _context.UserAddresses
                 .Where(ua => ua.UserId == userId)
+                .Include(ua => ua.address)
+                .Select(ua => ua.address)
                 .ToListAsync();
 
-            return userAddresses;
+            return addresses;
         }
         catch (Exception ex)
         {

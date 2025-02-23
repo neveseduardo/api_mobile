@@ -20,5 +20,5 @@ public interface IApiAuthenticationRepository
 
     Task<Address?> CreateAddressAndBindUser(Address address, int id);
 
-    Task<List<UserAddress>> GetUserAddresses(int id);
+    Task<List<Address?>> GetUserAddresses(int id);
 }
