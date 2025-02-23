@@ -235,7 +235,7 @@ public class ApiAuthenticationController : ControllerBase
 
     }
 
-    [HttpPost("enderecos/{id}")]
+    [HttpPost("usuarios/{id}/enderecos")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<AddressViewModel>> CreateAddressAndBindUser([FromBody] CreateAddressDto dto, int id)
     {
@@ -287,7 +287,7 @@ public class ApiAuthenticationController : ControllerBase
         }
     }
 
-    [HttpGet("enderecos/{id}")]
+    [HttpGet("usuarios/{id}/enderecos")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult> GetUserAddresses(int id)
     {
