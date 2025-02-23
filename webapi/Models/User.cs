@@ -17,12 +17,6 @@ public class User
 
     public string Cpf { get; set; } = "";
 
-
-    [ForeignKey("address")]
-    public Nullable<int> AddressId { get; set; }
-
-    public Address? address { get; set; }
-
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;

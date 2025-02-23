@@ -6,7 +6,6 @@ public class UserViewModel
     public string Name { get; set; } = "";
     public string Email { get; set; } = "";
     public string Cpf { get; set; } = "";
-    public Address? address { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

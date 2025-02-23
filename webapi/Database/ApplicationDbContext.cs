@@ -14,8 +14,12 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+
     public DbSet<Administrator> Administrators { get; set; }
+
     public DbSet<Address> Addresses { get; set; }
+
+    public DbSet<UserAddress> UserAddresses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

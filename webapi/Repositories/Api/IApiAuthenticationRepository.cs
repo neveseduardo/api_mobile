@@ -19,4 +19,6 @@ public interface IApiAuthenticationRepository
     Task<bool> FindUserByEmailAsync(string Email);
 
     Task<Address?> CreateAddressAndBindUser(Address address, int id);
+
+    Task<List<UserAddress>> GetUserAddresses(int id);
 }

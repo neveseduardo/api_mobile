@@ -25,8 +25,4 @@ public class CreateUserDto
     [Required(ErrorMessage = "Preenchimento do Campo '{0}' Obrigatório!")]
     [RegularExpression(@"^\d{3}\.\d{3}\.\d{3}-\d{2}$", ErrorMessage = "O campo '{0}' deve estar no formato 000.000.000-00.")]
     public string Cpf { get; set; } = null!;
-
-
-    [Display(Name = "AddressId")]
-    public int? AddressId { get; set; }
 }

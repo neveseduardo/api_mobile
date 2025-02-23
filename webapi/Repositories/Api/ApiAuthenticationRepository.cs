@@ -12,20 +12,26 @@ namespace WebApi.Repositories.Api;
 
 public class ApiAuthenticationRepository : IApiAuthenticationRepository
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ApplicationDbContext _context;
+
     private readonly IConfiguration _configuration;
+
     private readonly ILogger<ApiAuthenticationRepository> _logger;
 
-    public ApiAuthenticationRepository(ApplicationDbContext dBContext, IConfiguration configuration, ILogger<ApiAuthenticationRepository> logger)
+    public ApiAuthenticationRepository(
+        ApplicationDbContext context,
+        IConfiguration configuration,
+        ILogger<ApiAuthenticationRepository> logger
+    )
     {
-        _dbContext = dBContext;
+        _context = context;
         _configuration = configuration;
         _logger = logger;
     }
 
     public async Task<User?> ValidateUserAsync(string email, string password)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
 
         if (user == null || !PasswordHelper.VerifyPassword(password, user.Password))
         {
@@ -163,9 +169,7 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
     {
         try
         {
-            var user = await _dbContext.Users
-            .Include(u => u.address)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
 
             if (user == null)
             {
@@ -186,9 +190,9 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
     {
         try
         {
-            _dbContext.Users.Add(user);
+            _context.Users.Add(user);
 
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return user;
         }
@@ -203,7 +207,7 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
     {
         try
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
 
             if (user == null)
             {
@@ -214,7 +218,7 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao capturar usuário eplo email");
+            _logger.LogError(ex, "Falha ao capturar usuário pelo email");
             throw;
         }
     }
@@ -226,28 +230,49 @@ public class ApiAuthenticationRepository : IApiAuthenticationRepository
             address.CreatedAt = DateTime.UtcNow;
             address.UpdatedAt = DateTime.UtcNow;
 
-            _dbContext.Addresses.Add(address);
+            _context.Addresses.Add(address);
 
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            var user = await _dbContext.Users
-                .AsNoTracking()
-                .Include(u => u.address)
-                .FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
 
             if (user != null)
             {
-                user.AddressId = address.Id;
-                _dbContext.Entry(user).State = EntityState.Modified;
+                var userAddress = new UserAddress
+                {
+                    UserId = user.Id,
+                    AddressId = address.Id,
+                    PrincipalId = address.Id,
+                };
+
+                _context.UserAddresses.Add(userAddress);
+                _context.Entry(user).State = EntityState.Modified;
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return address;
         }
         catch (System.Exception ex)
         {
             _logger.LogError(ex, "Falha ao cadastrar endereco");
+            throw;
+        }
+    }
+
+    public async Task<List<UserAddress>> GetUserAddresses(int userId)
+    {
+        try
+        {
+            var userAddresses = await _context.UserAddresses
+                .Where(ua => ua.UserId == userId)
+                .ToListAsync();
+
+            return userAddresses;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao buscar endereços do usuário");
             throw;
         }
     }

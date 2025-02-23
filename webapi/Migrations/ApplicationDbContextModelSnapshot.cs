@@ -97,9 +97,6 @@ namespace webapi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Cpf")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -124,21 +121,55 @@ namespace webapi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("usuarios");
                 });
 
-            modelBuilder.Entity("WebApi.Models.User", b =>
+            modelBuilder.Entity("WebApi.Models.UserAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("PrincipalId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("enderecos_usuarios");
+                });
+
+            modelBuilder.Entity("WebApi.Models.UserAddress", b =>
                 {
                     b.HasOne("WebApi.Models.Address", "address")
                         .WithMany()
                         .HasForeignKey("AddressId");
 
+                    b.HasOne("WebApi.Models.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("address");
+
+                    b.Navigation("user");
                 });
 #pragma warning restore 612, 618
         }

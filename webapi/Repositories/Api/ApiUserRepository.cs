@@ -16,20 +16,14 @@ public class ApiUserRepository : IApiUserRepository
 
     public async Task<IEnumerable<User>> GetAllUsersAsync()
     {
-        var users = await _context.Users
-            .AsNoTracking()
-            .Include(u => u.address)
-            .ToListAsync();
+        var users = await _context.Users.ToListAsync();
 
         return users;
     }
 
     public async Task<User?> GetUserByIdAsync(int id)
     {
-        var user = await _context.Users
-            .AsNoTracking()
-            .Include(u => u.address)
-            .FirstOrDefaultAsync(x => x.Id == id);
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
 
         return user;
     }

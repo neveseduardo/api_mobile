@@ -155,7 +155,6 @@ public class ApiAuthenticationController : ControllerBase
                 Name = user.Name,
                 Email = user.Email,
                 Cpf = user.Cpf,
-                address = user.address
             };
 
 
@@ -236,7 +235,8 @@ public class ApiAuthenticationController : ControllerBase
 
     }
 
-    [HttpPost("endereco/{id}")]
+    [HttpPost("enderecos/{id}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<AddressViewModel>> CreateAddressAndBindUser([FromBody] CreateAddressDto dto, int id)
     {
         try
@@ -283,6 +283,28 @@ public class ApiAuthenticationController : ControllerBase
         catch (System.Exception ex)
         {
             _logger.LogError(ex, "Falha ao cadastrar endereço");
+            throw;
+        }
+    }
+
+    [HttpGet("enderecos/{id}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult> GetUserAddresses(int id)
+    {
+        try
+        {
+            var addresses = await _authRepository.GetUserAddresses(id);
+
+            return StatusCode(200, new
+            {
+                success = true,
+                message = "Dados retornados com sucesso!",
+                data = addresses,
+            });
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Falha ao pegar dados de endereços");
             throw;
         }
     }
