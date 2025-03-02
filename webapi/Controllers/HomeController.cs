@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using webapi.Models;
 
 namespace WebApi.Controllers;
 
-public class ApiHomeController : Controller
+public class HomeController : Controller
 {
-    public ApiHomeController()
+    public HomeController()
     {
     }
 

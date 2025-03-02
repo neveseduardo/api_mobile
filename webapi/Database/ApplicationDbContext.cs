@@ -14,8 +14,20 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+
     public DbSet<Administrator> Administrators { get; set; }
+
     public DbSet<Address> Addresses { get; set; }
+
+    public DbSet<Doctor> Doctors { get; set; }
+
+    public DbSet<Especialization> Especializations { get; set; }
+
+    public DbSet<Appointment> Appointments { get; set; }
+
+    public DbSet<AppointmentRating> AppointmentRatings { get; set; }
+
+    public DbSet<MedicalCenter> MedicalCenters { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -38,5 +50,6 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
         modelBuilder.Entity<Administrator>().HasIndex(u => u.Email).IsUnique();
+        modelBuilder.Entity<Doctor>().HasIndex(u => u.Email).IsUnique();
     }
 }
