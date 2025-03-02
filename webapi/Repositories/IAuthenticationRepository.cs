@@ -2,21 +2,19 @@ using System.Security.Claims;
 using WebApi.Models;
 
 namespace WebApi.Repositories;
-public interface IAuthenticationRepository
+public interface IAuthenticationRepository<T>
 {
-    Task<User?> ValidateUserAsync(string email, string password);
+    Task<T?> ValidateUserAsync(string email, string password);
 
-    string CreateToken(User user);
+    string CreateToken(T agent);
 
-    string CreateRefreshToken(User user);
+    string CreateRefreshToken(T agent);
 
     ClaimsPrincipal? ValidateRefreshToken(string refreshToken);
 
-    Task<User?> GetUserAsync(int id);
+    Task<T?> GetUserAsync(int id);
 
-    Task<User> CreateUserAsync(User user);
+    Task<T> CreateUserAsync(T agent);
 
     Task<bool> FindUserByEmailAsync(string Email);
-
-    Task<Address?> CreateAddressAndBindUser(Address address, int id);
 }

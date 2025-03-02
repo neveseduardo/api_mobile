@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("api/v1/administradores")]
 public class AdministratorController : Controller

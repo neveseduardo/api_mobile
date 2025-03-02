@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("api/v1/agendamento-avaliacoes")]
 public class AppointmentRatingController : ControllerBase
@@ -163,7 +163,7 @@ public class AppointmentRatingController : ControllerBase
 
             await _repository.UpdateAsync(appointmentRating);
 
-            return StatusCode(204, new
+            return StatusCode(200, new
             {
                 success = true,
                 message = "Dados atualizados com sucesso",
@@ -204,7 +204,7 @@ public class AppointmentRatingController : ControllerBase
 
             await _repository.DeleteAsync(appointmentRating);
 
-            return StatusCode(204, new
+            return StatusCode(200, new
             {
                 success = true,
                 message = "Dados deletados com sucesso",

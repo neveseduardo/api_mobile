@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("api/v1/usuarios")]
 public class UsersController : ControllerBase
@@ -25,16 +25,27 @@ public class UsersController : ControllerBase
         _logger = logger;
     }
 
+    protected UserViewModel? GetViewModel(User? user)
+    {
+        if (user != null)
+        {
+            var viewModel = new UserViewModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+            };
+
+            return viewModel;
+        }
+        return null;
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModelList = list.Select(u => new UserViewModel
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Email = u.Email,
-        }).ToList();
+        var viewModelList = list.Select(u => GetViewModel(u)).ToList();
 
         return StatusCode(200, new
         {
@@ -59,12 +70,7 @@ public class UsersController : ControllerBase
             });
         }
 
-        var viewModel = new UserViewModel
-        {
-            Id = user.Id,
-            Name = user.Name,
-            Email = user.Email,
-        };
+        var viewModel = GetViewModel(user);
 
         return StatusCode(200, new
         {
@@ -143,7 +149,7 @@ public class UsersController : ControllerBase
 
             await _repository.UpdateAsync(user);
 
-            return StatusCode(204, new
+            return StatusCode(200, new
             {
                 success = true,
                 message = "Dados atualizados com sucesso",
@@ -184,7 +190,7 @@ public class UsersController : ControllerBase
 
             await _repository.DeleteAsync(user);
 
-            return StatusCode(204, new
+            return StatusCode(200, new
             {
                 success = true,
                 message = "Dados deletados com sucesso",

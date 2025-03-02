@@ -13,30 +13,60 @@ namespace WebApi.Controllers;
 
 [Authorize(Policy = "AdminPolicy")]
 [ApiController]
-[Route("api/v1/especializacoes")]
-public class EspecializationController : ControllerBase
+[Route("api/v1/unidades")]
+public class MedicalCenterController : ControllerBase
 {
-    private readonly IRepository<Especialization> _repository;
-    private readonly ILogger<EspecializationController> _logger;
+    private readonly IRepository<MedicalCenter> _repository;
+    private readonly ILogger<MedicalCenterController> _logger;
 
-    public EspecializationController(IRepository<Especialization> repository, ILogger<EspecializationController> logger)
+    public MedicalCenterController(IRepository<MedicalCenter> repository, ILogger<MedicalCenterController> logger)
     {
         _repository = repository;
         _logger = logger;
     }
 
+    protected MedicalCenterViewModel? GetViewModel(MedicalCenter? medicalCenter)
+    {
+        if (medicalCenter != null)
+        {
+            AddressViewModel? address = null;
+
+            if (medicalCenter.Address != null)
+            {
+                address = new AddressViewModel
+                {
+                    Id = medicalCenter.Address.Id,
+                    Logradouro = medicalCenter.Address.Logradouro,
+                    Cep = medicalCenter.Address.Cep,
+                    Bairro = medicalCenter.Address.Bairro,
+                    Cidade = medicalCenter.Address.Cidade,
+                    Estado = medicalCenter.Address.Estado,
+                    Pais = medicalCenter.Address.Pais,
+                    Numero = medicalCenter.Address.Numero,
+                    Complemento = medicalCenter.Address.Complemento
+                };
+            }
+
+
+            var viewModel = new MedicalCenterViewModel
+            {
+                Id = medicalCenter.Id,
+                Name = medicalCenter.Name,
+                PhoneNumber = medicalCenter.PhoneNumber,
+                Email = medicalCenter.Email,
+                address = address,
+            };
+
+            return viewModel;
+        }
+        return null;
+    }
+
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EspecializationViewModel>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<MedicalCenterViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModelList = list.Select(u => new EspecializationViewModel
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Description = u.Description,
-            CreatedAt = u.CreatedAt ?? DateTime.Now,
-            UpdatedAt = u.UpdatedAt ?? DateTime.Now,
-        });
+        var viewModelList = list.Select(u => GetViewModel(u)).ToList();
 
         return StatusCode(200, new
         {
@@ -49,9 +79,9 @@ public class EspecializationController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
-        var especialization = await _repository.GetByIdAsync(id);
+        var MedicalCenter = await _repository.GetByIdAsync(id);
 
-        if (especialization == null)
+        if (MedicalCenter == null)
         {
             return StatusCode(404, new
             {
@@ -61,14 +91,7 @@ public class EspecializationController : ControllerBase
             });
         }
 
-        var viewModel = new EspecializationViewModel
-        {
-            Id = especialization.Id,
-            Name = especialization.Name,
-            Description = especialization.Description,
-            CreatedAt = especialization.CreatedAt ?? DateTime.Now,
-            UpdatedAt = especialization.UpdatedAt ?? DateTime.Now,
-        };
+        var viewModel = GetViewModel(MedicalCenter);
 
         return StatusCode(200, new
         {
@@ -79,7 +102,7 @@ public class EspecializationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAsync([FromBody] CreateEspecializationDto dto)
+    public async Task<IActionResult> AddAsync([FromBody] CreateMedicalCenterDto dto)
     {
         try
         {
@@ -88,14 +111,17 @@ public class EspecializationController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var especialization = new Especialization
+            var MedicalCenter = new MedicalCenter
             {
                 Name = dto.Name,
+                Email = dto.Email,
+                PhoneNumber = dto.PhoneNumber,
+                AddressId = dto.AddressId,
             };
 
-            await _repository.AddAsync(especialization);
+            await _repository.AddAsync(MedicalCenter);
 
-            var result = await GetByIdAsync(especialization.Id);
+            var result = await GetByIdAsync(MedicalCenter.Id);
 
             if (result is ObjectResult objectResult)
             {
@@ -119,7 +145,7 @@ public class EspecializationController : ControllerBase
     }
 
     [HttpPut("{Id}")]
-    public async Task<IActionResult> UpdateAsync([FromRoute] int Id, [FromBody] UpdateEspecializationDto dto)
+    public async Task<IActionResult> UpdateAsync([FromRoute] int Id, [FromBody] UpdateMedicalCenterDto dto)
     {
         try
         {
@@ -128,9 +154,9 @@ public class EspecializationController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var especialization = await _repository.GetByIdAsync(Id);
+            var medicalCenter = await _repository.GetByIdAsync(Id);
 
-            if (especialization == null)
+            if (medicalCenter == null)
             {
                 return StatusCode(404, new
                 {
@@ -140,10 +166,11 @@ public class EspecializationController : ControllerBase
                 });
             }
 
-            especialization.Name = dto.Name ?? especialization.Name;
-            especialization.Description = dto.Description ?? especialization.Description;
+            medicalCenter.Name = dto.Name ?? medicalCenter.Name;
+            medicalCenter.Email = dto.Email ?? medicalCenter.Email;
+            medicalCenter.PhoneNumber = dto.PhoneNumber ?? medicalCenter.PhoneNumber;
 
-            await _repository.UpdateAsync(especialization);
+            await _repository.UpdateAsync(medicalCenter);
 
             return StatusCode(200, new
             {
@@ -172,9 +199,9 @@ public class EspecializationController : ControllerBase
     {
         try
         {
-            var especialization = await _repository.GetByIdAsync(id);
+            var MedicalCenter = await _repository.GetByIdAsync(id);
 
-            if (especialization == null)
+            if (MedicalCenter == null)
             {
                 return StatusCode(404, new
                 {
@@ -184,7 +211,7 @@ public class EspecializationController : ControllerBase
                 });
             }
 
-            await _repository.DeleteAsync(especialization);
+            await _repository.DeleteAsync(MedicalCenter);
 
             return StatusCode(200, new
             {

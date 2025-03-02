@@ -11,15 +11,15 @@ using System.Text.Json;
 
 namespace WebApi.Controllers;
 
-[Route("api/v1/auth")]
-public class ApiAuthenticationController : ControllerBase
+[Route("api/v1/auth/user")]
+public class UserAuthController : ControllerBase
 {
-    private readonly IAuthenticationRepository _authRepository;
-    private readonly ILogger<ApiAuthenticationController> _logger;
+    private readonly IAuthenticationRepository<User> _repository;
+    private readonly ILogger<UserAuthController> _logger;
 
-    public ApiAuthenticationController(IAuthenticationRepository authRepository, ILogger<ApiAuthenticationController> logger)
+    public UserAuthController(IAuthenticationRepository<User> authRepository, ILogger<UserAuthController> logger)
     {
-        _authRepository = authRepository;
+        _repository = authRepository;
         _logger = logger;
     }
 
@@ -38,15 +38,15 @@ public class ApiAuthenticationController : ControllerBase
                 return BadRequest("Invalid client request");
             }
 
-            var user = await _authRepository.ValidateUserAsync(dto.Email, dto.Password);
+            var user = await _repository.ValidateUserAsync(dto.Email, dto.Password);
 
             if (user == null)
             {
                 return Unauthorized();
             }
 
-            var accessToken = _authRepository.CreateToken(user);
-            var refreshToken = _authRepository.CreateRefreshToken(user);
+            var accessToken = _repository.CreateToken(user);
+            var refreshToken = _repository.CreateRefreshToken(user);
 
             return StatusCode(200, new
             {
@@ -77,7 +77,7 @@ public class ApiAuthenticationController : ControllerBase
                 return BadRequest("Refresh token é obrigatório");
             }
 
-            var principal = _authRepository.ValidateRefreshToken(dto.RefreshToken);
+            var principal = _repository.ValidateRefreshToken(dto.RefreshToken);
 
             if (principal == null)
             {
@@ -91,15 +91,15 @@ public class ApiAuthenticationController : ControllerBase
                 return Unauthorized("Token inválido");
             }
 
-            var user = await _authRepository.GetUserAsync(UserId);
+            var user = await _repository.GetUserAsync(UserId);
 
             if (user == null)
             {
                 return NotFound("Usuário não encontrado");
             }
 
-            var newAccessToken = _authRepository.CreateToken(user);
-            var newRefreshToken = _authRepository.CreateRefreshToken(user);
+            var newAccessToken = _repository.CreateToken(user);
+            var newRefreshToken = _repository.CreateRefreshToken(user);
 
             return StatusCode(200, new
             {
@@ -137,32 +137,24 @@ public class ApiAuthenticationController : ControllerBase
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized(new { Message = "Token inválido" });
+                return StatusCode(401, new
+                {
+                    success = false,
+                    message = "Token inválido",
+                    data = Array.Empty<object>(),
+                });
             }
 
-            var user = await _authRepository.GetUserAsync(userId);
+            var user = await _repository.GetUserAsync(userId);
 
             if (user == null)
             {
-                return NotFound(new { Message = "Usuário não encontrado" });
-            }
-
-            AddressViewModel? address = null;
-
-            if (user.address != null)
-            {
-                address = new AddressViewModel
+                return StatusCode(404, new
                 {
-                    Id = user.address.Id,
-                    Logradouro = user.address.Logradouro,
-                    Cep = user.address.Cep,
-                    Bairro = user.address.Bairro,
-                    Cidade = user.address.Cidade,
-                    Estado = user.address.Estado,
-                    Pais = user.address.Pais,
-                    Numero = user.address.Numero,
-                    Complemento = user.address.Complemento
-                };
+                    success = false,
+                    message = "Usuário não encontrado",
+                    data = Array.Empty<object>(),
+                });
             }
 
             var viewModel = new UserViewModel
@@ -171,11 +163,15 @@ public class ApiAuthenticationController : ControllerBase
                 Name = user.Name,
                 Email = user.Email,
                 Cpf = user.Cpf,
-                address = address,
             };
 
 
-            return Ok(viewModel);
+            return StatusCode(200, new
+            {
+                success = true,
+                message = "Dados retornados com sucesso",
+                data = viewModel,
+            });
         }
         catch (System.Exception ex)
         {
@@ -186,7 +182,7 @@ public class ApiAuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<UserViewModel>> CreateUser([FromBody] CreateUserDto dto)
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
     {
         try
         {
@@ -201,7 +197,7 @@ public class ApiAuthenticationController : ControllerBase
                 });
             }
 
-            var existingUser = await _authRepository.FindUserByEmailAsync(dto.Email);
+            var existingUser = await _repository.FindUserByEmailAsync(dto.Email);
 
             if (existingUser)
             {
@@ -221,23 +217,16 @@ public class ApiAuthenticationController : ControllerBase
                 Password = PasswordHelper.HashPassword(dto.Password),
             };
 
-            await _authRepository.CreateUserAsync(user);
+            await _repository.CreateUserAsync(user);
 
-            var viewModel = new UserViewModel
+            var result = await GetUserData();
+
+            if (result is ObjectResult objectResult)
             {
-                Name = user.Name,
-                Email = user.Email,
-                Cpf = user.Cpf,
-            };
+                objectResult.StatusCode = 201;
+            }
 
-            _logger.LogInformation($"Cliente criado com ID: {user.Id}");
-
-            return StatusCode(201, new
-            {
-                success = true,
-                message = "Usuário cadastrado com sucesso",
-                data = viewModel,
-            });
+            return result;
         }
         catch (System.Exception ex)
         {
@@ -247,54 +236,4 @@ public class ApiAuthenticationController : ControllerBase
 
     }
 
-    [HttpPost("endereco/{id}")]
-    public async Task<ActionResult<AddressViewModel>> CreateAddressAndBindUser([FromBody] CreateAddressDto dto, int id)
-    {
-        try
-        {
-            if (!ModelState.IsValid)
-            {
-                return StatusCode(422, new
-                {
-                    success = false,
-                    message = "Formulário inválido!",
-                    data = ModelState,
-                });
-            }
-
-            var address = new Address
-            {
-                Cep = dto.Cep,
-                Logradouro = dto.Logradouro,
-                Numero = dto.Numero,
-                Cidade = dto.Cidade,
-                Estado = dto.Estado,
-                Pais = dto.Pais,
-            };
-
-            await _authRepository.CreateAddressAndBindUser(address, id);
-
-            var viewModel = new AddressViewModel
-            {
-                Id = address.Id,
-                Cep = address.Cep,
-                Logradouro = address.Logradouro,
-                Numero = address.Numero,
-                Cidade = address.Cidade,
-                Estado = address.Estado,
-                Pais = address.Pais,
-            };
-            return StatusCode(201, new
-            {
-                success = true,
-                message = "Endereço criado e vinculado com sucesso",
-                data = viewModel,
-            });
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex, "Falha ao cadastrar endereço");
-            throw;
-        }
-    }
 }

@@ -16,12 +16,7 @@ static class AuthenticationExtension
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         })
-        .AddCookie(options =>
-        {
-            options.LoginPath = "/auth";
-            options.AccessDeniedPath = "/auth";
-        })
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        .AddJwtBearer("Usercheme", options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -31,11 +26,29 @@ static class AuthenticationExtension
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? ""))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["UserSecretKey"] ?? ""))
+            };
+        })
+        .AddJwtBearer("AdminScheme", options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["AdminSecretKey"] ?? ""))
             };
         });
 
-        services.AddAuthorization();
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("UserPolicy", policy => policy.RequireAuthenticatedUser().AddAuthenticationSchemes("UserSchema"));
+            options.AddPolicy("AdminPolicy", policy => policy.RequireAuthenticatedUser().AddAuthenticationSchemes("AdminScheme"));
+        });
 
         return services;
     }

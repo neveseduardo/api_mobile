@@ -22,12 +22,15 @@ public class MedicalCenterRepository : IRepository<MedicalCenter>
     {
         return await _context.MedicalCenters
             .OrderByDescending(a => a.Id)
+            .Include(r => r.Address)
             .ToListAsync();
     }
 
     public async Task<MedicalCenter?> GetByIdAsync(int id)
     {
-        return await _context.MedicalCenters.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.MedicalCenters
+            .Include(r => r.Address)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<MedicalCenter?> AddAsync(MedicalCenter medicalCenter)

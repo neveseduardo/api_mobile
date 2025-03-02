@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(Policy = "AdminPolicy")]
 [ApiController]
 [Route("api/v1/enderecos")]
 public class AddressesController : ControllerBase

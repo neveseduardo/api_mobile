@@ -10,22 +10,22 @@ using WebApi.Models.Dto;
 
 namespace WebApi.Repositories;
 
-public class AuthenticationRepository : IAuthenticationRepository
+public class UserAuthRepository : IAuthenticationRepository<User>
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<AuthenticationRepository> _logger;
+    private readonly ILogger<UserAuthRepository> _logger;
 
-    public AuthenticationRepository(ApplicationDbContext dBContext, IConfiguration configuration, ILogger<AuthenticationRepository> logger)
+    public UserAuthRepository(ApplicationDbContext context, IConfiguration configuration, ILogger<UserAuthRepository> logger)
     {
-        _dbContext = dBContext;
+        _context = context;
         _configuration = configuration;
         _logger = logger;
     }
 
     public async Task<User?> ValidateUserAsync(string email, string password)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
 
         if (user == null || !PasswordHelper.VerifyPassword(password, user.Password))
         {
@@ -41,7 +41,7 @@ public class AuthenticationRepository : IAuthenticationRepository
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var privateKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? "");
+            var privateKey = Encoding.UTF8.GetBytes(jwtSettings["UserSecretKey"] ?? "");
             var credentials = new SigningCredentials(
                 new SymmetricSecurityKey(privateKey),
                 SecurityAlgorithms.HmacSha256);
@@ -86,7 +86,7 @@ public class AuthenticationRepository : IAuthenticationRepository
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var privateKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? "");
+            var privateKey = Encoding.UTF8.GetBytes(jwtSettings["UserSecretKey"] ?? "");
             var credentials = new SigningCredentials(
                 new SymmetricSecurityKey(privateKey),
                 SecurityAlgorithms.HmacSha256);
@@ -116,7 +116,7 @@ public class AuthenticationRepository : IAuthenticationRepository
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var privateKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? "");
+            var privateKey = Encoding.UTF8.GetBytes(jwtSettings["UserSecretKey"] ?? "");
 
             var validationParameters = new TokenValidationParameters
             {
@@ -163,7 +163,7 @@ public class AuthenticationRepository : IAuthenticationRepository
     {
         try
         {
-            var user = await _dbContext.Users
+            var user = await _context.Users
             .Include(u => u.address)
             .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -186,9 +186,9 @@ public class AuthenticationRepository : IAuthenticationRepository
     {
         try
         {
-            _dbContext.Users.Add(user);
+            _context.Users.Add(user);
 
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return user;
         }
@@ -203,7 +203,7 @@ public class AuthenticationRepository : IAuthenticationRepository
     {
         try
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
 
             if (user == null)
             {
@@ -226,11 +226,11 @@ public class AuthenticationRepository : IAuthenticationRepository
             address.CreatedAt = DateTime.UtcNow;
             address.UpdatedAt = DateTime.UtcNow;
 
-            _dbContext.Addresses.Add(address);
+            _context.Addresses.Add(address);
 
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            var user = await _dbContext.Users
+            var user = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.address)
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -238,10 +238,10 @@ public class AuthenticationRepository : IAuthenticationRepository
             if (user != null)
             {
                 user.AddressId = address.Id;
-                _dbContext.Entry(user).State = EntityState.Modified;
+                _context.Entry(user).State = EntityState.Modified;
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return address;
         }
