@@ -257,11 +257,22 @@
   {
     "id": 0,
     "name": "string",
-    "cpf": "string",
+    "phoneNumber": "string",
     "email": "string",
-    "crm": "string",
-    "especialization": {},
-    "createdAt": "string",
-    "updatedAt": "string"
+    "createdAt": "2025-03-02T20:01:26.705Z",
+    "updatedAt": "2025-03-02T20:01:26.705Z",
+    "address": {
+      "id": 0,
+      "logradouro": "string",
+      "cep": "string",
+      "bairro": "string",
+      "cidade": "string",
+      "estado": "string",
+      "pais": "string",
+      "numero": "string",
+      "complemento": "string",
+      "createdAt": "2025-03-02T20:01:26.705Z",
+      "updatedAt": "2025-03-02T20:01:26.705Z"
+    }
   }
   ```
