@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Models.Dto;
@@ -14,50 +13,43 @@ namespace WebApi.Controllers;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
-[Route("api/v1/enderecos")]
-public class AddressesController : ControllerBase
+[Route("api/v1/medicos")]
+public class DoctorController : ControllerBase
 {
-    private readonly IRepository<Address> _repository;
-    private readonly ILogger<AddressesController> _logger;
+    private readonly IRepository<Doctor> _repository;
+    private readonly ILogger<DoctorController> _logger;
 
-    public AddressesController(IRepository<Address> addressRepository, ILogger<AddressesController> logger)
+    public DoctorController(IRepository<Doctor> repository, ILogger<DoctorController> logger)
     {
-        _repository = addressRepository;
+        _repository = repository;
         _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<ActionResult> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-
-        var viewModels = list.Select(a => new AddressViewModel
+        var viewModelList = list.Select(u => new DoctorViewModel
         {
-            Id = a.Id,
-            Logradouro = a.Logradouro,
-            Cep = a.Cep,
-            Bairro = a.Bairro,
-            Cidade = a.Cidade,
-            Estado = a.Estado,
-            Pais = a.Pais,
-            Numero = a.Numero,
-            Complemento = a.Complemento
-        }).ToList();
+            Id = u.Id,
+            Name = u.Name,
+            Email = u.Email,
+        });
 
         return StatusCode(200, new
         {
             success = true,
             message = "Dados retornados com sucesso",
-            data = viewModels,
+            data = viewModelList,
         });
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync(int id)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
-        var address = await _repository.GetByIdAsync(id);
+        var doctor = await _repository.GetByIdAsync(id);
 
-        if (address == null)
+        if (doctor == null)
         {
             return StatusCode(404, new
             {
@@ -67,17 +59,11 @@ public class AddressesController : ControllerBase
             });
         }
 
-        var viewModel = new AddressViewModel
+        var viewModel = new DoctorViewModel
         {
-            Id = address.Id,
-            Logradouro = address.Logradouro,
-            Cep = address.Cep,
-            Bairro = address.Bairro,
-            Cidade = address.Cidade,
-            Estado = address.Estado,
-            Pais = address.Pais,
-            Numero = address.Numero,
-            Complemento = address.Complemento
+            Id = doctor.Id,
+            Name = doctor.Name,
+            Email = doctor.Email,
         };
 
         return StatusCode(200, new
@@ -85,11 +71,11 @@ public class AddressesController : ControllerBase
             success = true,
             message = "Dados retornados com sucesso",
             data = viewModel,
-        }); ;
+        });
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAsync([FromBody] CreateAddressDto dto)
+    public async Task<IActionResult> AddAsync([FromBody] CreateDoctorDto dto)
     {
         try
         {
@@ -98,21 +84,16 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = new Address
+            var doctor = new Doctor
             {
-                Logradouro = dto.Logradouro,
-                Cep = dto.Cep,
-                Bairro = dto.Bairro,
-                Cidade = dto.Cidade,
-                Estado = dto.Estado,
-                Pais = dto.Pais,
-                Numero = dto.Numero,
-                Complemento = dto.Complemento
+                Name = dto.Name,
+                Email = dto.Email,
+                CPF = dto.CPF,
             };
 
-            await _repository.AddAsync(address);
+            await _repository.AddAsync(doctor);
 
-            var result = await GetByIdAsync(address.Id);
+            var result = await GetByIdAsync(doctor.Id);
 
             if (result is ObjectResult objectResult)
             {
@@ -135,8 +116,8 @@ public class AddressesController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAddressDto dto)
+    [HttpPut("{Id}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] int Id, [FromBody] UpdateDoctorDto dto)
     {
         try
         {
@@ -145,9 +126,9 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = await _repository.GetByIdAsync(id);
+            var doctor = await _repository.GetByIdAsync(Id);
 
-            if (address == null)
+            if (doctor == null)
             {
                 return StatusCode(404, new
                 {
@@ -157,16 +138,11 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            address.Logradouro = dto.Logradouro;
-            address.Cep = dto.Cep;
-            address.Bairro = dto.Bairro;
-            address.Cidade = dto.Cidade;
-            address.Estado = dto.Estado;
-            address.Pais = dto.Pais;
-            address.Numero = dto.Numero;
-            address.Complemento = dto.Complemento;
+            doctor.Name = dto.Name ?? doctor.Name;
+            doctor.Email = dto.Email ?? doctor.Email;
+            doctor.CPF = dto.CPF ?? doctor.CPF;
 
-            await _repository.UpdateAsync(address);
+            await _repository.UpdateAsync(doctor);
 
             return StatusCode(200, new
             {
@@ -181,22 +157,23 @@ public class AddressesController : ControllerBase
 
             return StatusCode(400, new
             {
-                success = true,
+                success = false,
                 message = "Falha ao atualizar item",
                 trace = ex.Message,
                 data = Array.Empty<object>(),
             });
         }
+
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    [HttpDelete("{Id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         try
         {
-            var address = await _repository.GetByIdAsync(id);
+            var doctor = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (doctor == null)
             {
                 return StatusCode(404, new
                 {
@@ -206,23 +183,23 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            await _repository.DeleteAsync(address);
+            await _repository.DeleteAsync(doctor);
 
             return StatusCode(200, new
             {
                 success = true,
-                message = "Objeto deletado com sucesso",
+                message = "Dados deletados com sucesso",
                 data = Array.Empty<object>(),
             });
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, "Falha ao deletar item");
 
             return StatusCode(400, new
             {
-                success = true,
-                message = "Falha ao atualizar item",
+                success = false,
+                message = "Falha ao deletar item",
                 trace = ex.Message,
                 data = Array.Empty<object>(),
             });

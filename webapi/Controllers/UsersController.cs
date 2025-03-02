@@ -2,13 +2,11 @@
 using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using WebApi.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
@@ -21,9 +19,9 @@ public class UsersController : ControllerBase
     private readonly IRepository<User> _repository;
     private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IRepository<User> userRepository, ILogger<UsersController> logger)
+    public UsersController(IRepository<User> repository, ILogger<UsersController> logger)
     {
-        _repository = userRepository;
+        _repository = repository;
         _logger = logger;
     }
 
@@ -36,7 +34,7 @@ public class UsersController : ControllerBase
             Id = u.Id,
             Name = u.Name,
             Email = u.Email,
-        });
+        }).ToList();
 
         return StatusCode(200, new
         {
@@ -95,12 +93,14 @@ public class UsersController : ControllerBase
 
             await _repository.AddAsync(user);
 
-            return StatusCode(201, new
+            var result = await GetByIdAsync(user.Id);
+
+            if (result is ObjectResult objectResult)
             {
-                success = true,
-                message = "Dados criados com sucesso",
-                data = user,
-            });
+                objectResult.StatusCode = 201;
+            }
+
+            return result;
         }
         catch (System.Exception ex)
         {
@@ -143,7 +143,7 @@ public class UsersController : ControllerBase
 
             await _repository.UpdateAsync(user);
 
-            return StatusCode(200, new
+            return StatusCode(204, new
             {
                 success = true,
                 message = "Dados atualizados com sucesso",
@@ -184,7 +184,7 @@ public class UsersController : ControllerBase
 
             await _repository.DeleteAsync(user);
 
-            return StatusCode(200, new
+            return StatusCode(204, new
             {
                 success = true,
                 message = "Dados deletados com sucesso",

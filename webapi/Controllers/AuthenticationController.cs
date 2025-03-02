@@ -147,7 +147,23 @@ public class ApiAuthenticationController : ControllerBase
                 return NotFound(new { Message = "Usuário não encontrado" });
             }
 
-            _logger.LogInformation($"Dados do viewModel: {JsonSerializer.Serialize(user)}");
+            AddressViewModel? address = null;
+
+            if (user.address != null)
+            {
+                address = new AddressViewModel
+                {
+                    Id = user.address.Id,
+                    Logradouro = user.address.Logradouro,
+                    Cep = user.address.Cep,
+                    Bairro = user.address.Bairro,
+                    Cidade = user.address.Cidade,
+                    Estado = user.address.Estado,
+                    Pais = user.address.Pais,
+                    Numero = user.address.Numero,
+                    Complemento = user.address.Complemento
+                };
+            }
 
             var viewModel = new UserViewModel
             {
@@ -155,7 +171,7 @@ public class ApiAuthenticationController : ControllerBase
                 Name = user.Name,
                 Email = user.Email,
                 Cpf = user.Cpf,
-                address = user.address
+                address = address,
             };
 
 

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Models.Dto;
@@ -14,50 +13,67 @@ namespace WebApi.Controllers;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
-[Route("api/v1/enderecos")]
-public class AddressesController : ControllerBase
+[Route("api/v1/agendamento-avaliacoes")]
+public class AppointmentRatingController : ControllerBase
 {
-    private readonly IRepository<Address> _repository;
-    private readonly ILogger<AddressesController> _logger;
+    private readonly IRepository<AppointmentRating> _repository;
+    private readonly ILogger<AppointmentRatingController> _logger;
 
-    public AddressesController(IRepository<Address> addressRepository, ILogger<AddressesController> logger)
+    public AppointmentRatingController(IRepository<AppointmentRating> repository, ILogger<AppointmentRatingController> logger)
     {
-        _repository = addressRepository;
+        _repository = repository;
         _logger = logger;
     }
 
+    protected AppointmentRatingViewModel? GetViewModel(AppointmentRating appointmentRating)
+    {
+        if (appointmentRating != null)
+        {
+            UserViewModel? user = null;
+
+            if (appointmentRating.User != null)
+            {
+                user = new UserViewModel
+                {
+                    Id = appointmentRating.User.Id,
+                    Name = appointmentRating.User.Name,
+                    Email = appointmentRating.User.Email,
+                };
+            }
+
+            return new AppointmentRatingViewModel
+            {
+                Id = appointmentRating.Id,
+                Rating = appointmentRating.Rating,
+                Comment = appointmentRating.Comment,
+                User = user,
+                CreatedAt = appointmentRating.CreatedAt ?? DateTime.Now,
+                UpdatedAt = appointmentRating.UpdatedAt ?? DateTime.Now,
+            };
+        }
+        return null;
+    }
+
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<AppointmentRatingViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-
-        var viewModels = list.Select(a => new AddressViewModel
-        {
-            Id = a.Id,
-            Logradouro = a.Logradouro,
-            Cep = a.Cep,
-            Bairro = a.Bairro,
-            Cidade = a.Cidade,
-            Estado = a.Estado,
-            Pais = a.Pais,
-            Numero = a.Numero,
-            Complemento = a.Complemento
-        }).ToList();
+        var viewModelList = list.Select(u => GetViewModel(u)).ToList();
 
         return StatusCode(200, new
         {
             success = true,
             message = "Dados retornados com sucesso",
-            data = viewModels,
+            data = viewModelList,
         });
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync(int id)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
-        var address = await _repository.GetByIdAsync(id);
+        var appointmentRating = await _repository.GetByIdAsync(id);
 
-        if (address == null)
+        if (appointmentRating == null)
         {
             return StatusCode(404, new
             {
@@ -67,29 +83,18 @@ public class AddressesController : ControllerBase
             });
         }
 
-        var viewModel = new AddressViewModel
-        {
-            Id = address.Id,
-            Logradouro = address.Logradouro,
-            Cep = address.Cep,
-            Bairro = address.Bairro,
-            Cidade = address.Cidade,
-            Estado = address.Estado,
-            Pais = address.Pais,
-            Numero = address.Numero,
-            Complemento = address.Complemento
-        };
+        var viewModel = GetViewModel(appointmentRating);
 
         return StatusCode(200, new
         {
             success = true,
             message = "Dados retornados com sucesso",
             data = viewModel,
-        }); ;
+        });
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAsync([FromBody] CreateAddressDto dto)
+    public async Task<IActionResult> AddAsync([FromBody] CreateAppointmentRatingDto dto)
     {
         try
         {
@@ -98,21 +103,16 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = new Address
+            var appointmentRating = new AppointmentRating
             {
-                Logradouro = dto.Logradouro,
-                Cep = dto.Cep,
-                Bairro = dto.Bairro,
-                Cidade = dto.Cidade,
-                Estado = dto.Estado,
-                Pais = dto.Pais,
-                Numero = dto.Numero,
-                Complemento = dto.Complemento
+                Rating = dto.Rating,
+                Comment = dto.Comment,
+                UserId = dto.UserId,
             };
 
-            await _repository.AddAsync(address);
+            await _repository.AddAsync(appointmentRating);
 
-            var result = await GetByIdAsync(address.Id);
+            var result = await GetByIdAsync(appointmentRating.Id);
 
             if (result is ObjectResult objectResult)
             {
@@ -135,8 +135,8 @@ public class AddressesController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAddressDto dto)
+    [HttpPut("{Id}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] int Id, [FromBody] UpdateAppointmentRatingDto dto)
     {
         try
         {
@@ -145,9 +145,9 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = await _repository.GetByIdAsync(id);
+            var appointmentRating = await _repository.GetByIdAsync(Id);
 
-            if (address == null)
+            if (appointmentRating == null)
             {
                 return StatusCode(404, new
                 {
@@ -157,18 +157,12 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            address.Logradouro = dto.Logradouro;
-            address.Cep = dto.Cep;
-            address.Bairro = dto.Bairro;
-            address.Cidade = dto.Cidade;
-            address.Estado = dto.Estado;
-            address.Pais = dto.Pais;
-            address.Numero = dto.Numero;
-            address.Complemento = dto.Complemento;
+            appointmentRating.Rating = dto.Rating ?? appointmentRating.Rating;
+            appointmentRating.Comment = dto.Comment ?? appointmentRating.Comment;
 
-            await _repository.UpdateAsync(address);
+            await _repository.UpdateAsync(appointmentRating);
 
-            return StatusCode(200, new
+            return StatusCode(204, new
             {
                 success = true,
                 message = "Dados atualizados com sucesso",
@@ -181,22 +175,23 @@ public class AddressesController : ControllerBase
 
             return StatusCode(400, new
             {
-                success = true,
+                success = false,
                 message = "Falha ao atualizar item",
                 trace = ex.Message,
                 data = Array.Empty<object>(),
             });
         }
+
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    [HttpDelete("{Id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         try
         {
-            var address = await _repository.GetByIdAsync(id);
+            var appointmentRating = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (appointmentRating == null)
             {
                 return StatusCode(404, new
                 {
@@ -206,23 +201,23 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            await _repository.DeleteAsync(address);
+            await _repository.DeleteAsync(appointmentRating);
 
-            return StatusCode(200, new
+            return StatusCode(204, new
             {
                 success = true,
-                message = "Objeto deletado com sucesso",
+                message = "Dados deletados com sucesso",
                 data = Array.Empty<object>(),
             });
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, "Falha ao deletar item");
 
             return StatusCode(400, new
             {
-                success = true,
-                message = "Falha ao atualizar item",
+                success = false,
+                message = "Falha ao deletar item",
                 trace = ex.Message,
                 data = Array.Empty<object>(),
             });

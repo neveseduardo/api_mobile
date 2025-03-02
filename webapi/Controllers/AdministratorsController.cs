@@ -92,12 +92,14 @@ public class AdministratorController : Controller
 
             await _repository.AddAsync(administrator);
 
-            return StatusCode(201, new
+            var result = await GetByIdAsync(administrator.Id);
+
+            if (result is ObjectResult objectResult)
             {
-                success = true,
-                message = "Dados criados com sucesso",
-                data = administrator,
-            });
+                objectResult.StatusCode = 201;
+            }
+
+            return result;
         }
         catch (System.Exception ex)
         {

@@ -11,12 +11,12 @@ public static class RouteExtensions
         {
             endpoints.MapControllerRoute(
                 name: "api",
-                pattern: "api/v1/{controller=ApiHome}/{action=Index}/{id?}"
+                pattern: "api/v1/{controller=Home}/{action=Index}/{id?}"
             );
 
             endpoints.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=WebHome}/{action=Index}/{id?}"
+                pattern: "{controller=Home}/{action=Index}/{id?}"
             );
         });
     }

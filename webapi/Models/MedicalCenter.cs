@@ -7,7 +7,7 @@ namespace WebApi.Models;
 public class MedicalCenter
 {
     [Key]
-    public int id { get; set; }
+    public int Id { get; set; }
 
     public string Name { get; set; } = "";
 

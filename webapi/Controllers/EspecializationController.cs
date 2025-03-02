@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Models.Dto;
@@ -14,50 +13,45 @@ namespace WebApi.Controllers;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
-[Route("api/v1/enderecos")]
-public class AddressesController : ControllerBase
+[Route("api/v1/especializacoes")]
+public class EspecializationController : ControllerBase
 {
-    private readonly IRepository<Address> _repository;
-    private readonly ILogger<AddressesController> _logger;
+    private readonly IRepository<Especialization> _repository;
+    private readonly ILogger<EspecializationController> _logger;
 
-    public AddressesController(IRepository<Address> addressRepository, ILogger<AddressesController> logger)
+    public EspecializationController(IRepository<Especialization> repository, ILogger<EspecializationController> logger)
     {
-        _repository = addressRepository;
+        _repository = repository;
         _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<EspecializationViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-
-        var viewModels = list.Select(a => new AddressViewModel
+        var viewModelList = list.Select(u => new EspecializationViewModel
         {
-            Id = a.Id,
-            Logradouro = a.Logradouro,
-            Cep = a.Cep,
-            Bairro = a.Bairro,
-            Cidade = a.Cidade,
-            Estado = a.Estado,
-            Pais = a.Pais,
-            Numero = a.Numero,
-            Complemento = a.Complemento
-        }).ToList();
+            Id = u.Id,
+            Name = u.Name,
+            Description = u.Description,
+            CreatedAt = u.CreatedAt ?? DateTime.Now,
+            UpdatedAt = u.UpdatedAt ?? DateTime.Now,
+        });
 
         return StatusCode(200, new
         {
             success = true,
             message = "Dados retornados com sucesso",
-            data = viewModels,
+            data = viewModelList,
         });
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync(int id)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
-        var address = await _repository.GetByIdAsync(id);
+        var especialization = await _repository.GetByIdAsync(id);
 
-        if (address == null)
+        if (especialization == null)
         {
             return StatusCode(404, new
             {
@@ -67,17 +61,13 @@ public class AddressesController : ControllerBase
             });
         }
 
-        var viewModel = new AddressViewModel
+        var viewModel = new EspecializationViewModel
         {
-            Id = address.Id,
-            Logradouro = address.Logradouro,
-            Cep = address.Cep,
-            Bairro = address.Bairro,
-            Cidade = address.Cidade,
-            Estado = address.Estado,
-            Pais = address.Pais,
-            Numero = address.Numero,
-            Complemento = address.Complemento
+            Id = especialization.Id,
+            Name = especialization.Name,
+            Description = especialization.Description,
+            CreatedAt = especialization.CreatedAt ?? DateTime.Now,
+            UpdatedAt = especialization.UpdatedAt ?? DateTime.Now,
         };
 
         return StatusCode(200, new
@@ -85,11 +75,11 @@ public class AddressesController : ControllerBase
             success = true,
             message = "Dados retornados com sucesso",
             data = viewModel,
-        }); ;
+        });
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAsync([FromBody] CreateAddressDto dto)
+    public async Task<IActionResult> AddAsync([FromBody] CreateEspecializationDto dto)
     {
         try
         {
@@ -98,21 +88,14 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = new Address
+            var especialization = new Especialization
             {
-                Logradouro = dto.Logradouro,
-                Cep = dto.Cep,
-                Bairro = dto.Bairro,
-                Cidade = dto.Cidade,
-                Estado = dto.Estado,
-                Pais = dto.Pais,
-                Numero = dto.Numero,
-                Complemento = dto.Complemento
+                Name = dto.Name,
             };
 
-            await _repository.AddAsync(address);
+            await _repository.AddAsync(especialization);
 
-            var result = await GetByIdAsync(address.Id);
+            var result = await GetByIdAsync(especialization.Id);
 
             if (result is ObjectResult objectResult)
             {
@@ -135,8 +118,8 @@ public class AddressesController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAddressDto dto)
+    [HttpPut("{Id}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] int Id, [FromBody] UpdateEspecializationDto dto)
     {
         try
         {
@@ -145,9 +128,9 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = await _repository.GetByIdAsync(id);
+            var especialization = await _repository.GetByIdAsync(Id);
 
-            if (address == null)
+            if (especialization == null)
             {
                 return StatusCode(404, new
                 {
@@ -157,16 +140,10 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            address.Logradouro = dto.Logradouro;
-            address.Cep = dto.Cep;
-            address.Bairro = dto.Bairro;
-            address.Cidade = dto.Cidade;
-            address.Estado = dto.Estado;
-            address.Pais = dto.Pais;
-            address.Numero = dto.Numero;
-            address.Complemento = dto.Complemento;
+            especialization.Name = dto.Name ?? especialization.Name;
+            especialization.Description = dto.Description ?? especialization.Description;
 
-            await _repository.UpdateAsync(address);
+            await _repository.UpdateAsync(especialization);
 
             return StatusCode(200, new
             {
@@ -181,22 +158,23 @@ public class AddressesController : ControllerBase
 
             return StatusCode(400, new
             {
-                success = true,
+                success = false,
                 message = "Falha ao atualizar item",
                 trace = ex.Message,
                 data = Array.Empty<object>(),
             });
         }
+
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    [HttpDelete("{Id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         try
         {
-            var address = await _repository.GetByIdAsync(id);
+            var especialization = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (especialization == null)
             {
                 return StatusCode(404, new
                 {
@@ -206,23 +184,23 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            await _repository.DeleteAsync(address);
+            await _repository.DeleteAsync(especialization);
 
             return StatusCode(200, new
             {
                 success = true,
-                message = "Objeto deletado com sucesso",
+                message = "Dados deletados com sucesso",
                 data = Array.Empty<object>(),
             });
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, "Falha ao deletar item");
 
             return StatusCode(400, new
             {
-                success = true,
-                message = "Falha ao atualizar item",
+                success = false,
+                message = "Falha ao deletar item",
                 trace = ex.Message,
                 data = Array.Empty<object>(),
             });
