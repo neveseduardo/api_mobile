@@ -239,3 +239,29 @@
     "updatedAt": "string"
   }
   ```
+
+### Unidades
+
+**POST /api/v1/unidades**
+- **Payload:**
+  ```json
+  {
+    "name": "string",
+    "phoneNumber": "+6..5. 16-39.560453.5.6804215.3.56 07 70.63-8.71-.71273 12.-.-8894998. 129.8 4-0779-6576  -5",
+    "email": "user@example.com",
+    "addressId": 2147483647
+  }
+  ```
+- **Resposta:**
+  ```json
+  {
+    "id": 0,
+    "name": "string",
+    "cpf": "string",
+    "email": "string",
+    "crm": "string",
+    "especialization": {},
+    "createdAt": "string",
+    "updatedAt": "string"
+  }
+  ```

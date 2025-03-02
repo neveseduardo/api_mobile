@@ -15,10 +15,10 @@ public class AdministratorSeeder
 
     public void Seed()
     {
-        if (!_context.Administrators.Any(a => a.Email == "email@email.com"))
+        if (!_context.Administrators.Any(a => a.Email == "administrador@administrador.com"))
         {
             var password = PasswordHelper.HashPassword("Senh@123");
-            var Administrator = new Administrator { Name = "Admin", Email = "email@email.com", Password = "" };
+            var Administrator = new Administrator { Name = "Administrador", Email = "administrador@administrador.com", Password = "" };
 
             Administrator.Password = password;
 

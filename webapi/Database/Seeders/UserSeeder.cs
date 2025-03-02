@@ -15,10 +15,10 @@ public class UserSeeder
 
     public void Seed()
     {
-        if (!_context.Users.Any(a => a.Email == "email@email.com"))
+        if (!_context.Users.Any(a => a.Email == "usuario@usuario.com"))
         {
             var password = PasswordHelper.HashPassword("Senh@123");
-            var User = new User { Name = "Cliente", Email = "email@email.com", Password = "", Cpf = "701.734.621-11" };
+            var User = new User { Name = "Cliente", Email = "usuario@usuario.com", Password = "", Cpf = "701.734.621-11" };
 
             User.Password = password;
 

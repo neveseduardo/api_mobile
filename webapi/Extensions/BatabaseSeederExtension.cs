@@ -13,14 +13,20 @@ static class DatabaseSeederExtension
             var context = services.GetRequiredService<ApplicationDbContext>();
 
             var userSeeder = new UserSeeder(context);
-            var admionistratorSeeder = new AdministratorSeeder(context);
+            var administratorSeeder = new AdministratorSeeder(context);
             var especializationSeeder = new EspecializationSeeder(context);
             var doctorSeeder = new DoctorSeeder(context);
+            var addressSeeder = new AddressSeeder(context);
+            var medicalCenterSeeder = new MedicalCenterSeeder(context);
+            var appointmentSeeder = new AppointmentSeeder(context);
 
+            addressSeeder.Seed();
             userSeeder.Seed();
-            admionistratorSeeder.Seed();
+            administratorSeeder.Seed();
             especializationSeeder.Seed();
             doctorSeeder.Seed();
+            medicalCenterSeeder.Seed();
+            appointmentSeeder.Seed();
         }
     }
 }
