@@ -2,15 +2,12 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
 
-namespace webapi.Controllers.Api;
+namespace WebApi.Controllers;
 
 public class ApiHomeController : Controller
 {
-    private readonly ILogger<ApiHomeController> _logger;
-
-    public ApiHomeController(ILogger<ApiHomeController> logger)
+    public ApiHomeController()
     {
-        _logger = logger;
     }
 
     public IActionResult Index()

@@ -1,7 +1,7 @@
 using WebApi.Database;
-using WebApi.Repositories.Api;
-using WebApi.Repositories.Web;
+using WebApi.Repositories;
 using WebApi.Extensions;
+using WebApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,11 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddMvc();
 builder.Services.AddDbContext<ApplicationDbContext>();
-builder.Services.AddTransient<IApiAuthenticationRepository, ApiAuthenticationRepository>();
-builder.Services.AddTransient<IWebAuthenticationRepository, WebAuthenticationRepository>();
-builder.Services.AddScoped<IApiUserRepository, ApiUserRepository>();
-builder.Services.AddScoped<IApiAddressRepository, ApiAddressRepository>();
-builder.Services.AddScoped<IApiAdministratorRepository, ApiAdministratorRepository>();
+builder.Services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
+builder.Services.AddScoped<IRepository<Address>, AddressRepository>();
+builder.Services.AddScoped<IRepository<Administrator>, AdministratorRepository>();
 builder.Services.AddCustomSwagger();
 
 var app = builder.Build();

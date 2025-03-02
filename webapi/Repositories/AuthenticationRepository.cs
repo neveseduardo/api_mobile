@@ -8,15 +8,15 @@ using WebApi.Models;
 using WebApi.Database;
 using WebApi.Models.Dto;
 
-namespace WebApi.Repositories.Api;
+namespace WebApi.Repositories;
 
-public class ApiAuthenticationRepository : IApiAuthenticationRepository
+public class AuthenticationRepository : IAuthenticationRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<ApiAuthenticationRepository> _logger;
+    private readonly ILogger<AuthenticationRepository> _logger;
 
-    public ApiAuthenticationRepository(ApplicationDbContext dBContext, IConfiguration configuration, ILogger<ApiAuthenticationRepository> logger)
+    public AuthenticationRepository(ApplicationDbContext dBContext, IConfiguration configuration, ILogger<AuthenticationRepository> logger)
     {
         _dbContext = dBContext;
         _configuration = configuration;

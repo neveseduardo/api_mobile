@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Repositories.Api;
+using WebApi.Repositories;
 using WebApi.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
@@ -9,15 +9,15 @@ using WebApi.Models;
 using WebApi.Helpers;
 using System.Text.Json;
 
-namespace WebApi.Controllers.Api;
+namespace WebApi.Controllers;
 
 [Route("api/v1/auth")]
 public class ApiAuthenticationController : ControllerBase
 {
-    private readonly IApiAuthenticationRepository _authRepository;
+    private readonly IAuthenticationRepository _authRepository;
     private readonly ILogger<ApiAuthenticationController> _logger;
 
-    public ApiAuthenticationController(IApiAuthenticationRepository authRepository, ILogger<ApiAuthenticationController> logger)
+    public ApiAuthenticationController(IAuthenticationRepository authRepository, ILogger<ApiAuthenticationController> logger)
     {
         _authRepository = authRepository;
         _logger = logger;

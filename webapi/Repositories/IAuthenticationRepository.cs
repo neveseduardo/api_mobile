@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using WebApi.Models;
 
-namespace WebApi.Repositories.Api;
-public interface IApiAuthenticationRepository
+namespace WebApi.Repositories;
+public interface IAuthenticationRepository
 {
     Task<User?> ValidateUserAsync(string email, string password);
 
