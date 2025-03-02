@@ -17,8 +17,5 @@ public class UpdateDoctorDto
     public string? CRM { get; set; } = "";
 
     [Range(1, int.MaxValue, ErrorMessage = "O campo {0} deve ser um valor positivo.")]
-    public int? AddressId { get; set; }
-
-    [Range(1, int.MaxValue, ErrorMessage = "O campo {0} deve ser um valor positivo.")]
     public int? EspecializationId { get; set; }
 }

@@ -21,12 +21,21 @@ public class AppointmentRepository : IRepository<Appointment>
 
     public async Task<IEnumerable<Appointment>> GetAllAsync()
     {
-        return await _context.Appointments.ToListAsync();
+        return await _context.Appointments
+            .OrderByDescending(a => a.Id)
+            .Include(r => r.Doctor)
+            .Include(r => r.User)
+            .Include(r => r.AppointmentRating)
+            .ToListAsync();
     }
 
     public async Task<Appointment?> GetByIdAsync(int id)
     {
-        return await _context.Appointments.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Appointments
+            .Include(r => r.Doctor)
+            .Include(r => r.User)
+            .Include(r => r.AppointmentRating)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Appointment?> AddAsync(Appointment appointment)
@@ -72,49 +81,5 @@ public class AppointmentRepository : IRepository<Appointment>
             _logger.LogError(ex, "Falha ao deletar item");
             throw;
         }
-    }
-
-    public AppointmentViewModel? GetViewModel(Appointment? appointment)
-    {
-        if (appointment != null)
-        {
-            UserViewModel? user = null;
-            DoctorViewModel? doctor = null;
-
-            if (appointment?.User != null)
-            {
-                user = new UserViewModel
-                {
-                    Id = appointment.User.Id,
-                    Name = appointment.User.Name,
-                    Email = appointment.User.Email,
-                };
-            }
-
-            if (appointment?.Doctor != null)
-            {
-                doctor = new DoctorViewModel
-                {
-                    Id = appointment.Doctor.Id,
-                    Name = appointment.Doctor.Name,
-                    Email = appointment.Doctor.Email,
-                };
-            }
-
-            var viewModel = new AppointmentViewModel
-            {
-                Id = appointment!.Id,
-                Date = appointment.Date,
-                Notes = appointment.Notes,
-                Status = appointment.Status,
-                User = user,
-                Doctor = doctor,
-                CreatedAt = appointment.CreatedAt ?? DateTime.Now,
-                UpdatedAt = appointment.UpdatedAt ?? DateTime.Now,
-            };
-
-            return viewModel;
-        }
-        return null;
     }
 }

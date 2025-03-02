@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/v1/agendamentos")]
 public class AppointmentController : ControllerBase
@@ -32,6 +32,7 @@ public class AppointmentController : ControllerBase
         {
             UserViewModel? user = null;
             DoctorViewModel? doctor = null;
+            AppointmentRatingViewModel? appointmentRating = null;
 
             if (appointment?.User != null)
             {
@@ -53,6 +54,18 @@ public class AppointmentController : ControllerBase
                 };
             }
 
+            if (appointment!.AppointmentRating != null)
+            {
+                appointmentRating = new AppointmentRatingViewModel
+                {
+                    Id = appointment.AppointmentRating.Id,
+                    Rating = appointment.AppointmentRating.Rating,
+                    Comment = appointment.AppointmentRating.Comment,
+                    CreatedAt = appointment.AppointmentRating.CreatedAt ?? DateTime.Now,
+                    UpdatedAt = appointment.AppointmentRating.UpdatedAt ?? DateTime.Now,
+                };
+            }
+
             var viewModel = new AppointmentViewModel
             {
                 Id = appointment!.Id,
@@ -61,6 +74,7 @@ public class AppointmentController : ControllerBase
                 Status = appointment.Status,
                 User = user,
                 Doctor = doctor,
+                AppointmentRating = appointmentRating,
                 CreatedAt = appointment.CreatedAt ?? DateTime.Now,
                 UpdatedAt = appointment.UpdatedAt ?? DateTime.Now,
             };

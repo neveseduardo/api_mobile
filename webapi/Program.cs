@@ -11,9 +11,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddMvc();
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
-builder.Services.AddScoped<IRepository<User>, UserRepository>();
-builder.Services.AddScoped<IRepository<Address>, AddressRepository>();
-builder.Services.AddScoped<IRepository<Administrator>, AdministratorRepository>();
+builder.Services.AddTransient<IRepository<User>, UserRepository>();
+builder.Services.AddTransient<IRepository<Address>, AddressRepository>();
+builder.Services.AddTransient<IRepository<Administrator>, AdministratorRepository>();
+builder.Services.AddTransient<IRepository<Doctor>, DoctorRepository>();
+builder.Services.AddTransient<IRepository<Especialization>, EspecializationRepository>();
+builder.Services.AddTransient<IRepository<MedicalCenter>, MedicalCenterRepository>();
+builder.Services.AddTransient<IRepository<Appointment>, AppointmentRepository>();
+builder.Services.AddTransient<IRepository<AppointmentRating>, AppointmentRatingRepository>();
 builder.Services.AddCustomSwagger();
 
 var app = builder.Build();

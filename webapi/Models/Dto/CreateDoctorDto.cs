@@ -21,12 +21,7 @@ public class CreateDoctorDto
     [RegularExpression(@"^\d{4,6}[A-Za-z]{2}$", ErrorMessage = "O campo {0} deve estar no formato 9999AA ou 999999AA.")]
     public string CRM { get; set; } = "";
 
-    [ForeignKey("address")]
-    [Range(1, int.MaxValue, ErrorMessage = "O campo {0} deve ser um valor positivo.")]
-    public Nullable<int> AddressId { get; set; }
-
     [Required(ErrorMessage = "Campo {0} obrigatório.")]
     [Range(1, int.MaxValue, ErrorMessage = "O campo {0} deve ser um valor positivo.")]
-    [ForeignKey("Especialization")]
     public int EspecializationId { get; set; }
 }

@@ -20,12 +20,17 @@ public class AppointmentRatingRepository : IRepository<AppointmentRating>
 
     public async Task<IEnumerable<AppointmentRating>> GetAllAsync()
     {
-        return await _context.AppointmentRatings.ToListAsync();
+        return await _context.AppointmentRatings
+            .OrderByDescending(a => a.Id)
+            .Include(r => r.Appointment)
+            .ToListAsync();
     }
 
     public async Task<AppointmentRating?> GetByIdAsync(int id)
     {
-        return await _context.AppointmentRatings.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.AppointmentRatings
+            .Include(r => r.Appointment)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<AppointmentRating?> AddAsync(AppointmentRating appointmentRating)

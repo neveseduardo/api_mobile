@@ -17,11 +17,6 @@ public class Doctor
 
     public string CRM { get; set; } = "";
 
-    [ForeignKey("address")]
-    public Nullable<int> AddressId { get; set; }
-
-    public Address? address { get; set; }
-
     [ForeignKey("Especialization")]
     public int EspecializationId { get; set; }
 

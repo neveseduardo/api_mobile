@@ -15,10 +15,12 @@ static class DatabaseSeederExtension
             var userSeeder = new UserSeeder(context);
             var admionistratorSeeder = new AdministratorSeeder(context);
             var especializationSeeder = new EspecializationSeeder(context);
+            var doctorSeeder = new DoctorSeeder(context);
 
             userSeeder.Seed();
             admionistratorSeeder.Seed();
             especializationSeeder.Seed();
+            doctorSeeder.Seed();
         }
     }
 }

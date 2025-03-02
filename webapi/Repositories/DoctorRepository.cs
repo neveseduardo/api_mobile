@@ -20,7 +20,9 @@ public class DoctorRepository : IRepository<Doctor>
 
     public async Task<IEnumerable<Doctor>> GetAllAsync()
     {
-        return await _context.Doctors.ToListAsync();
+        return await _context.Doctors
+            .OrderByDescending(a => a.Id)
+            .ToListAsync();
     }
 
     public async Task<Doctor?> GetByIdAsync(int id)

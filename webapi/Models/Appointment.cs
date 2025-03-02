@@ -25,9 +25,6 @@ public class Appointment
 
     public Doctor? Doctor { get; set; }
 
-    [ForeignKey("AppointmentRating")]
-    public Nullable<int> AppointmentRatingId { get; set; }
-
     public AppointmentRating? AppointmentRating { get; set; }
 
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;

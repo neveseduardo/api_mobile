@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/v1/agendamento-avaliacoes")]
 public class AppointmentRatingController : ControllerBase
@@ -25,30 +25,30 @@ public class AppointmentRatingController : ControllerBase
         _logger = logger;
     }
 
-    protected AppointmentRatingViewModel? GetViewModel(AppointmentRating appointmentRating)
+    protected AppointmentRatingViewModel? GetViewModel(AppointmentRating ar)
     {
-        if (appointmentRating != null)
+        if (ar != null)
         {
             UserViewModel? user = null;
 
-            if (appointmentRating.User != null)
+            if (ar.User != null)
             {
                 user = new UserViewModel
                 {
-                    Id = appointmentRating.User.Id,
-                    Name = appointmentRating.User.Name,
-                    Email = appointmentRating.User.Email,
+                    Id = ar.User.Id,
+                    Name = ar.User.Name,
+                    Email = ar.User.Email,
                 };
             }
 
             return new AppointmentRatingViewModel
             {
-                Id = appointmentRating.Id,
-                Rating = appointmentRating.Rating,
-                Comment = appointmentRating.Comment,
+                Id = ar.Id,
+                Rating = ar.Rating,
+                Comment = ar.Comment,
                 User = user,
-                CreatedAt = appointmentRating.CreatedAt ?? DateTime.Now,
-                UpdatedAt = appointmentRating.UpdatedAt ?? DateTime.Now,
+                CreatedAt = ar.CreatedAt ?? DateTime.Now,
+                UpdatedAt = ar.UpdatedAt ?? DateTime.Now,
             };
         }
         return null;
@@ -108,6 +108,7 @@ public class AppointmentRatingController : ControllerBase
                 Rating = dto.Rating,
                 Comment = dto.Comment,
                 UserId = dto.UserId,
+                AppointmentId = dto.AppointmentId,
             };
 
             await _repository.AddAsync(appointmentRating);

@@ -124,7 +124,6 @@ namespace webapi.Migrations
                     CPF = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     CRM = table.Column<string>(type: "TEXT", nullable: false),
-                    AddressId = table.Column<int>(type: "INTEGER", nullable: true),
                     EspecializationId = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
@@ -133,14 +132,40 @@ namespace webapi.Migrations
                 {
                     table.PrimaryKey("PK_medicos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_medicos_enderecos_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "enderecos",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_medicos_especializacoes_EspecializationId",
                         column: x => x.EspecializationId,
                         principalTable: "especializacoes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "agendamentos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true),
+                    Status = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_agendamentos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_agendamentos_medicos_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "medicos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_agendamentos_usuarios_UserId",
+                        column: x => x.UserId,
+                        principalTable: "usuarios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -162,44 +187,13 @@ namespace webapi.Migrations
                 {
                     table.PrimaryKey("PK_agendamento_avaliacoes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_agendamento_avaliacoes_agendamentos_AppointmentId",
+                        column: x => x.AppointmentId,
+                        principalTable: "agendamentos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_agendamento_avaliacoes_usuarios_UserId",
-                        column: x => x.UserId,
-                        principalTable: "usuarios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "agendamentos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", nullable: true),
-                    Status = table.Column<string>(type: "TEXT", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AppointmentRatingId = table.Column<int>(type: "INTEGER", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_agendamentos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_agendamentos_agendamento_avaliacoes_AppointmentRatingId",
-                        column: x => x.AppointmentRatingId,
-                        principalTable: "agendamento_avaliacoes",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_agendamentos_medicos_DoctorId",
-                        column: x => x.DoctorId,
-                        principalTable: "medicos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_agendamentos_usuarios_UserId",
                         column: x => x.UserId,
                         principalTable: "usuarios",
                         principalColumn: "Id",
@@ -215,17 +209,13 @@ namespace webapi.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_agendamento_avaliacoes_AppointmentId",
                 table: "agendamento_avaliacoes",
-                column: "AppointmentId");
+                column: "AppointmentId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_agendamento_avaliacoes_UserId",
                 table: "agendamento_avaliacoes",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_agendamentos_AppointmentRatingId",
-                table: "agendamentos",
-                column: "AppointmentRatingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_agendamentos_DoctorId",
@@ -240,11 +230,6 @@ namespace webapi.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_centros_medicos_AddressId",
                 table: "centros_medicos",
-                column: "AddressId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_medicos_AddressId",
-                table: "medicos",
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
@@ -268,34 +253,22 @@ namespace webapi.Migrations
                 table: "usuarios",
                 column: "Email",
                 unique: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_agendamento_avaliacoes_agendamentos_AppointmentId",
-                table: "agendamento_avaliacoes",
-                column: "AppointmentId",
-                principalTable: "agendamentos",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_agendamento_avaliacoes_agendamentos_AppointmentId",
-                table: "agendamento_avaliacoes");
-
             migrationBuilder.DropTable(
                 name: "administradores");
+
+            migrationBuilder.DropTable(
+                name: "agendamento_avaliacoes");
 
             migrationBuilder.DropTable(
                 name: "centros_medicos");
 
             migrationBuilder.DropTable(
                 name: "agendamentos");
-
-            migrationBuilder.DropTable(
-                name: "agendamento_avaliacoes");
 
             migrationBuilder.DropTable(
                 name: "medicos");

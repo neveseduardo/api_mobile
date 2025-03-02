@@ -20,7 +20,9 @@ public class AddressRepository : IRepository<Address>
 
     public async Task<IEnumerable<Address>> GetAllAsync()
     {
-        return await _context.Addresses.ToListAsync();
+        return await _context.Addresses
+            .OrderByDescending(a => a.Id)
+            .ToListAsync();
     }
 
     public async Task<Address?> GetByIdAsync(int id)

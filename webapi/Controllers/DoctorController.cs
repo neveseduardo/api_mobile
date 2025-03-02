@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/v1/medicos")]
 public class DoctorController : ControllerBase
@@ -34,6 +34,7 @@ public class DoctorController : ControllerBase
             Id = u.Id,
             Name = u.Name,
             Email = u.Email,
+            CRM = u.CRM,
         });
 
         return StatusCode(200, new
@@ -89,6 +90,8 @@ public class DoctorController : ControllerBase
                 Name = dto.Name,
                 Email = dto.Email,
                 CPF = dto.CPF,
+                CRM = dto.CRM,
+                EspecializationId = dto.EspecializationId,
             };
 
             await _repository.AddAsync(doctor);

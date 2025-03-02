@@ -20,7 +20,9 @@ public class UserRepository : IRepository<User>
 
     public async Task<IEnumerable<User>> GetAllAsync()
     {
-        return await _context.Users.ToListAsync();
+        return await _context.Users
+            .OrderByDescending(a => a.Id)
+            .ToListAsync();
     }
 
     public async Task<User?> GetByIdAsync(int id)

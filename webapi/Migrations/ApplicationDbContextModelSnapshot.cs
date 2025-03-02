@@ -97,9 +97,6 @@ namespace webapi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AppointmentRatingId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -123,8 +120,6 @@ namespace webapi.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppointmentRatingId");
 
                     b.HasIndex("DoctorId");
 
@@ -159,7 +154,8 @@ namespace webapi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -170,9 +166,6 @@ namespace webapi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("AddressId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("CPF")
@@ -201,8 +194,6 @@ namespace webapi.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AddressId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -312,10 +303,6 @@ namespace webapi.Migrations
 
             modelBuilder.Entity("WebApi.Models.Appointment", b =>
                 {
-                    b.HasOne("WebApi.Models.AppointmentRating", "AppointmentRating")
-                        .WithMany()
-                        .HasForeignKey("AppointmentRatingId");
-
                     b.HasOne("WebApi.Models.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
@@ -328,8 +315,6 @@ namespace webapi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppointmentRating");
-
                     b.Navigation("Doctor");
 
                     b.Navigation("User");
@@ -338,8 +323,8 @@ namespace webapi.Migrations
             modelBuilder.Entity("WebApi.Models.AppointmentRating", b =>
                 {
                     b.HasOne("WebApi.Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
+                        .WithOne("AppointmentRating")
+                        .HasForeignKey("WebApi.Models.AppointmentRating", "AppointmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -356,10 +341,6 @@ namespace webapi.Migrations
 
             modelBuilder.Entity("WebApi.Models.Doctor", b =>
                 {
-                    b.HasOne("WebApi.Models.Address", "address")
-                        .WithMany()
-                        .HasForeignKey("AddressId");
-
                     b.HasOne("WebApi.Models.Especialization", "Especialization")
                         .WithMany()
                         .HasForeignKey("EspecializationId")
@@ -367,8 +348,6 @@ namespace webapi.Migrations
                         .IsRequired();
 
                     b.Navigation("Especialization");
-
-                    b.Navigation("address");
                 });
 
             modelBuilder.Entity("WebApi.Models.MedicalCenter", b =>
@@ -389,6 +368,11 @@ namespace webapi.Migrations
                         .HasForeignKey("AddressId");
 
                     b.Navigation("address");
+                });
+
+            modelBuilder.Entity("WebApi.Models.Appointment", b =>
+                {
+                    b.Navigation("AppointmentRating");
                 });
 #pragma warning restore 612, 618
         }

@@ -20,7 +20,9 @@ public class EspecializationRepository : IRepository<Especialization>
 
     public async Task<IEnumerable<Especialization>> GetAllAsync()
     {
-        return await _context.Especializations.ToListAsync();
+        return await _context.Especializations
+            .OrderByDescending(a => a.Id)
+            .ToListAsync();
     }
 
     public async Task<Especialization?> GetByIdAsync(int id)

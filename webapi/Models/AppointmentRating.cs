@@ -14,9 +14,9 @@ public class AppointmentRating
     public string? Comment { get; set; } = "";
 
     [ForeignKey("Appointment")]
-    public int AppointmentId { get; set; }
+    public int AppointmentId { get; set; } // Mantém a chave estrangeira
 
-    public Appointment? Appointment { get; set; }
+    public Appointment? Appointment { get; set; } // Relacionamento correto
 
     [ForeignKey("User")]
     public int UserId { get; set; }

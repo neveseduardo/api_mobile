@@ -20,7 +20,9 @@ public class AdministratorRepository : IRepository<Administrator>
 
     public async Task<IEnumerable<Administrator>> GetAllAsync()
     {
-        return await _context.Administrators.ToListAsync();
+        return await _context.Administrators
+            .OrderByDescending(a => a.Id)
+            .ToListAsync();
     }
 
     public async Task<Administrator?> GetByIdAsync(int id)
