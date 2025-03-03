@@ -1,9 +1,12 @@
 import { ThemedView } from '@/components/ui/ThemedView';
 import UserProfileHeader from '@/components/modules/user/UserProfileHeader';
-import { useAuth } from '@/contexts/UserAuthenticationContext';
+import { useUserAuth } from '@/contexts/UserAuthenticationContext';
 
 const UserScreen = () => {
-	const { userData } = useAuth();
+	const { userData } = useUserAuth();
+
+	// eslint-disable-next-line no-console
+	console.log('userData', userData);
 
 	return (
 		<ThemedView className="flex-1 w-full p-5">

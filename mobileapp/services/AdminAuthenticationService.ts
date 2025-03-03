@@ -40,9 +40,9 @@ export class AdminAuthenticationService implements IAuthenticationService<IAdmin
 			}
 
 			const user: IAdmin = {
-				id: data.id,
-				email: data.email,
-				name: data.name,
+				id: data?.data?.id,
+				email: data?.data?.email,
+				name: data?.data?.name,
 			};
 
 			return user;

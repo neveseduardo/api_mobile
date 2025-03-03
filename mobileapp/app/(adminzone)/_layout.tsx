@@ -1,19 +1,24 @@
 import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Layout() {
 	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
+		<SafeAreaProvider>
+			<SafeAreaView className="flex flex-1">
+				<GestureHandlerRootView style={{ flex: 1 }}>
+					<Drawer>
+						<Drawer.Screen name="index" options={{ title: 'Início', drawerLabel: 'Início' }} />
+						<Drawer.Screen name="agendamentos" options={{ title: 'Agendamentos', drawerLabel: 'Agendamentos' }} />
+						<Drawer.Screen name="enderecos" options={{ title: 'Endereços', drawerLabel: 'Endereços' }} />
+						<Drawer.Screen name="medicos" options={{ title: 'Médicos', drawerLabel: 'Médicos' }} />
+						<Drawer.Screen name="unidades" options={{ title: 'Unidades médicas', drawerLabel: 'Unidades médicas' }} />
+						<Drawer.Screen name="usuarios" options={{ title: 'Usuários', drawerLabel: 'Usuários' }} />
+						<Drawer.Screen name="administradores" options={{ title: 'Administradores', drawerLabel: 'Administradores' }} />
+					</Drawer>
+				</GestureHandlerRootView>
+			</SafeAreaView>
+		</SafeAreaProvider>
 
-			<Drawer>
-				<Drawer.Screen name="index" options={{ drawerLabel: 'Início', headerShown: false }} />
-				<Drawer.Screen name="agendamentos" options={{ drawerLabel: 'Agendamentos', headerShown: false }} />
-				<Drawer.Screen name="enderecos" options={{ drawerLabel: 'Endereços', headerShown: false }} />
-				<Drawer.Screen name="medicos" options={{ drawerLabel: 'Médicos', headerShown: false }} />
-				<Drawer.Screen name="unidades" options={{ drawerLabel: 'Unidades médicas', headerShown: false }} />
-				<Drawer.Screen name="usuarios" options={{ drawerLabel: 'Usuários', headerShown: false }} />
-				<Drawer.Screen name="administradores" options={{ drawerLabel: 'Administradores', headerShown: false }} />
-			</Drawer>
-		</GestureHandlerRootView>
 	);
 }

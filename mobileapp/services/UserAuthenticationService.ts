@@ -44,10 +44,10 @@ export class UserAuthenticationService implements IAuthenticationService<IUser> 
 			}
 
 			const user: IUser = {
-				id: data.id,
-				email: data.email,
-				name: data.name,
-				cpf: data.cpf,
+				id: data?.data?.id,
+				email: data?.data?.email,
+				name: data?.data?.name,
+				cpf: data?.data?.cpf,
 			};
 
 			return user;

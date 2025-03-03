@@ -13,6 +13,10 @@ const defaultValue: AuthContextType<IUser> = {
 	logout: async () => { },
 };
 
+const USER_ACCESS_TOKEN_NAME = 'user_access_token';
+const USER_REFRESH_TOKEN_NAME = 'user_refresh_token';
+const USER_DATA_NAME = 'user_userData';
+
 const UserAuthenticationContext = createContext<AuthContextType<IUser>>(defaultValue);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -24,9 +28,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	useEffect(() => {
 		const loadAuthData = async () => {
-			const storedAccessToken = await AsyncStorage.getItem('access_token');
-			const storedRefreshToken = await AsyncStorage.getItem('refresh_token');
-			const storedUserData = await AsyncStorage.getItem('userData');
+			const storedAccessToken = await AsyncStorage.getItem(USER_ACCESS_TOKEN_NAME);
+			const storedRefreshToken = await AsyncStorage.getItem(USER_REFRESH_TOKEN_NAME);
+			const storedUserData = await AsyncStorage.getItem(USER_DATA_NAME);
+
+			// eslint-disable-next-line no-console
+			console.log('data', storedAccessToken, storedRefreshToken, storedUserData);
 
 			if (storedAccessToken && storedRefreshToken && storedUserData) {
 				setAccessToken(storedAccessToken);
@@ -42,16 +49,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		try {
 			const { accessToken, refreshToken } = await service.login({ username, password });
 
-			await AsyncStorage.setItem('access_token', accessToken);
-			await AsyncStorage.setItem('refresh_token', refreshToken);
+			await AsyncStorage.setItem(USER_ACCESS_TOKEN_NAME, accessToken);
+			await AsyncStorage.setItem(USER_REFRESH_TOKEN_NAME, refreshToken);
 
 			setAccessToken(accessToken);
 			setRefreshToken(refreshToken);
 
 			const user = await service.userData();
 
+			// eslint-disable-next-line no-console
+			console.log('pegay', user);
+
+			await AsyncStorage.setItem(USER_DATA_NAME, JSON.stringify(user));
+
 			setUserData(user);
-			await AsyncStorage.setItem('userData', JSON.stringify(user));
 
 			return { accessToken, user };
 		} catch (error) {
@@ -77,9 +88,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			setRefreshToken('');
 			setUserData(null);
 
-			await AsyncStorage.removeItem('access_token');
-			await AsyncStorage.removeItem('refresh_token');
-			await AsyncStorage.removeItem('userData');
+			await AsyncStorage.removeItem(USER_ACCESS_TOKEN_NAME);
+			await AsyncStorage.removeItem(USER_REFRESH_TOKEN_NAME);
+			await AsyncStorage.removeItem(USER_DATA_NAME);
 		} catch (error) {
 			console.error('Erro ao fazer logout:', error);
 			throw error;

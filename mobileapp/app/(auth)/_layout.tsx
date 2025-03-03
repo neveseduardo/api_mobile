@@ -12,6 +12,7 @@ export default function AuthLayout() {
 				<Stack initialRouteName="userlogin">
 					<Stack.Screen name="userlogin" options={{ headerShown: false }} />
 					<Stack.Screen name="register" options={{ headerShown: false }} />
+					<Stack.Screen name="adminlogin" options={{ headerShown: false }} />
 				</Stack>
 				<StatusBar style="auto" />
 			</UserAuthenticationProvider>
