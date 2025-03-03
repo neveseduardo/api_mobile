@@ -53,7 +53,7 @@ export default function AddressScreen() {
 
 	const onSubmit = async (data: LoginFormData) => {
 		try {
-			const response = await service.create({
+			const response = await service.addFromAdminAsync({
 				cep: data.cep,
 				logradouro: data.logradouro,
 				numero: data.numero,

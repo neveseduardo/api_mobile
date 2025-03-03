@@ -18,7 +18,23 @@ export class AddressService {
 		return this.client.get(`${API_URL}/localidades/estados`);
 	}
 
-	async create(data: any): Promise<any> {
+	async addFromAdminAsync(data: any): Promise<any> {
 		return this.client.post('/enderecos', data);
+	}
+
+	async getAllFromAdminAsync(): Promise<any> {
+		return this.client.get('/enderecos');
+	}
+
+	async getByIdFromAdminAsync(id: number): Promise<any> {
+		return this.client.get(`/enderecos/${id}`);
+	}
+
+	async updateFromAdminAsync(id: number, data: any) {
+		return this.client.put(`/enderecos/${id}`, data);
+	}
+
+	async deleteFromAdminAsync(id: number) {
+		return this.client.delete(`/enderecos/${id}`);
 	}
 };
