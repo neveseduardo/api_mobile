@@ -67,6 +67,22 @@ namespace webapi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "planos_saude",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Coverage = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_planos_saude", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "centros_medicos",
                 columns: table => new
                 {
@@ -137,6 +153,30 @@ namespace webapi.Migrations
                         principalTable: "especializacoes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "convênios",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Provider = table.Column<string>(type: "TEXT", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    HealthPlanId = table.Column<int>(type: "INTEGER", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_convênios", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_convênios_planos_saude_HealthPlanId",
+                        column: x => x.HealthPlanId,
+                        principalTable: "planos_saude",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -233,6 +273,11 @@ namespace webapi.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_convênios_HealthPlanId",
+                table: "convênios",
+                column: "HealthPlanId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_medicos_Email",
                 table: "medicos",
                 column: "Email",
@@ -268,7 +313,13 @@ namespace webapi.Migrations
                 name: "centros_medicos");
 
             migrationBuilder.DropTable(
+                name: "convênios");
+
+            migrationBuilder.DropTable(
                 name: "agendamentos");
+
+            migrationBuilder.DropTable(
+                name: "planos_saude");
 
             migrationBuilder.DropTable(
                 name: "medicos");

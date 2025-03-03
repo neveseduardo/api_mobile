@@ -29,6 +29,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<MedicalCenter> MedicalCenters { get; set; }
 
+    public DbSet<HealthPlan> HealthPlans { get; set; }
+
+    public DbSet<MedicalAgreement> MedicalAgreements { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)

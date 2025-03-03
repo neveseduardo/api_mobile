@@ -99,7 +99,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<AppointmentViewModel>> GetByIdAsync([FromRoute] int id)
     {
         var appointment = await _repository.GetByIdAsync(id);
 
@@ -146,12 +146,13 @@ public class AppointmentController : ControllerBase
 
             var result = await GetByIdAsync(appointment.Id);
 
-            if (result is ObjectResult objectResult)
+            if (result.Result is ObjectResult objectResult)
             {
                 objectResult.StatusCode = 201;
+                return objectResult;
             }
 
-            return result;
+            return StatusCode(201, result.Value);
         }
         catch (System.Exception ex)
         {

@@ -47,7 +47,7 @@ public class EspecializationController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<EspecializationViewModel>> GetByIdAsync([FromRoute] int id)
     {
         var especialization = await _repository.GetByIdAsync(id);
 
@@ -97,12 +97,13 @@ public class EspecializationController : ControllerBase
 
             var result = await GetByIdAsync(especialization.Id);
 
-            if (result is ObjectResult objectResult)
+            if (result.Result is ObjectResult objectResult)
             {
                 objectResult.StatusCode = 201;
+                return objectResult;
             }
 
-            return result;
+            return StatusCode(201, result.Value);
         }
         catch (System.Exception ex)
         {

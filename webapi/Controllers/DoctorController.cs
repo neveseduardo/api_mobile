@@ -26,7 +26,7 @@ public class DoctorController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<DoctorViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
         var viewModelList = list.Select(u => new DoctorViewModel
@@ -46,7 +46,7 @@ public class DoctorController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<DoctorViewModel>> GetByIdAsync([FromRoute] int id)
     {
         var doctor = await _repository.GetByIdAsync(id);
 
@@ -98,12 +98,13 @@ public class DoctorController : ControllerBase
 
             var result = await GetByIdAsync(doctor.Id);
 
-            if (result is ObjectResult objectResult)
+            if (result.Result is ObjectResult objectResult)
             {
                 objectResult.StatusCode = 201;
+                return objectResult;
             }
 
-            return result;
+            return StatusCode(201, result.Value);
         }
         catch (System.Exception ex)
         {

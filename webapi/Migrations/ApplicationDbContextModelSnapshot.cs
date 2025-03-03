@@ -227,6 +227,67 @@ namespace webapi.Migrations
                     b.ToTable("especializacoes");
                 });
 
+            modelBuilder.Entity("WebApi.Models.HealthPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Coverage")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("planos_saude");
+                });
+
+            modelBuilder.Entity("WebApi.Models.MedicalAgreement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("HealthPlanId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HealthPlanId");
+
+                    b.ToTable("convênios");
+                });
+
             modelBuilder.Entity("WebApi.Models.MedicalCenter", b =>
                 {
                     b.Property<int>("Id")
@@ -350,6 +411,15 @@ namespace webapi.Migrations
                     b.Navigation("Especialization");
                 });
 
+            modelBuilder.Entity("WebApi.Models.MedicalAgreement", b =>
+                {
+                    b.HasOne("WebApi.Models.HealthPlan", "HealthPlan")
+                        .WithMany("MedicalAgreements")
+                        .HasForeignKey("HealthPlanId");
+
+                    b.Navigation("HealthPlan");
+                });
+
             modelBuilder.Entity("WebApi.Models.MedicalCenter", b =>
                 {
                     b.HasOne("WebApi.Models.Address", "Address")
@@ -373,6 +443,11 @@ namespace webapi.Migrations
             modelBuilder.Entity("WebApi.Models.Appointment", b =>
                 {
                     b.Navigation("AppointmentRating");
+                });
+
+            modelBuilder.Entity("WebApi.Models.HealthPlan", b =>
+                {
+                    b.Navigation("MedicalAgreements");
                 });
 #pragma warning restore 612, 618
         }

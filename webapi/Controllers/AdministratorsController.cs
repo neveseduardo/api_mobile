@@ -44,7 +44,7 @@ public class AdministratorController : Controller
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<AdministratorViewModel>> GetByIdAsync([FromRoute] int id)
     {
         var administrator = await _repository.GetByIdAsync(id);
 
@@ -94,12 +94,13 @@ public class AdministratorController : Controller
 
             var result = await GetByIdAsync(administrator.Id);
 
-            if (result is ObjectResult objectResult)
+            if (result.Result is ObjectResult objectResult)
             {
                 objectResult.StatusCode = 201;
+                return objectResult;
             }
 
-            return result;
+            return StatusCode(201, result.Value);
         }
         catch (System.Exception ex)
         {

@@ -56,7 +56,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
+    public async Task<ActionResult<UserViewModel>> GetByIdAsync([FromRoute] int id)
     {
         var user = await _repository.GetByIdAsync(id);
 
@@ -101,12 +101,13 @@ public class UsersController : ControllerBase
 
             var result = await GetByIdAsync(user.Id);
 
-            if (result is ObjectResult objectResult)
+            if (result.Result is ObjectResult objectResult)
             {
                 objectResult.StatusCode = 201;
+                return objectResult;
             }
 
-            return result;
+            return StatusCode(201, result.Value);
         }
         catch (System.Exception ex)
         {
