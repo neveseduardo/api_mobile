@@ -1,73 +1,47 @@
-import { useState } from 'react';
+import { useAdminAuth } from '@/contexts/AdminAuthenticationContext';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Href, useLocalSearchParams, useRouter } from 'expo-router';
+import { Href, router } from 'expo-router';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
 import PasswordInput from '@/components/ui/PasswordInput';
-import { useUserAuth } from '@/contexts/UserAuthenticationContext';
 import AuthHeader from '@/components/modules/auth/AuthHeader';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { z } from 'zod';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { isCPF } from '@/utils/helpers';
 
 const formSchema = z.object({
-	name: z.string().min(1, 'Campo obrigatório'),
 	email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
 	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
-	cpassword: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
-	cpf: z.string()
-		.min(11, 'O CPF deve ter 11 caracteres')
-		.max(14, 'O CPF deve ter no máximo 14 caracteres')
-		.refine(isCPF, { message: 'CPF inválido' }),
-}).refine((data) => data.password === data.cpassword, {
-	message: 'As senhas devem ser iguais',
-	path: ['cpassword'],
 });
 
 type InnerFormData = z.infer<typeof formSchema>;
-
-const cpfMask = [/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/];
 
 export default function LoginScreen() {
 	const { control, handleSubmit, formState: { errors } } = useForm<InnerFormData>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: 'Jhon Due',
-			email: 'email@email.com',
-			cpf: '737.425.159-93',
+			email: 'administrador@administrador.com',
 			password: 'Senh@123',
-			cpassword: 'Senh@123',
 		},
 	});
 
-	const router = useRouter();
-	const params = useLocalSearchParams();
-	const { addressId } = params;
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 
-	const { register, login } = useUserAuth();
+	const { login } = useAdminAuth();
 
 	const onSubmit = async (data: InnerFormData) => {
 		try {
 			setLoading(true);
 
-			await register(
-				data.name,
-				data.email,
-				data.cpf,
-				data.password,
-				!isNaN(Number(addressId)) ? Number(addressId) : undefined,
-			);
-
 			const { accessToken, user } = await login(data.email, data.password);
 
 			if (accessToken && user) {
-				router.replace('/(userzone)' as Href);
+				router.replace('/(adminzone)' as Href);
 			}
 		} catch (error: any) {
 			console.error('Erro de Authenticação', error);
@@ -81,12 +55,12 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<ThemedView className="items-center justify-center flex-1 p-8 bg-gray-500">
+		<ThemedView className="relative items-center justify-center flex-1 p-8 bg-gray">
 			<View className="flex flex-col w-full gap-5">
 				<AuthHeader
 					icon="lock-closed-outline"
-					title="Cadastre-se"
-					description="Insira os dados solicitados abaixo para registrar-se no aplicativo."
+					title="Área reservada"
+					description="Este login serve somente para administradores utilizarem a plataforma."
 				/>
 
 				{!!error && (
@@ -97,24 +71,6 @@ export default function LoginScreen() {
 				)}
 
 				<View className="flex flex-col w-full gap-4">
-					<Controller
-						control={control}
-						name="name"
-						render={({ field: { onChange, onBlur, value } }) => (
-							<TextInput
-								autoCapitalize="characters"
-								returnKeyType="next"
-								placeholder="name"
-								value={value}
-								onChangeText={onChange}
-								onBlur={onBlur}
-								disabled={loading}
-								error={!!errors.name}
-								errorMessage={errors.name?.message}
-							/>
-						)}
-					/>
-
 					<Controller
 						control={control}
 						name="email"
@@ -135,29 +91,11 @@ export default function LoginScreen() {
 
 					<Controller
 						control={control}
-						name="cpf"
-						render={({ field: { onChange, onBlur, value } }) => (
-							<TextInput
-								returnKeyType="next"
-								placeholder="CPF"
-								value={value}
-								onChangeText={onChange}
-								onBlur={onBlur}
-								disabled={loading}
-								error={!!errors.cpf}
-								errorMessage={errors.cpf?.message}
-								mask={cpfMask}
-							/>
-						)}
-					/>
-
-					<Controller
-						control={control}
 						name="password"
 						render={({ field: { onChange, onBlur, value } }) => (
 							<PasswordInput
 								placeholder="Senha"
-								returnKeyType="next"
+								returnKeyType="done"
 								value={value}
 								onChangeText={onChange}
 								onBlur={onBlur}
@@ -168,40 +106,23 @@ export default function LoginScreen() {
 						)}
 					/>
 
-					<Controller
-						control={control}
-						name="cpassword"
-						render={({ field: { onChange, onBlur, value } }) => (
-							<PasswordInput
-								placeholder="Confirmar Senha"
-								returnKeyType="done"
-								value={value}
-								onChangeText={onChange}
-								onBlur={onBlur}
-								disabled={loading}
-								error={!!errors.cpassword}
-								errorMessage={errors.cpassword?.message}
-							/>
-						)}
-					/>
-
 					<Button
 						onPress={handleSubmit(onSubmit)}
 						color="primary"
 						className="w-full"
 						disabled={loading}
 					>
-						<Text className="text-white">FINALIZAR</Text>
+						<Text className="text-white">ENTRAR</Text>
 					</Button>
 
 					<View className="flex flex-row items-center justify-center w-full gap-2 text-center">
-						<ThemedText className="leading-10 align-middle">Já possui uma conta?</ThemedText>
+						<ThemedText className="leading-10 align-middle">Não consegue autenticar?</ThemedText>
 						<TouchableOpacity
 							className=""
 							onPress={() => router.push('/(auth)/userlogin')}
 						>
 
-							<Text className="font-semibold text-blue-400">Fazer login</Text>
+							<Text className="font-semibold text-blue-400">Login de usuário</Text>
 						</TouchableOpacity>
 					</View>
 				</View>

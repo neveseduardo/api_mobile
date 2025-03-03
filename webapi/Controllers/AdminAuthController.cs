@@ -121,14 +121,14 @@ public class AdminAuthController : ControllerBase
     }
 
     [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Policy = "AdminPolicy")]
     public IActionResult Logout()
     {
         return Ok(new { Message = "Logout realizado com sucesso" });
     }
 
     [HttpGet("usuario")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> GetUserData()
     {
         try

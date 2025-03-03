@@ -2,8 +2,8 @@
 	"React Native Functional Component": {
 		"prefix": "rnf",
 		"body": [
-			"import { ThemedText } from '@/components/ThemedText';",
-			"import { ThemedView } from '@/components/ThemedView';",
+			"import { ThemedText } from '@/components/ui/ThemedText';",
+			"import { ThemedView } from '@/components/ui/ThemedView';",
 			"",
 			"const $1${TM_FILENAME_BASE} = () => {",
 			"\treturn (",

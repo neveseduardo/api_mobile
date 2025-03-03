@@ -121,14 +121,14 @@ public class UserAuthController : ControllerBase
     }
 
     [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Policy = "UserPolicy")]
     public IActionResult Logout()
     {
         return Ok(new { Message = "Logout realizado com sucesso" });
     }
 
     [HttpGet("usuario")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Policy = "UserPolicy")]
     public async Task<IActionResult> GetUserData()
     {
         try

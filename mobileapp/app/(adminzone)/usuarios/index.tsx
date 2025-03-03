@@ -1,12 +1,12 @@
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 
-const NotFoundScrren = () => {
+const UsuariosScreen = () => {
 	return (
 		<ThemedView className="items-center justify-center flex-1">
-			<ThemedText>Oops! Não conseguimos encontrar a página.</ThemedText>
+			<ThemedText>UsuariosScreen</ThemedText>
 		</ThemedView>
 	);
 };
 
-export default NotFoundScrren;
+export default UsuariosScreen;

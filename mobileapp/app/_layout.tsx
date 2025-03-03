@@ -4,17 +4,12 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { AuthProvider } from '@/contexts/AuthContext';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
+import { useColorScheme } from 'react-native';
 
 
 SplashScreen.preventAutoHideAsync();
-SplashScreen.setOptions({
-	duration: 1000,
-	fade: true,
-});
 
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
@@ -33,17 +28,15 @@ export default function RootLayout() {
 	}
 
 	return (
-		<AuthProvider>
-
-			<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-				<Stack initialRouteName="index">
-					<Stack.Screen name="index" options={{ headerShown: false }} />
-					<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-					<Stack.Screen name="+not-found" />
-				</Stack>
-				<StatusBar style="auto" />
-			</ThemeProvider>
-		</AuthProvider>
+		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+			<Stack initialRouteName="index">
+				<Stack.Screen name="index" options={{ headerShown: false }} />
+				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+				<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
+				<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
+				<Stack.Screen name="+not-found" />
+			</Stack>
+			<StatusBar style="auto" />
+		</ThemeProvider>
 	);
 }

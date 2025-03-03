@@ -16,7 +16,7 @@ static class AuthenticationExtension
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         })
-        .AddJwtBearer("Usercheme", options =>
+        .AddJwtBearer("UserSchema", options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
