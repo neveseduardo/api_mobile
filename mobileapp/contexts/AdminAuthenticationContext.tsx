@@ -1,8 +1,8 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AxiosHttpClient } from '../services/AxiosHttpClient';
 import { AuthContextType, AuthProviderProps, IAdmin } from '@/@types';
 import { AdminAuthenticationService } from '@/services/AdminAuthenticationService';
+import { useAxiosClient } from '../services/AxiosHttpClient';
 
 const defaultValue: AuthContextType<IAdmin> = {
 	access_token: '',
@@ -13,7 +13,7 @@ const defaultValue: AuthContextType<IAdmin> = {
 	logout: async () => { },
 };
 
-const USER_ACCESS_TOKEN_NAME = 'admin_access_token';
+export const USER_ACCESS_TOKEN_NAME = 'admin_access_token';
 const USER_REFRESH_TOKEN_NAME = 'admin_refresh_token';
 const USER_DATA_NAME = 'admin_userData';
 
@@ -23,8 +23,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
 	const [refresh_token, setRefreshToken] = useState<string>(defaultValue.refresh_token);
 	const [userData, setUserData] = useState<IAdmin | null>(defaultValue.userData);
-	const httpClient = AxiosHttpClient;
-	const service = new AdminAuthenticationService(httpClient);
+	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
+	const service = new AdminAuthenticationService(client);
 
 	useEffect(() => {
 		const loadAuthData = async () => {
@@ -75,8 +75,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const logout = async () => {
 		try {
-			await service.logout();
-
 			setAccessToken('');
 			setRefreshToken('');
 			setUserData(null);

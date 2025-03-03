@@ -21,8 +21,6 @@ export class UserAuthenticationService implements IAuthenticationService<IUser> 
 				refreshToken: (response.data?.data?.refreshToken ?? '') as string,
 			};
 
-			// eslint-disable-next-line no-console
-			console.log('response', response, tokens);
 
 			if (!tokens.accessToken || !tokens.refreshToken) {
 				throw 'Não autorizado!';

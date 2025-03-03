@@ -10,7 +10,7 @@ import AuthHeader from '@/components/modules/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
 const formSchema = z.object({
@@ -136,7 +136,7 @@ export default function LoginScreen() {
 				disabled={loading}
 				className="!w-[40px] !h-[40px] absolute bottom-0 right-0 m-5"
 			>
-				<Ionicons name="person" color={'#ffffff'} />
+				<Ionicons size={22} name="eye-off-outline" color={'#ffffff'} />
 			</Button>
 		</ThemedView>
 	);

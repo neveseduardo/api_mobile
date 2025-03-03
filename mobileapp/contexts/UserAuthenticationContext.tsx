@@ -1,8 +1,8 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { UserAuthenticationService } from '@/services/UserAuthenticationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AxiosHttpClient } from '../services/AxiosHttpClient';
 import { AuthContextType, AuthProviderProps, IUser } from '@/@types';
+import { useAxiosClient } from '../services/AxiosHttpClient';
 
 const defaultValue: AuthContextType<IUser> = {
 	access_token: '',
@@ -13,7 +13,7 @@ const defaultValue: AuthContextType<IUser> = {
 	logout: async () => { },
 };
 
-const USER_ACCESS_TOKEN_NAME = 'user_access_token';
+export const USER_ACCESS_TOKEN_NAME = 'user_access_token';
 const USER_REFRESH_TOKEN_NAME = 'user_refresh_token';
 const USER_DATA_NAME = 'user_userData';
 
@@ -23,17 +23,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
 	const [refresh_token, setRefreshToken] = useState<string>(defaultValue.refresh_token);
 	const [userData, setUserData] = useState<IUser | null>(defaultValue.userData);
-	const httpClient = AxiosHttpClient;
-	const service = new UserAuthenticationService(httpClient);
+	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
+	const service = new UserAuthenticationService(client);
 
 	useEffect(() => {
 		const loadAuthData = async () => {
 			const storedAccessToken = await AsyncStorage.getItem(USER_ACCESS_TOKEN_NAME);
 			const storedRefreshToken = await AsyncStorage.getItem(USER_REFRESH_TOKEN_NAME);
 			const storedUserData = await AsyncStorage.getItem(USER_DATA_NAME);
-
-			// eslint-disable-next-line no-console
-			console.log('data', storedAccessToken, storedRefreshToken, storedUserData);
 
 			if (storedAccessToken && storedRefreshToken && storedUserData) {
 				setAccessToken(storedAccessToken);
@@ -57,10 +54,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			const user = await service.userData();
 
-			// eslint-disable-next-line no-console
-			console.log('pegay', user);
-
 			await AsyncStorage.setItem(USER_DATA_NAME, JSON.stringify(user));
+
+			// eslint-disable-next-line no-console
+			console.log('access_token', accessToken);
 
 			setUserData(user);
 
@@ -82,8 +79,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const logout = async () => {
 		try {
-			await service.logout();
-
 			setAccessToken('');
 			setRefreshToken('');
 			setUserData(null);

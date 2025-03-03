@@ -10,7 +10,7 @@ import AuthHeader from '@/components/modules/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
 const formSchema = z.object({

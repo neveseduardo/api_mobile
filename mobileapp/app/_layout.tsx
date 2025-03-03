@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
 import { useColorScheme } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 
 SplashScreen.preventAutoHideAsync();
@@ -29,14 +30,19 @@ export default function RootLayout() {
 
 	return (
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-			<Stack initialRouteName="index">
-				<Stack.Screen name="index" options={{ headerShown: false }} />
-				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-				<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
-				<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
-				<Stack.Screen name="+not-found" />
-			</Stack>
+			<SafeAreaProvider>
+				<SafeAreaView className="flex flex-1">
+					<Stack initialRouteName="index">
+						<Stack.Screen name="index" options={{ headerShown: false }} />
+						<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+						<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
+						<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
+						<Stack.Screen name="+not-found" />
+					</Stack>
+				</SafeAreaView>
+			</SafeAreaProvider>
 			<StatusBar style="auto" />
 		</ThemeProvider>
+
 	);
 }

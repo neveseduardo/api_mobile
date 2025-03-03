@@ -16,7 +16,7 @@ const AddressListScreen = () => {
 			</ThemedView>
 
 			<Button
-				onPress={() => router.push('/(adminzone)/enderecos/postalcode')}
+				onPress={() => router.push('/(userzone)/perfil/enderecos/postalcode')}
 				circular
 				color="primary"
 				className="!w-[40px] !h-[40px] absolute right-0 bottom-0 m-5"

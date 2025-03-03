@@ -7,7 +7,7 @@ const SplashScreen = () => {
 
 	useEffect(() => {
 		setTimeout(() => {
-			router.replace('/(auth)/adminlogin');
+			router.replace('/(auth)/userlogin');
 		}, 3000);
 	}, []);
 
