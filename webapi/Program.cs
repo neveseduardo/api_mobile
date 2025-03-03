@@ -45,4 +45,4 @@ app.MapRazorPages();
 app.SeedDatabase();
 app.UseStaticFiles();
 
-app.Run();
+app.Run("http://0.0.0.0:5000");
