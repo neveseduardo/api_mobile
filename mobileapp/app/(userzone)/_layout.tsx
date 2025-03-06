@@ -10,9 +10,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 export default function TabLayout() {
 
 	return (
-		<SafeAreaProvider>
-			<SafeAreaView className="flex flex-1">
-				<AuthProvider>
+		<AuthProvider>
+			<SafeAreaProvider>
+				<SafeAreaView className="flex flex-1">
 					<Tabs
 						screenOptions={{
 							headerShown: false,
@@ -60,9 +60,9 @@ export default function TabLayout() {
 							}}
 						/>
 					</Tabs>
-				</AuthProvider>
-			</SafeAreaView>
-		</SafeAreaProvider>
+				</SafeAreaView>
+			</SafeAreaProvider>
+		</AuthProvider>
 
 	);
 }

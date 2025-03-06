@@ -34,6 +34,7 @@ public class UsersController : ControllerBase
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
+                Cpf = user.Cpf,
             };
 
             return viewModel;
@@ -94,6 +95,7 @@ public class UsersController : ControllerBase
             {
                 Name = dto.Name,
                 Email = dto.Email,
+                Cpf = dto.Cpf,
                 Password = dto.Password,
             };
 
@@ -145,8 +147,9 @@ public class UsersController : ControllerBase
                 });
             }
 
-            user.Name = dto.Name;
-            user.Email = dto.Email;
+            user.Name = dto.Name ?? user.Name;
+            user.Email = dto.Email ?? user.Email;
+            user.Cpf = dto.Cpf ?? user.Cpf;
 
             await _repository.UpdateAsync(user);
 

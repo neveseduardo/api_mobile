@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const useAxiosClient = (TOKEN_KEY: string) => {
+export const HttpClient = (TOKEN_KEY: string) => {
 	const client: AxiosInstance = axios.create({
 		baseURL: process.env.EXPO_PUBLIC_API_URL ?? '/',
 		timeout: 3 * 60 * 1000,

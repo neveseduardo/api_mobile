@@ -2,7 +2,7 @@ import { createContext, useState, useContext, ReactNode, useEffect } from 'react
 import { UserAuthenticationService } from '@/services/UserAuthenticationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, AuthProviderProps, IUser } from '@/@types';
-import { useAxiosClient } from '../services/AxiosHttpClient';
+import { HttpClient } from '../services/HttpClient';
 
 const defaultValue: AuthContextType<IUser> = {
 	access_token: '',
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
 	const [refresh_token, setRefreshToken] = useState<string>(defaultValue.refresh_token);
 	const [userData, setUserData] = useState<IUser | null>(defaultValue.userData);
-	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
+	const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 	const service = new UserAuthenticationService(client);
 
 	useEffect(() => {
@@ -55,9 +55,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			const user = await service.userData();
 
 			await AsyncStorage.setItem(USER_DATA_NAME, JSON.stringify(user));
-
-			// eslint-disable-next-line no-console
-			console.log('access_token', accessToken);
 
 			setUserData(user);
 

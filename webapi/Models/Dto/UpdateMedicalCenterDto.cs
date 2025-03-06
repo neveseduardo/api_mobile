@@ -13,6 +13,27 @@ public class UpdateMedicalCenterDto
     [EmailAddress(ErrorMessage = "O campo {0} deve ser um endereço de email válido.")]
     public string? Email { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "O campo {0} deve ser um valor positivo.")]
-    public int? AddressId { get; set; }
+    [StringLength(255, ErrorMessage = "O campo 'Logradouro' deve ter no máximo 255 caracteres.")]
+    public string Logradouro { get; set; } = "";
+
+    [RegularExpression(@"^\d{5}-\d{3}$", ErrorMessage = "O campo 'Cep' deve estar no formato 00000-000.")]
+    public string Cep { get; set; } = "";
+
+    [StringLength(255, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Bairro { get; set; } = "";
+
+    [StringLength(255, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Cidade { get; set; } = "";
+
+    [StringLength(255, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Estado { get; set; } = "";
+
+    [StringLength(255, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Pais { get; set; } = "Brasil";
+
+    [StringLength(255, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Numero { get; set; } = "SN";
+
+    [StringLength(255, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Complemento { get; set; } = "";
 }

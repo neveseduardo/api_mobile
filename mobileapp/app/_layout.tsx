@@ -3,12 +3,11 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
-import { useColorScheme } from 'react-native';
+import { ActivityIndicator, useColorScheme } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,9 +28,10 @@ export default function RootLayout() {
 	}
 
 	return (
-		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-			<SafeAreaProvider>
-				<SafeAreaView className="flex flex-1">
+		<Suspense fallback={<ActivityIndicator size={'small'} />}>
+			<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+				<StatusBar style="auto" />
+				<SafeAreaProvider>
 					<Stack initialRouteName="index">
 						<Stack.Screen name="index" options={{ headerShown: false }} />
 						<Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -39,10 +39,9 @@ export default function RootLayout() {
 						<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
 						<Stack.Screen name="+not-found" />
 					</Stack>
-				</SafeAreaView>
-			</SafeAreaProvider>
-			<StatusBar style="auto" />
-		</ThemeProvider>
+				</SafeAreaProvider>
+			</ThemeProvider>
+		</Suspense>
 
 	);
 }

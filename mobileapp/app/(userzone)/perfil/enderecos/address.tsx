@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import AuthHeader from '@/components/modules/auth/AuthHeader';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAxiosClient } from '@/services/AxiosHttpClient';
+import { HttpClient } from '@/services/HttpClient';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
 import { AddressService } from '@/services/AddressService';
 import { z } from 'zod';
@@ -46,7 +46,7 @@ export default function AddressScreen() {
 			estado: (estado ?? '') as string,
 		},
 	});
-	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
+	const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 	const service = new AddressService(client);
 
 	const [loading, setLoading] = useState(false);

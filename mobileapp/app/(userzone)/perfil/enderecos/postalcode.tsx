@@ -9,7 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAxiosClient } from '@/services/AxiosHttpClient';
+import { HttpClient } from '@/services/HttpClient';
 import { AddressService } from '@/services/AddressService';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
 
@@ -31,7 +31,7 @@ export default function PostalCodeScreen() {
 		},
 	});
 
-	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
+	const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 	const service = new AddressService(client);
 
 	const [loading, setLoading] = useState(false);

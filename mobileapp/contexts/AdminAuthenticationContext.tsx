@@ -2,7 +2,7 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, AuthProviderProps, IAdmin } from '@/@types';
 import { AdminAuthenticationService } from '@/services/AdminAuthenticationService';
-import { useAxiosClient } from '../services/AxiosHttpClient';
+import { HttpClient } from '../services/HttpClient';
 
 const defaultValue: AuthContextType<IAdmin> = {
 	access_token: '',
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
 	const [refresh_token, setRefreshToken] = useState<string>(defaultValue.refresh_token);
 	const [userData, setUserData] = useState<IAdmin | null>(defaultValue.userData);
-	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
+	const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 	const service = new AdminAuthenticationService(client);
 
 	useEffect(() => {
@@ -54,7 +54,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			const user = await service.userData();
 
+
 			setUserData(user);
+
 			await AsyncStorage.setItem(USER_DATA_NAME, JSON.stringify(user));
 
 			return { accessToken, user };

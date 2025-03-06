@@ -7,10 +7,8 @@ import Button from '@/components/ui/Button';
 import AuthHeader from '@/components/modules/auth/AuthHeader';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAxiosClient } from '@/services/AxiosHttpClient';
-import { AddressService } from '@/services/AddressService';
 import { z } from 'zod';
-import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const loginSchema = z.object({
 	cep: z.string().min(1, 'Campo obrigatório!!'),
@@ -27,52 +25,28 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function AddressScreen() {
 	const router = useRouter();
 	const params = useLocalSearchParams();
-	const {
-		cep,
-		logradouro,
-		bairro,
-		localidade,
-		estado,
-	} = params;
+	const { ...routeParams } = params;
+
 	const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: {
-			cep: (cep ?? '') as string,
-			logradouro: (logradouro ?? '') as string,
-			numero: '',
-			complemento: '',
-			bairro: (bairro ?? '') as string,
-			cidade: (localidade ?? '') as string,
-			estado: (estado ?? '') as string,
+			cep: (routeParams.cep ?? '') as string,
+			logradouro: (routeParams.logradouro ?? '') as string,
+			numero: (routeParams.numero) as string,
+			complemento: (routeParams.complemento ?? '') as string,
+			bairro: (routeParams.bairro ?? '') as string,
+			cidade: ((routeParams.localidade ?? routeParams.cidade) ?? '') as string,
+			estado: (routeParams.estado ?? '') as string,
 		},
 	});
-	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
-	const service = new AddressService(client);
 
-	const [loading, setLoading] = useState(false);
+	const [loading] = useState(false);
 
 	const onSubmit = async (data: LoginFormData) => {
-		try {
-			const response = await service.addFromAdminAsync({
-				cep: data.cep,
-				logradouro: data.logradouro,
-				numero: data.numero,
-				complemento: data.complemento,
-				bairro: data.bairro,
-				cidade: data.cidade,
-				estado: data.estado,
-				pais: 'Brasil',
-			});
-
-			router.push({
-				pathname: '/(adminzone)/enderecos',
-				params: { addressId: response.addressId },
-			});
-		} catch (error: any) {
-			console.error(error);
-		} finally {
-			setLoading(false);
-		}
+		router.push({
+			pathname: '/(adminzone)/unidades/unidade',
+			params: { ...routeParams, ...data },
+		});
 	};
 
 	return (
@@ -209,10 +183,13 @@ export default function AddressScreen() {
 					<Button
 						onPress={handleSubmit(onSubmit)}
 						color="primary"
-						className="w-full"
+						className="flex flex-row justify-center w-full gap-2"
 						disabled={loading}
 					>
-						<Text className="text-white">CADASTRAR ENDEREÇO</Text>
+						<Text className="text-white">
+							SEGUINTE
+						</Text>
+						<Ionicons name="arrow-forward" color={'#fff'} />
 					</Button>
 				</View>
 			</View>

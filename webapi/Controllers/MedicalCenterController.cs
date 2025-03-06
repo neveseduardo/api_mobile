@@ -17,10 +17,16 @@ namespace WebApi.Controllers;
 public class MedicalCenterController : ControllerBase
 {
     private readonly IRepository<MedicalCenter> _repository;
+    private readonly IRepository<Address> _addressRepository;
     private readonly ILogger<MedicalCenterController> _logger;
 
-    public MedicalCenterController(IRepository<MedicalCenter> repository, ILogger<MedicalCenterController> logger)
+    public MedicalCenterController(
+        IRepository<MedicalCenter> repository,
+        IRepository<Address> addressRepository,
+        ILogger<MedicalCenterController> logger
+    )
     {
+        _addressRepository = addressRepository;
         _repository = repository;
         _logger = logger;
     }
@@ -111,17 +117,35 @@ public class MedicalCenterController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var MedicalCenter = new MedicalCenter
+            var address = new Address
+            {
+                Logradouro = dto.Logradouro,
+                Cep = dto.Cep,
+                Bairro = dto.Bairro,
+                Cidade = dto.Cidade,
+                Estado = dto.Estado,
+                Pais = dto.Pais,
+                Numero = dto.Numero,
+                Complemento = dto.Complemento
+            };
+
+            var medicalCenter = new MedicalCenter
             {
                 Name = dto.Name,
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
-                AddressId = dto.AddressId,
             };
 
-            await _repository.AddAsync(MedicalCenter);
+            await _addressRepository.AddAsync(address);
 
-            var result = await GetByIdAsync(MedicalCenter.Id);
+            if (address.Id != 0)
+            {
+                medicalCenter.AddressId = address.Id;
+            }
+
+            await _repository.AddAsync(medicalCenter);
+
+            var result = await GetByIdAsync(medicalCenter.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -172,6 +196,25 @@ public class MedicalCenterController : ControllerBase
             medicalCenter.PhoneNumber = dto.PhoneNumber ?? medicalCenter.PhoneNumber;
 
             await _repository.UpdateAsync(medicalCenter);
+
+            if (medicalCenter.Address != null)
+            {
+                var address = await _addressRepository.GetByIdAsync(medicalCenter.Address.Id);
+
+                if (address != null)
+                {
+                    address.Logradouro = dto.Logradouro ?? address.Logradouro;
+                    address.Cep = dto.Cep ?? address.Cep;
+                    address.Bairro = dto.Bairro ?? address.Bairro;
+                    address.Cidade = dto.Cidade ?? address.Cidade;
+                    address.Estado = dto.Estado ?? address.Estado;
+                    address.Pais = dto.Pais ?? address.Pais;
+                    address.Numero = dto.Numero ?? address.Numero;
+                    address.Complemento = dto.Complemento ?? address.Complemento;
+
+                    await _addressRepository.UpdateAsync(address);
+                }
+            }
 
             return StatusCode(200, new
             {

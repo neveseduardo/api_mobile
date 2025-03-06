@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text } from 'react-native';
-import { RelativePathString, router } from 'expo-router';
+import { router } from 'expo-router';
 import { ThemedView } from '@/components/ui/ThemedView';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
@@ -8,10 +8,10 @@ import AuthHeader from '@/components/modules/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useAxiosClient } from '@/services/AxiosHttpClient';
-import { AddressService } from '@/services/AddressService';
+import { HttpClient } from '@/services/HttpClient';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
+import { UnitService } from '@/services/UnitService';
+import { z } from 'zod';
 
 const cepSchema = z.object({
 	cep: z
@@ -23,6 +23,9 @@ const cepSchema = z.object({
 
 type CepFormData = z.infer<typeof cepSchema>;
 
+const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
+const service = new UnitService(client);
+
 export default function PostalCodeScreen() {
 	const { control, handleSubmit, formState: { errors } } = useForm<CepFormData>({
 		resolver: zodResolver(cepSchema),
@@ -31,9 +34,6 @@ export default function PostalCodeScreen() {
 		},
 	});
 
-	const { client } = useAxiosClient(USER_ACCESS_TOKEN_NAME);
-	const service = new AddressService(client);
-
 	const [loading, setLoading] = useState(false);
 
 	const onSubmit = async (data: CepFormData) => {
@@ -41,7 +41,7 @@ export default function PostalCodeScreen() {
 			const addressData = await service.search(data.cep);
 
 			router.push({
-				pathname: '/(adminzone)/enderecos/address',
+				pathname: '/(adminzone)/unidades/address',
 				params: { ...addressData.data, cep: data.cep },
 			});
 		} catch (error: any) {
