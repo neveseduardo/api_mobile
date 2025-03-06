@@ -1,15 +1,16 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, AuthProviderProps, IAdmin } from '@/@types';
 import { AdminAuthenticationService } from '@/services/AdminAuthenticationService';
 import { HttpClient } from '../services/HttpClient';
 
-const defaultValue: AuthContextType<IAdmin> = {
+type AdminContextType = Omit<AuthContextType<IAdmin>, 'register'>;
+
+const defaultValue: AdminContextType = {
 	access_token: '',
 	refresh_token: '',
 	userData: null,
 	login: async () => { },
-	register: async () => { },
 	logout: async () => { },
 };
 
@@ -17,7 +18,7 @@ export const USER_ACCESS_TOKEN_NAME = 'admin_access_token';
 const USER_REFRESH_TOKEN_NAME = 'admin_refresh_token';
 const USER_DATA_NAME = 'admin_userData';
 
-const UserAuthenticationContext = createContext<AuthContextType<IAdmin>>(defaultValue);
+const UserAuthenticationContext = createContext<AdminContextType>(defaultValue);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
@@ -26,21 +27,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 	const service = new AdminAuthenticationService(client);
 
-	useEffect(() => {
-		const loadAuthData = async () => {
-			const storedAccessToken = await AsyncStorage.getItem(USER_ACCESS_TOKEN_NAME);
-			const storedRefreshToken = await AsyncStorage.getItem(USER_REFRESH_TOKEN_NAME);
-			const storedUserData = await AsyncStorage.getItem(USER_DATA_NAME);
+	const loadAuthData = useCallback(async () => {
+		const storedAccessToken = await AsyncStorage.getItem(USER_ACCESS_TOKEN_NAME);
+		const storedRefreshToken = await AsyncStorage.getItem(USER_REFRESH_TOKEN_NAME);
+		const storedUserData = await AsyncStorage.getItem(USER_DATA_NAME);
 
-			if (storedAccessToken && storedRefreshToken && storedUserData) {
-				setAccessToken(storedAccessToken);
-				setRefreshToken(storedRefreshToken);
-				setUserData(JSON.parse(storedUserData));
-			}
-		};
-
-		loadAuthData();
+		if (storedAccessToken && storedRefreshToken && storedUserData) {
+			setAccessToken(storedAccessToken);
+			setRefreshToken(storedRefreshToken);
+			setUserData(JSON.parse(storedUserData));
+		}
 	}, []);
+
+	useEffect(() => {
+		loadAuthData();
+	}, [loadAuthData]);
 
 	const login = async (username: string, password: string) => {
 		try {
@@ -66,24 +67,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
-	const register = async (name: string, email: string, cpf: string, password: string, addressId?: number) => {
-		try {
-			await service.register({ name, email, cpf, password, addressId });
-		} catch (error) {
-			console.error('Erro ao fazer login:', error);
-			throw error;
-		}
-	};
-
 	const logout = async () => {
 		try {
-			setAccessToken('');
-			setRefreshToken('');
-			setUserData(null);
-
 			await AsyncStorage.removeItem(USER_ACCESS_TOKEN_NAME);
 			await AsyncStorage.removeItem(USER_REFRESH_TOKEN_NAME);
 			await AsyncStorage.removeItem(USER_DATA_NAME);
+			setAccessToken('');
+			setRefreshToken('');
+			setUserData(null);
 		} catch (error) {
 			console.error('Erro ao fazer logout:', error);
 			throw error;
@@ -96,7 +87,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				access_token,
 				refresh_token,
 				userData,
-				register,
 				login,
 				logout,
 			}}

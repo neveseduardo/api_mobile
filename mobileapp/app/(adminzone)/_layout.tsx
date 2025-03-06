@@ -5,8 +5,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AdminDrawerContent from '@/components/ui/AdminDrawerContent';
 import { AuthProvider } from '@/contexts/AdminAuthenticationContext';
+import AdminLogoutButton from '../../components/ui/AdminLogoutButton';
 
 export default function Layout() {
+
+
 	return (
 		<AuthProvider>
 			<SafeAreaProvider>
@@ -14,13 +17,17 @@ export default function Layout() {
 					<GestureHandlerRootView style={{ flex: 1 }}>
 						<Drawer
 							drawerContent={(props) => (
-								<SafeAreaView>
-									<View className="flex flex-col gap-4 p-5">
+								<SafeAreaView className="flex-1">
+									<View className="flex-1 gap-4 p-5">
 										<AdminDrawerContent />
 
-										<ScrollView>
-											<DrawerItemList {...props} />
-										</ScrollView>
+										<View className="flex-1">
+											<ScrollView className="flex-1">
+												<DrawerItemList {...props} />
+											</ScrollView>
+										</View>
+
+										<AdminLogoutButton />
 									</View>
 								</SafeAreaView>
 							)}

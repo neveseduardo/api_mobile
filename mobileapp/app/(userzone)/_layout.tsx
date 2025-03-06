@@ -12,55 +12,53 @@ export default function TabLayout() {
 	return (
 		<AuthProvider>
 			<SafeAreaProvider>
-				<SafeAreaView className="flex flex-1">
-					<Tabs
-						screenOptions={{
-							headerShown: false,
-							tabBarButton: HapticTab,
-							tabBarBackground: TabBarBackground,
-							tabBarStyle: Platform.select({
-								ios: { position: 'absolute' },
-								default: {},
-							}),
+				<Tabs
+					screenOptions={{
+						headerShown: false,
+						tabBarButton: HapticTab,
+						tabBarBackground: TabBarBackground,
+						tabBarStyle: Platform.select({
+							ios: { position: 'absolute' },
+							default: {},
+						}),
+					}}
+				>
+					<Tabs.Screen
+						name="index"
+						options={{
+							title: 'Home',
+							tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={20} color={color} />,
 						}}
-					>
-						<Tabs.Screen
-							name="index"
-							options={{
-								title: 'Home',
-								tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={20} color={color} />,
-							}}
-						/>
-						<Tabs.Screen
-							name="pesquisar"
-							options={{
-								title: 'Pesquisar',
-								tabBarIcon: ({ color }) => <Ionicons name="search" size={20} color={color} />,
-							}}
-						/>
-						<Tabs.Screen
-							name="agendamentos"
-							options={{
-								title: 'Agendamentos',
-								tabBarIcon: ({ color }) => <Ionicons name="calendar-clear-outline" size={20} color={color} />,
-							}}
-						/>
-						<Tabs.Screen
-							name="unidades"
-							options={{
-								title: 'Unidades',
-								tabBarIcon: ({ color }) => <Ionicons name="business-outline" size={20} color={color} />,
-							}}
-						/>
-						<Tabs.Screen
-							name="perfil"
-							options={{
-								title: 'Perfil',
-								tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={20} color={color} />,
-							}}
-						/>
-					</Tabs>
-				</SafeAreaView>
+					/>
+					<Tabs.Screen
+						name="pesquisar"
+						options={{
+							title: 'Pesquisar',
+							tabBarIcon: ({ color }) => <Ionicons name="search" size={20} color={color} />,
+						}}
+					/>
+					<Tabs.Screen
+						name="agendamentos"
+						options={{
+							title: 'Agendamentos',
+							tabBarIcon: ({ color }) => <Ionicons name="calendar-clear-outline" size={20} color={color} />,
+						}}
+					/>
+					<Tabs.Screen
+						name="unidades"
+						options={{
+							title: 'Unidades',
+							tabBarIcon: ({ color }) => <Ionicons name="business-outline" size={20} color={color} />,
+						}}
+					/>
+					<Tabs.Screen
+						name="perfil"
+						options={{
+							title: 'Perfil',
+							tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={20} color={color} />,
+						}}
+					/>
+				</Tabs>
 			</SafeAreaProvider>
 		</AuthProvider>
 
