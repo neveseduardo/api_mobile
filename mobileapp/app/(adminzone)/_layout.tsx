@@ -6,10 +6,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AdminDrawerContent from '@/components/ui/AdminDrawerContent';
 import { AuthProvider } from '@/contexts/AdminAuthenticationContext';
 import AdminLogoutButton from '../../components/ui/AdminLogoutButton';
+import { Ionicons } from '@expo/vector-icons'; // Importe o Ionicons
 
 export default function Layout() {
-
-
 	return (
 		<AuthProvider>
 			<SafeAreaProvider>
@@ -32,12 +31,62 @@ export default function Layout() {
 								</SafeAreaView>
 							)}
 						>
-							<Drawer.Screen name="index" options={{ title: 'Início', drawerLabel: 'Início' }} />
-							<Drawer.Screen name="agendamentos" options={{ title: 'Agendamentos', drawerLabel: 'Agendamentos' }} />
-							<Drawer.Screen name="medicos" options={{ title: 'Médicos', drawerLabel: 'Médicos' }} />
-							<Drawer.Screen name="unidades" options={{ headerShown: false, drawerLabel: 'Unidades médicas' }} />
-							<Drawer.Screen name="usuarios" options={{ headerShown: false, drawerLabel: 'Usuários' }} />
-							<Drawer.Screen name="administradores" options={{ headerShown: false, drawerLabel: 'Administradores' }} />
+							<Drawer.Screen
+								name="index"
+								options={{
+									title: 'Início',
+									drawerLabel: 'Início',
+									drawerIcon: ({ color, size }) => (<Ionicons name="home-outline" size={size} color={color} />),
+								}}
+							/>
+							<Drawer.Screen
+								name="administradores"
+								options={{
+									headerShown: false,
+									drawerLabel: 'Administradores',
+									drawerIcon: ({ color, size }) => (<Ionicons name="people-outline" size={size} color={color} />),
+								}}
+							/>
+							<Drawer.Screen
+								name="usuarios"
+								options={{
+									headerShown: false,
+									drawerLabel: 'Usuários',
+									drawerIcon: ({ color, size }) => (<Ionicons name="person-outline" size={size} color={color} />),
+								}}
+							/>
+							<Drawer.Screen
+								name="agendamentos"
+								options={{
+									title: 'Agendamentos',
+									drawerLabel: 'Agendamentos',
+									drawerIcon: ({ color, size }) => (<Ionicons name="calendar-outline" size={size} color={color} />),
+								}}
+							/>
+							<Drawer.Screen
+								name="medicos"
+								options={{
+									title: 'Médicos',
+									drawerLabel: 'Médicos',
+									drawerIcon: ({ color, size }) => (<Ionicons name="medical-outline" size={size} color={color} />),
+								}}
+							/>
+							<Drawer.Screen
+								name="exames"
+								options={{
+									title: 'Exames',
+									drawerLabel: 'Exames',
+									drawerIcon: ({ color, size }) => (<Ionicons name="document-outline" size={size} color={color} />),
+								}}
+							/>
+							<Drawer.Screen
+								name="unidades"
+								options={{
+									headerShown: false,
+									drawerLabel: 'Unidades médicas',
+									drawerIcon: ({ color, size }) => (<Ionicons name="medkit-outline" size={size} color={color} />),
+								}}
+							/>
 						</Drawer>
 					</GestureHandlerRootView>
 				</SafeAreaView>
