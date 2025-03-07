@@ -1,14 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -53,37 +49,22 @@ public class AddressesController : ControllerBase
 
         var viewModels = list.Select(a => GetViewModel(a)).ToList();
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModels,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModels));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<AddressViewModel>> GetByIdAsync(int id)
     {
-        var address = await _repository.GetByIdAsync(id);
+        var model = await _repository.GetByIdAsync(id);
 
-        if (address == null)
+        if (model == null)
         {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(address);
+        var viewModel = GetViewModel(model);
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        }); ;
+        return StatusCode(200, ApiHelper.Ok(viewModel));
     }
 
     [HttpPost]
@@ -93,10 +74,10 @@ public class AddressesController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var address = new Address
+            var model = new Address
             {
                 Logradouro = dto.Logradouro,
                 Cep = dto.Cep,
@@ -108,9 +89,9 @@ public class AddressesController : ControllerBase
                 Complemento = dto.Complemento
             };
 
-            await _repository.AddAsync(address);
+            await _repository.AddAsync(model);
 
-            var result = await GetByIdAsync(address.Id);
+            var result = await GetByIdAsync(model.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -120,17 +101,10 @@ public class AddressesController : ControllerBase
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -141,50 +115,34 @@ public class AddressesController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var address = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            address.Logradouro = dto.Logradouro ?? address.Logradouro;
-            address.Cep = dto.Cep ?? address.Cep;
-            address.Bairro = dto.Bairro ?? address.Bairro;
-            address.Cidade = dto.Cidade ?? address.Cidade;
-            address.Estado = dto.Estado ?? address.Estado;
-            address.Pais = dto.Pais ?? address.Pais;
-            address.Numero = dto.Numero ?? address.Numero;
-            address.Complemento = dto.Complemento ?? address.Complemento;
+            model.Logradouro = dto.Logradouro ?? model.Logradouro;
+            model.Cep = dto.Cep ?? model.Cep;
+            model.Bairro = dto.Bairro ?? model.Bairro;
+            model.Cidade = dto.Cidade ?? model.Cidade;
+            model.Estado = dto.Estado ?? model.Estado;
+            model.Pais = dto.Pais ?? model.Pais;
+            model.Numero = dto.Numero ?? model.Numero;
+            model.Complemento = dto.Complemento ?? model.Complemento;
+            model.UpdatedAt = DateTime.Now;
 
-            await _repository.UpdateAsync(address);
+            await _repository.UpdateAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -193,38 +151,21 @@ public class AddressesController : ControllerBase
     {
         try
         {
-            var address = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            await _repository.DeleteAsync(address);
+            await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Objeto deletado com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            _logger.LogError(ex, "Falha ao deletar item");
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }

@@ -23,6 +23,20 @@ public class AdminAuthController : ControllerBase
         _logger = logger;
     }
 
+    protected AdministratorViewModel GetViewModel(Administrator administrator)
+    {
+        var viewModel = new AdministratorViewModel
+        {
+            Id = administrator.Id,
+            Name = administrator.Name,
+            Email = administrator.Email,
+            CreatedAt = administrator.CreatedAt,
+            UpdatedAt = administrator.UpdatedAt,
+        };
+
+        return viewModel;
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> AuthenticateUser([FromBody] LoginDto dto)
     {
@@ -30,40 +44,26 @@ public class AdminAuthController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            if (dto == null || string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Password))
+            var model = await _repository.ValidateUserAsync(dto.Email, dto.Password);
+
+            if (model == null)
             {
-                return BadRequest("Invalid client request");
+                return StatusCode(401, ApiHelper.Unauthorized());
             }
 
-            var administrator = await _repository.ValidateUserAsync(dto.Email, dto.Password);
+            var accessToken = _repository.CreateToken(model);
+            var refreshToken = _repository.CreateRefreshToken(model);
+            var tokens = new { AccessToken = accessToken, RefreshToken = refreshToken };
 
-            if (administrator == null)
-            {
-                return Unauthorized();
-            }
-
-            var accessToken = _repository.CreateToken(administrator);
-            var refreshToken = _repository.CreateRefreshToken(administrator);
-
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Login efetuado com sucesso!",
-                data = new { AccessToken = accessToken, RefreshToken = refreshToken },
-            });
+            return StatusCode(200, ApiHelper.Ok(tokens));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, ex.Message);
-
-            return Problem(
-                detail: ex.Message,
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "Internal Server Error"
-            );
+            _logger.LogError(ex, "Falha ao tentar autenticar");
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -157,12 +157,7 @@ public class AdminAuthController : ControllerBase
                 });
             }
 
-            var viewModel = new UserViewModel
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-            };
+            var viewModel = GetViewModel(user);
 
 
             return StatusCode(200, new

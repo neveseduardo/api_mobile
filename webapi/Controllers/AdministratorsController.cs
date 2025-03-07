@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Helpers;
 using WebApi.Repositories;
 using WebApi.Models;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers;
 
@@ -24,53 +22,42 @@ public class AdministratorController : Controller
         _logger = logger;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<AdministratorViewModel>>> GetAllAsync()
+    protected AdministratorViewModel GetViewModel(Administrator administrator)
     {
-        var list = await _repository.GetAllAsync();
-        var viewModelList = list.Select(u => new AdministratorViewModel
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Email = u.Email,
-        });
-
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModelList,
-        });
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<AdministratorViewModel>> GetByIdAsync([FromRoute] int id)
-    {
-        var administrator = await _repository.GetByIdAsync(id);
-
-        if (administrator == null)
-        {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
-        }
-
         var viewModel = new AdministratorViewModel
         {
             Id = administrator.Id,
             Name = administrator.Name,
             Email = administrator.Email,
+            CreatedAt = administrator.CreatedAt,
+            UpdatedAt = administrator.UpdatedAt,
         };
 
-        return StatusCode(200, new
+        return viewModel;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<AdministratorViewModel>>> GetAllAsync()
+    {
+        var list = await _repository.GetAllAsync();
+        var viewModels = list.Select(u => GetViewModel(u));
+
+        return StatusCode(200, ApiHelper.Ok(viewModels));
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<AdministratorViewModel>> GetByIdAsync([FromRoute] int id)
+    {
+        var model = await _repository.GetByIdAsync(id);
+
+        if (model == null)
         {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        });
+            return StatusCode(404, ApiHelper.NotFound());
+        }
+
+        var viewModel = GetViewModel(model);
+
+        return StatusCode(200, ApiHelper.Ok(viewModel));
     }
 
     [HttpPost]
@@ -80,19 +67,19 @@ public class AdministratorController : Controller
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var administrator = new Administrator
+            var model = new Administrator
             {
                 Name = dto.Name,
                 Email = dto.Email,
                 Password = dto.Password,
             };
 
-            await _repository.AddAsync(administrator);
+            await _repository.AddAsync(model);
 
-            var result = await GetByIdAsync(administrator.Id);
+            var result = await GetByIdAsync(model.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -102,17 +89,10 @@ public class AdministratorController : Controller
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -123,44 +103,28 @@ public class AdministratorController : Controller
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var administrator = await _repository.GetByIdAsync(Id);
+            var model = await _repository.GetByIdAsync(Id);
 
-            if (administrator == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            administrator.Name = dto.Name;
-            administrator.Email = dto.Email;
+            model.Name = dto.Name ?? model.Name;
+            model.Email = dto.Email ?? model.Email;
+            model.UpdatedAt = DateTime.Now;
 
-            await _repository.UpdateAsync(administrator);
+            await _repository.UpdateAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
 
     }
@@ -170,38 +134,21 @@ public class AdministratorController : Controller
     {
         try
         {
-            var administrator = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (administrator == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            await _repository.DeleteAsync(administrator);
+            await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados deletados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao deletar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao deletar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            _logger.LogError(ex, "Falha ao criar item");
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }

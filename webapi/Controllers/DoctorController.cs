@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -25,54 +22,47 @@ public class DoctorController : ControllerBase
         _logger = logger;
     }
 
+    protected DoctorViewModel? GetViewModel(Doctor? doctor)
+    {
+        DoctorViewModel? viewModel = null;
+
+        if (doctor != null)
+        {
+            viewModel = new DoctorViewModel
+            {
+                Id = doctor.Id,
+                Name = doctor.Name,
+                Email = doctor.Email,
+                CRM = doctor.CRM,
+                CreatedAt = doctor.CreatedAt,
+                UpdatedAt = doctor.UpdatedAt,
+            };
+        }
+        return viewModel;
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DoctorViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModelList = list.Select(u => new DoctorViewModel
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Email = u.Email,
-            CRM = u.CRM,
-        });
+        var viewModels = list.Select(u => GetViewModel(u)).ToList();
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModelList,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModels));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<DoctorViewModel>> GetByIdAsync([FromRoute] int id)
     {
-        var doctor = await _repository.GetByIdAsync(id);
+        var model = await _repository.GetByIdAsync(id);
 
-        if (doctor == null)
+        if (model == null)
         {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = new DoctorViewModel
-        {
-            Id = doctor.Id,
-            Name = doctor.Name,
-            Email = doctor.Email,
-        };
+        var viewModel = GetViewModel(model);
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModel!));
     }
 
     [HttpPost]
@@ -82,10 +72,10 @@ public class DoctorController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var doctor = new Doctor
+            var model = new Doctor
             {
                 Name = dto.Name,
                 Email = dto.Email,
@@ -94,9 +84,9 @@ public class DoctorController : ControllerBase
                 EspecializationId = dto.EspecializationId,
             };
 
-            await _repository.AddAsync(doctor);
+            await _repository.AddAsync(model);
 
-            var result = await GetByIdAsync(doctor.Id);
+            var result = await GetByIdAsync(model.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -106,17 +96,10 @@ public class DoctorController : ControllerBase
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -127,47 +110,30 @@ public class DoctorController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var doctor = await _repository.GetByIdAsync(Id);
+            var model = await _repository.GetByIdAsync(Id);
 
-            if (doctor == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            doctor.Name = dto.Name ?? doctor.Name;
-            doctor.Email = dto.Email ?? doctor.Email;
-            doctor.CPF = dto.CPF ?? doctor.CPF;
+            model.Name = dto.Name ?? model.Name;
+            model.Email = dto.Email ?? model.Email;
+            model.CPF = dto.CPF ?? model.CPF;
+            model.UpdatedAt = DateTime.Now;
 
-            await _repository.UpdateAsync(doctor);
+            await _repository.UpdateAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
-
     }
 
     [HttpDelete("{Id}")]
@@ -175,38 +141,21 @@ public class DoctorController : ControllerBase
     {
         try
         {
-            var doctor = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (doctor == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            await _repository.DeleteAsync(doctor);
+            await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados deletados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao deletar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao deletar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }

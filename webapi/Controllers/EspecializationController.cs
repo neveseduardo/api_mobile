@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -25,57 +22,46 @@ public class EspecializationController : ControllerBase
         _logger = logger;
     }
 
+    protected EspecializationViewModel? GetViewModel(Especialization? especialization)
+    {
+        EspecializationViewModel? viewModel = null;
+
+        if (especialization != null)
+        {
+            viewModel = new EspecializationViewModel
+            {
+                Id = especialization.Id,
+                Name = especialization.Name,
+                Description = especialization.Description,
+                CreatedAt = especialization.CreatedAt ?? DateTime.Now,
+                UpdatedAt = especialization.UpdatedAt ?? DateTime.Now,
+            };
+        }
+        return viewModel;
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EspecializationViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModelList = list.Select(u => new EspecializationViewModel
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Description = u.Description,
-            CreatedAt = u.CreatedAt ?? DateTime.Now,
-            UpdatedAt = u.UpdatedAt ?? DateTime.Now,
-        });
+        var viewModels = list.Select(u => GetViewModel(u)).ToList();
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModelList,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModels));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<EspecializationViewModel>> GetByIdAsync([FromRoute] int id)
     {
-        var especialization = await _repository.GetByIdAsync(id);
+        var model = await _repository.GetByIdAsync(id);
 
-        if (especialization == null)
+        if (model == null)
         {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = new EspecializationViewModel
-        {
-            Id = especialization.Id,
-            Name = especialization.Name,
-            Description = especialization.Description,
-            CreatedAt = especialization.CreatedAt ?? DateTime.Now,
-            UpdatedAt = especialization.UpdatedAt ?? DateTime.Now,
-        };
+        var viewModel = GetViewModel(model);
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModel!));
     }
 
     [HttpPost]
@@ -85,17 +71,17 @@ public class EspecializationController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var especialization = new Especialization
+            var model = new Especialization
             {
                 Name = dto.Name,
             };
 
-            await _repository.AddAsync(especialization);
+            await _repository.AddAsync(model);
 
-            var result = await GetByIdAsync(especialization.Id);
+            var result = await GetByIdAsync(model.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -105,17 +91,10 @@ public class EspecializationController : ControllerBase
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -126,46 +105,29 @@ public class EspecializationController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var especialization = await _repository.GetByIdAsync(Id);
+            var model = await _repository.GetByIdAsync(Id);
 
-            if (especialization == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            especialization.Name = dto.Name ?? especialization.Name;
-            especialization.Description = dto.Description ?? especialization.Description;
+            model.Name = dto.Name ?? model.Name;
+            model.Description = dto.Description ?? model.Description;
+            model.UpdatedAt = DateTime.Now;
 
-            await _repository.UpdateAsync(especialization);
+            await _repository.UpdateAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
-
     }
 
     [HttpDelete("{Id}")]
@@ -173,38 +135,21 @@ public class EspecializationController : ControllerBase
     {
         try
         {
-            var especialization = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (especialization == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            await _repository.DeleteAsync(especialization);
+            await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados deletados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao deletar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao deletar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }

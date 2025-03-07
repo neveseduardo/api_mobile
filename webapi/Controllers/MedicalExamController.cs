@@ -9,6 +9,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -47,37 +48,22 @@ public class MedicalExamController : ControllerBase
 
         var viewModels = list.Select(a => GetViewModel(a)).ToList();
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModels,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModels));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<MedicalExamViewModel>> GetByIdAsync(int id)
     {
-        var medicalExam = await _repository.GetByIdAsync(id);
+        var model = await _repository.GetByIdAsync(id);
 
-        if (medicalExam == null)
+        if (model == null)
         {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(medicalExam);
+        var viewModel = GetViewModel(model);
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        }); ;
+        return StatusCode(200, ApiHelper.Ok(viewModel));
     }
 
     [HttpPost]
@@ -87,18 +73,18 @@ public class MedicalExamController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var medicalExam = new MedicalExam
+            var model = new MedicalExam
             {
                 Name = dto.Name,
                 Description = dto.Description
             };
 
-            await _repository.AddAsync(medicalExam);
+            await _repository.AddAsync(model);
 
-            var result = await GetByIdAsync(medicalExam.Id);
+            var result = await GetByIdAsync(model.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -108,17 +94,10 @@ public class MedicalExamController : ControllerBase
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -129,45 +108,29 @@ public class MedicalExamController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var medicalExam = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (medicalExam == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            medicalExam.Name = dto.Name ?? medicalExam.Name;
-            medicalExam.Description = dto.Description ?? medicalExam.Description;
-            medicalExam.Active = dto.Active ?? medicalExam.Active;
+            model.Name = dto.Name ?? model.Name;
+            model.Description = dto.Description ?? model.Description;
+            model.Active = dto.Active ?? model.Active;
+            model.UpdatedAt = DateTime.Now;
 
-            await _repository.UpdateAsync(medicalExam);
+            await _repository.UpdateAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -176,38 +139,21 @@ public class MedicalExamController : ControllerBase
     {
         try
         {
-            var medicalExam = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (medicalExam == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            await _repository.DeleteAsync(medicalExam);
+            await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Objeto deletado com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            _logger.LogError(ex, "Falha ao deletar item");
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }

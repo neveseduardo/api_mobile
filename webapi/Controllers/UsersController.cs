@@ -8,6 +8,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -25,60 +26,41 @@ public class UsersController : ControllerBase
         _logger = logger;
     }
 
-    protected UserViewModel? GetViewModel(User? user)
+    protected UserViewModel GetViewModel(User user)
     {
-        if (user != null)
+        var viewModel = new UserViewModel
         {
-            var viewModel = new UserViewModel
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Cpf = user.Cpf,
-            };
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Cpf = user.Cpf,
+        };
 
-            return viewModel;
-        }
-        return null;
+        return viewModel;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModelList = list.Select(u => GetViewModel(u)).ToList();
+        var viewModels = list.Select(u => GetViewModel(u)).ToList();
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModelList,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModels));
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<UserViewModel>> GetByIdAsync([FromRoute] int id)
     {
-        var user = await _repository.GetByIdAsync(id);
+        var model = await _repository.GetByIdAsync(id);
 
-        if (user == null)
+        if (model == null)
         {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(user);
+        var viewModel = GetViewModel(model);
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModel));
     }
 
     [HttpPost]
@@ -88,10 +70,10 @@ public class UsersController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var user = new User
+            var model = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
@@ -99,9 +81,9 @@ public class UsersController : ControllerBase
                 Password = dto.Password,
             };
 
-            await _repository.AddAsync(user);
+            await _repository.AddAsync(model);
 
-            var result = await GetByIdAsync(user.Id);
+            var result = await GetByIdAsync(model.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -111,17 +93,10 @@ public class UsersController : ControllerBase
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -132,86 +107,53 @@ public class UsersController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            var user = await _repository.GetByIdAsync(Id);
+            var model = await _repository.GetByIdAsync(Id);
 
-            if (user == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            user.Name = dto.Name ?? user.Name;
-            user.Email = dto.Email ?? user.Email;
-            user.Cpf = dto.Cpf ?? user.Cpf;
+            model.Name = dto.Name ?? model.Name;
+            model.Email = dto.Email ?? model.Email;
+            model.Cpf = dto.Cpf ?? model.Cpf;
+            model.UpdatedAt = DateTime.Now;
 
-            await _repository.UpdateAsync(user);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            await _repository.UpdateAsync(model);
+
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
-
     }
 
-    [HttpDelete("{Id}")]
-    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
     {
         try
         {
-            var user = await _repository.GetByIdAsync(id);
+            var model = await _repository.GetByIdAsync(id);
 
-            if (user == null)
+            if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            await _repository.DeleteAsync(user);
+            await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados deletados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao deletar item");
-
-            return StatusCode(400, new
-            {
-                success = false,
-                message = "Falha ao deletar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }

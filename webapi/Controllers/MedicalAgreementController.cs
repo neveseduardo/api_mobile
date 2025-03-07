@@ -1,14 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -19,6 +15,21 @@ public class MedicalAgreementsController : ControllerBase
 {
     private readonly IRepository<MedicalAgreement> _repository;
     private readonly ILogger<MedicalAgreementsController> _logger;
+
+    protected MedicalAgreementViewModel GetViewModel(MedicalAgreement medicalAgreement)
+    {
+        var viewModel = new MedicalAgreementViewModel
+        {
+            Id = medicalAgreement.Id,
+            Name = medicalAgreement.Name,
+            Provider = medicalAgreement.Provider,
+            HealthPlan = medicalAgreement.HealthPlan,
+            CreatedAt = medicalAgreement.CreatedAt,
+            UpdatedAt = medicalAgreement.UpdatedAt,
+        };
+
+        return viewModel;
+    }
 
     public MedicalAgreementsController(IRepository<MedicalAgreement> MedicalAgreementRepository, ILogger<MedicalAgreementsController> logger)
     {
@@ -31,20 +42,9 @@ public class MedicalAgreementsController : ControllerBase
     {
         var list = await _repository.GetAllAsync();
 
-        var viewModels = list.Select(a => new MedicalAgreementViewModel
-        {
-            Id = a.Id,
-            Name = a.Name,
-            Provider = a.Provider,
-            HealthPlan = a.HealthPlan
-        }).ToList();
+        var viewModels = list.Select(u => GetViewModel(u)).ToList();
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModels,
-        });
+        return StatusCode(200, ApiHelper.Ok(viewModels));
     }
 
     [HttpGet("{id}")]
@@ -54,28 +54,12 @@ public class MedicalAgreementsController : ControllerBase
 
         if (model == null)
         {
-            return StatusCode(404, new
-            {
-                success = true,
-                message = "Item não encontrado",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = new MedicalAgreementViewModel
-        {
-            Id = model.Id,
-            Name = model.Name,
-            Provider = model.Provider,
-            HealthPlan = model.HealthPlan
-        };
+        var viewModel = GetViewModel(model);
 
-        return StatusCode(200, new
-        {
-            success = true,
-            message = "Dados retornados com sucesso",
-            data = viewModel,
-        }); ;
+        return StatusCode(200, ApiHelper.Ok(viewModel));
     }
 
     [HttpPost]
@@ -85,7 +69,7 @@ public class MedicalAgreementsController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var MedicalAgreement = new MedicalAgreement
@@ -106,17 +90,10 @@ public class MedicalAgreementsController : ControllerBase
 
             return StatusCode(201, result.Value);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao criar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao criar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -127,19 +104,14 @@ public class MedicalAgreementsController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var model = await _repository.GetByIdAsync(id);
 
             if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             model.Name = dto.Name!;
@@ -147,24 +119,12 @@ public class MedicalAgreementsController : ControllerBase
 
             await _repository.UpdateAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados atualizados com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -177,34 +137,17 @@ public class MedicalAgreementsController : ControllerBase
 
             if (model == null)
             {
-                return StatusCode(404, new
-                {
-                    success = true,
-                    message = "Item não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             await _repository.DeleteAsync(model);
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Objeto deletado com sucesso",
-                data = Array.Empty<object>(),
-            });
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
-
-            return StatusCode(400, new
-            {
-                success = true,
-                message = "Falha ao atualizar item",
-                trace = ex.Message,
-                data = Array.Empty<object>(),
-            });
+            _logger.LogError(ex, "Falha ao deletar item");
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 }
