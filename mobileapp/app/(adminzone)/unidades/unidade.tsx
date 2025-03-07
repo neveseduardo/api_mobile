@@ -11,7 +11,6 @@ import { HttpClient } from '@/services/HttpClient';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
 import { UnitService } from '@/services/UnitService';
 import { z } from 'zod';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 const loginSchema = z.object({
 	name: z.string().min(1, 'Campo obrigatório!!'),

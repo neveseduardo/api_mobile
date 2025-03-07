@@ -7,10 +7,11 @@ import Button from '@/components/ui/Button';
 import AuthHeader from '@/components/modules/auth/AuthHeader';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { HttpClient } from '@/services/HttpClient';
-import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
-import { AddressService } from '@/services/AddressService';
 import { z } from 'zod';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { HttpClient } from '@/services/HttpClient';
+import { UserAddressService } from '@/services/userservices/UserAddressService';
+import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
 
 const loginSchema = z.object({
 	cep: z.string().min(1, 'Campo obrigatório!!'),
@@ -24,50 +25,46 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
+const service = new UserAddressService(client);
+
 export default function AddressScreen() {
 	const router = useRouter();
 	const params = useLocalSearchParams();
-	const {
-		cep,
-		logradouro,
-		bairro,
-		localidade,
-		estado,
-	} = params;
+	const { ...routeParams } = params;
+
 	const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: {
-			cep: (cep ?? '') as string,
-			logradouro: (logradouro ?? '') as string,
-			numero: '',
-			complemento: '',
-			bairro: (bairro ?? '') as string,
-			cidade: (localidade ?? '') as string,
-			estado: (estado ?? '') as string,
+			cep: (routeParams.cep ?? '') as string,
+			logradouro: (routeParams.logradouro ?? '') as string,
+			numero: (routeParams.numero) as string,
+			complemento: (routeParams.complemento ?? '') as string,
+			bairro: (routeParams.bairro ?? '') as string,
+			cidade: ((routeParams.localidade ?? routeParams.cidade) ?? '') as string,
+			estado: (routeParams.estado ?? '') as string,
 		},
 	});
-	const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
-	const service = new AddressService(client);
 
 	const [loading, setLoading] = useState(false);
 
 	const onSubmit = async (data: LoginFormData) => {
-		try {
-			const response = await service.create({
-				cep: data.cep,
-				logradouro: data.logradouro,
-				numero: data.numero,
-				complemento: data.complemento,
-				bairro: data.bairro,
-				cidade: data.cidade,
-				estado: data.estado,
-				pais: 'Brasil',
-			});
+		setLoading(true);
 
-			router.push({
-				pathname: '/perfil',
-				params: { addressId: response.addressId },
-			});
+		try {
+			const payload = {
+				...data,
+				cep: String(routeParams.cep).replace(/(\d{5})(\d{3})/, '$1-$2'),
+			};
+
+			if (!routeParams.editable) {
+				await service.addFromUserAsync(payload);
+			}
+
+			if (routeParams.editable) {
+				await service.updateFromUserAsync(Number(routeParams.id), payload);
+			}
+			router.push('/(userzone)/perfil/enderecos');
 		} catch (error: any) {
 			console.error(error);
 		} finally {
@@ -209,10 +206,12 @@ export default function AddressScreen() {
 					<Button
 						onPress={handleSubmit(onSubmit)}
 						color="primary"
-						className="w-full"
+						className="flex flex-row justify-center w-full gap-2"
 						disabled={loading}
 					>
-						<Text className="text-white">CADASTRAR ENDEREÇO</Text>
+						<Text className="text-white">
+							{routeParams.editable ? 'ATUALIZAR' : 'CADASTRAR'}
+						</Text>
 					</Button>
 				</View>
 			</View>

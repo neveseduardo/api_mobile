@@ -5,7 +5,7 @@ export default function RootLayout() {
 		<Stack initialRouteName="index">
 			<Stack.Screen name="index" options={{
 				headerShown: true,
-				headerTitle: 'Unidades médicas',
+				headerTitle: 'Exames',
 			}}
 			/>
 		</Stack>

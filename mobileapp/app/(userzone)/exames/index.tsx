@@ -1,12 +1,12 @@
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 
-const PesquisaScreen = () => {
+const ExamesScreen = () => {
 	return (
 		<ThemedView className="items-center justify-center flex-1">
-			<ThemedText>PesquisaScreen</ThemedText>
+			<ThemedText>ExamesScreen</ThemedText>
 		</ThemedView>
 	);
 };
 
-export default PesquisaScreen;
+export default ExamesScreen;

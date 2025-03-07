@@ -73,8 +73,15 @@ export default function RegisterScreen() {
 			console.error('Erro de Authenticação', error);
 			if (error?.response?.status === 401) {
 				setError('Usuário ou senha inválidos. Tente novamente!');
+				return;
 			}
-			setError('Erro! Não conseguimos conectar com o servidor.');
+
+			if (error?.response?.status === 422) {
+				setError(error?.response?.data?.message ?? 'O formulário contem dados inválidos');
+				return;
+			}
+
+			setError('Não conseguimos conectar com o servidor.');
 		} finally {
 			setLoading(false);
 		}
