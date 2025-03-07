@@ -11,7 +11,7 @@ using WebApi.Database;
 namespace webapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250303170551_M01-InitialMigration")]
+    [Migration("20250307170520_M01-InitialMigration")]
     partial class M01InitialMigration
     {
         /// <inheritdoc />
@@ -322,6 +322,34 @@ namespace webapi.Migrations
                     b.HasIndex("AddressId");
 
                     b.ToTable("centros_medicos");
+                });
+
+            modelBuilder.Entity("WebApi.Models.MedicalExam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Active")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("exames");
                 });
 
             modelBuilder.Entity("WebApi.Models.User", b =>

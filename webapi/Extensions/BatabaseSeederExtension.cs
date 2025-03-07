@@ -19,6 +19,7 @@ static class DatabaseSeederExtension
             var addressSeeder = new AddressSeeder(context);
             var medicalCenterSeeder = new MedicalCenterSeeder(context);
             var appointmentSeeder = new AppointmentSeeder(context);
+            var medicalExamSeeder = new MedicalExamSeeder(context);
 
             addressSeeder.Seed();
             userSeeder.Seed();
@@ -27,6 +28,7 @@ static class DatabaseSeederExtension
             doctorSeeder.Seed();
             medicalCenterSeeder.Seed();
             appointmentSeeder.Seed();
+            medicalExamSeeder.Seed();
         }
     }
 }

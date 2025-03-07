@@ -33,6 +33,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<MedicalAgreement> MedicalAgreements { get; set; }
 
+    public DbSet<MedicalExam> MedicalExams { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)

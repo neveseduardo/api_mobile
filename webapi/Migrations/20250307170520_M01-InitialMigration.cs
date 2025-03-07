@@ -67,6 +67,23 @@ namespace webapi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "exames",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Active = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_exames", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "planos_saude",
                 columns: table => new
                 {
@@ -314,6 +331,9 @@ namespace webapi.Migrations
 
             migrationBuilder.DropTable(
                 name: "convênios");
+
+            migrationBuilder.DropTable(
+                name: "exames");
 
             migrationBuilder.DropTable(
                 name: "agendamentos");

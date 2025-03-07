@@ -14,31 +14,25 @@ namespace WebApi.Controllers;
 
 [Authorize(Policy = "AdminPolicy")]
 [ApiController]
-[Route("api/v1/enderecos")]
-public class AddressesController : ControllerBase
+[Route("api/v1/exames")]
+public class MedicalExamController : ControllerBase
 {
-    private readonly IRepository<Address> _repository;
-    private readonly ILogger<AddressesController> _logger;
+    private readonly IRepository<MedicalExam> _repository;
+    private readonly ILogger<MedicalExamController> _logger;
 
-    public AddressesController(IRepository<Address> addressRepository, ILogger<AddressesController> logger)
+    public MedicalExamController(IRepository<MedicalExam> MedicalExamRepository, ILogger<MedicalExamController> logger)
     {
-        _repository = addressRepository;
+        _repository = MedicalExamRepository;
         _logger = logger;
     }
 
-    protected AddressViewModel GetViewModel(Address model)
+    protected MedicalExamViewModel GetViewModel(MedicalExam model)
     {
-        var viewModel = new AddressViewModel
+        var viewModel = new MedicalExamViewModel
         {
             Id = model.Id,
-            Logradouro = model.Logradouro,
-            Cep = model.Cep,
-            Bairro = model.Bairro,
-            Cidade = model.Cidade,
-            Estado = model.Estado,
-            Pais = model.Pais,
-            Numero = model.Numero,
-            Complemento = model.Complemento,
+            Name = model.Name,
+            Description = model.Description,
             CreatedAt = model.CreatedAt,
             UpdatedAt = model.UpdatedAt,
         };
@@ -47,7 +41,7 @@ public class AddressesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AddressViewModel>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<MedicalExamViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
 
@@ -62,11 +56,11 @@ public class AddressesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<AddressViewModel>> GetByIdAsync(int id)
+    public async Task<ActionResult<MedicalExamViewModel>> GetByIdAsync(int id)
     {
-        var address = await _repository.GetByIdAsync(id);
+        var medicalExam = await _repository.GetByIdAsync(id);
 
-        if (address == null)
+        if (medicalExam == null)
         {
             return StatusCode(404, new
             {
@@ -76,7 +70,7 @@ public class AddressesController : ControllerBase
             });
         }
 
-        var viewModel = GetViewModel(address);
+        var viewModel = GetViewModel(medicalExam);
 
         return StatusCode(200, new
         {
@@ -87,7 +81,7 @@ public class AddressesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddAsync([FromBody] CreateAddressDto dto)
+    public async Task<ActionResult> AddAsync([FromBody] CreateMedicalExamDto dto)
     {
         try
         {
@@ -96,21 +90,15 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = new Address
+            var medicalExam = new MedicalExam
             {
-                Logradouro = dto.Logradouro,
-                Cep = dto.Cep,
-                Bairro = dto.Bairro,
-                Cidade = dto.Cidade,
-                Estado = dto.Estado,
-                Pais = dto.Pais,
-                Numero = dto.Numero,
-                Complemento = dto.Complemento
+                Name = dto.Name,
+                Description = dto.Description
             };
 
-            await _repository.AddAsync(address);
+            await _repository.AddAsync(medicalExam);
 
-            var result = await GetByIdAsync(address.Id);
+            var result = await GetByIdAsync(medicalExam.Id);
 
             if (result.Result is ObjectResult objectResult)
             {
@@ -135,7 +123,7 @@ public class AddressesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAddressDto dto)
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateMedicalExamDto dto)
     {
         try
         {
@@ -144,9 +132,9 @@ public class AddressesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var address = await _repository.GetByIdAsync(id);
+            var medicalExam = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (medicalExam == null)
             {
                 return StatusCode(404, new
                 {
@@ -156,16 +144,11 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            address.Logradouro = dto.Logradouro ?? address.Logradouro;
-            address.Cep = dto.Cep ?? address.Cep;
-            address.Bairro = dto.Bairro ?? address.Bairro;
-            address.Cidade = dto.Cidade ?? address.Cidade;
-            address.Estado = dto.Estado ?? address.Estado;
-            address.Pais = dto.Pais ?? address.Pais;
-            address.Numero = dto.Numero ?? address.Numero;
-            address.Complemento = dto.Complemento ?? address.Complemento;
+            medicalExam.Name = dto.Name ?? medicalExam.Name;
+            medicalExam.Description = dto.Description ?? medicalExam.Description;
+            medicalExam.Active = dto.Active ?? medicalExam.Active;
 
-            await _repository.UpdateAsync(address);
+            await _repository.UpdateAsync(medicalExam);
 
             return StatusCode(200, new
             {
@@ -193,9 +176,9 @@ public class AddressesController : ControllerBase
     {
         try
         {
-            var address = await _repository.GetByIdAsync(id);
+            var medicalExam = await _repository.GetByIdAsync(id);
 
-            if (address == null)
+            if (medicalExam == null)
             {
                 return StatusCode(404, new
                 {
@@ -205,7 +188,7 @@ public class AddressesController : ControllerBase
                 });
             }
 
-            await _repository.DeleteAsync(address);
+            await _repository.DeleteAsync(medicalExam);
 
             return StatusCode(200, new
             {
