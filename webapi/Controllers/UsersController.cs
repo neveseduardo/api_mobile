@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApi.Models;
 using WebApi.Repositories;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApi.Helpers;
 
 namespace WebApi.Controllers;
@@ -78,7 +74,7 @@ public class UsersController : ControllerBase
                 Name = dto.Name,
                 Email = dto.Email,
                 Cpf = dto.Cpf,
-                Password = dto.Password,
+                Password = PasswordHelper.HashPassword(dto.Password),
             };
 
             await _repository.AddAsync(model);

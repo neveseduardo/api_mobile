@@ -19,11 +19,10 @@ Retorna a lista de avaliações de agendamentos cadastradas na aplicação.
     "rating": 0,
     "comment": "string",
     "appointmentId": 0,
-    "userId": 0,
+    "appointment": {...},
+    "user": {...},
     "createdAt": "2025-03-03T18:09:14.162Z",
     "updatedAt": "2025-03-03T18:09:14.162Z",
-    "appointment": {...},
-    "user": {...}
   },
   { ... },
   { ... }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApi.Models;
 
-[Table("convênios")]
+[Table("convenios")]
 public class MedicalAgreement
 {
     [Key]

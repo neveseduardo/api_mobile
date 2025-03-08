@@ -1,7 +1,3 @@
-Sem problemas! Vou criar um mapa das rotas, com os DTOs e os retornos, seguindo o mesmo formato que você utilizou anteriormente. Aqui está:
-
----
-
 # Módulo de Autenticação de Administradores
 
 Este módulo gerencia a autenticação de administradores na aplicação, permitindo operações de login, refresh token, logout e obtenção de dados do usuário.

@@ -17,7 +17,9 @@ Retorna a lista de administradores cadastrados na aplicação.
   {
     "id": 0,
     "name": "string",
-    "email": "string"
+    "email": "string",
+    "createdAt": "2025-03-08T12:22:02.931Z",
+    "updatedAt": "2025-03-08T12:22:02.931Z"
   },
   { ... },
   { ... }
@@ -61,7 +63,9 @@ Obtém os detalhes de um administrador específico pelo seu ID.
 {
   "id": 0,
   "name": "string",
-  "email": "string"
+  "email": "string",
+  "createdAt": "2025-03-08T12:22:02.931Z",
+  "updatedAt": "2025-03-08T12:22:02.931Z"
 }
 ```
 

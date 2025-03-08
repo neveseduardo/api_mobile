@@ -74,7 +74,7 @@ public class AdministratorController : Controller
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Password = dto.Password,
+                Password = PasswordHelper.HashPassword(dto.Password),
             };
 
             await _repository.AddAsync(model);

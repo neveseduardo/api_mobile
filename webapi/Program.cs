@@ -1,7 +1,5 @@
 using WebApi.Database;
-using WebApi.Repositories;
 using WebApi.Extensions;
-using WebApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,4 +29,4 @@ app.MapRazorPages();
 app.SeedDatabase();
 app.UseStaticFiles();
 
-app.Run("http://0.0.0.0:5000");
+app.Run();

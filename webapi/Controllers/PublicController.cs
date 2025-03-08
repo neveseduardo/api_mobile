@@ -92,7 +92,7 @@ public class PublicController : ControllerBase
                 viewModel = GetAddressViewModelAsync(address);
             }
 
-            return StatusCode(200, new HttpDefaultResponse<AddressViewModel?>(viewModel));
+            return StatusCode(200, ApiHelper.Ok(viewModel!));
         }
         catch (Exception ex)
         {
