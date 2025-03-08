@@ -95,7 +95,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao criar item");
+            _logger.LogError(ex, ex.Message);
             return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
@@ -129,7 +129,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, ex.Message);
             return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
@@ -152,7 +152,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao deletar item");
+            _logger.LogError(ex, ex.Message);
             return StatusCode(500, ApiHelper.InternalServerError());
         }
     }

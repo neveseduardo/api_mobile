@@ -1,17 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebApi.Models;
-using WebApi.Repositories;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Database;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers;
 
@@ -44,12 +39,11 @@ public class PublicController : ControllerBase
 
             return user;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falah ao capturar usuário autenticado");
+            _logger.LogError(ex, ex.Message);
             throw;
         }
-
     }
 
     protected AddressViewModel? GetAddressViewModelAsync(Address? address)
@@ -76,9 +70,9 @@ public class PublicController : ControllerBase
 
             return null;
         }
-        catch (System.Exception exception)
+        catch (Exception exception)
         {
-            _logger.LogError(exception, "Falha ao capturar address viewmodel");
+            _logger.LogError(exception, exception.Message);
             throw;
         }
     }
@@ -100,10 +94,10 @@ public class PublicController : ControllerBase
 
             return StatusCode(200, new HttpDefaultResponse<AddressViewModel?>(viewModel));
         }
-        catch (System.Exception exception)
+        catch (Exception ex)
         {
-            _logger.LogError(exception, "Erro ao capturar endereço do usuário");
-            return StatusCode(400, new HttpDefaultResponse<object[]>(Array.Empty<object>(), "Falha ao capturar endereço", false));
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -114,7 +108,7 @@ public class PublicController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(422, new HttpDefaultResponse<ModelStateDictionary>(ModelState, "Formulário inválido", false));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var address = new Address
@@ -144,12 +138,12 @@ public class PublicController : ControllerBase
 
             var viewModel = GetAddressViewModelAsync(address);
 
-            return StatusCode(201, new HttpDefaultResponse<AddressViewModel?>(viewModel, "Dados cadastrados com sucesso"));
+            return StatusCode(201, ApiHelper.Ok(viewModel!));
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao adicionar item");
-            return StatusCode(400, new HttpDefaultResponse<object[]>(Array.Empty<object>(), "Falha ao cadastrar endereço", false));
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -160,21 +154,21 @@ public class PublicController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(422, new HttpDefaultResponse<ModelStateDictionary>(ModelState, "Formulário inválido", false));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var user = await GetAuthenticatedUserAsync();
 
             if (user == null)
             {
-                return StatusCode(404, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Usuário não contrado", false));
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             var address = await _context.Addresses.FirstOrDefaultAsync(u => u.Id == user.AddressId);
 
             if (address == null)
             {
-                return StatusCode(404, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Endereço não contrado", false));
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             address.Logradouro = dto.Logradouro ?? address.Logradouro;
@@ -191,12 +185,12 @@ public class PublicController : ControllerBase
 
             await _context.SaveChangesAsync();
 
-            return StatusCode(200, new HttpDefaultResponse<int[]?>(Array.Empty<int>(), "Dados atualizados com sucesso"));
+            return StatusCode(200, ApiHelper.Ok(address));
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao adicionar item");
-            return StatusCode(400, new HttpDefaultResponse<object[]>(Array.Empty<object>(), "Falha ao atualizar endereço", false));
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -209,25 +203,25 @@ public class PublicController : ControllerBase
 
             if (user == null)
             {
-                return StatusCode(404, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Usuário não contrado", false));
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             var address = await _context.Addresses.FirstOrDefaultAsync(u => u.Id == user.AddressId);
 
             if (address == null)
             {
-                return StatusCode(404, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Endereço não contrado", false));
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             _context.Addresses.Remove(address);
             await _context.SaveChangesAsync();
 
-            return StatusCode(200, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Dados deletados com sucesso"));
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao adicionar item");
-            return StatusCode(400, new HttpDefaultResponse<object[]>(Array.Empty<object>(), "Falha ao deletar endereço", false));
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -238,14 +232,14 @@ public class PublicController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(422, new HttpDefaultResponse<ModelStateDictionary>(ModelState, "Formulário inválido", false));
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             var user = await GetAuthenticatedUserAsync();
 
             if (user == null)
             {
-                return StatusCode(404, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Usuário não contrado", false));
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             user.Name = dto.Name;
@@ -254,12 +248,12 @@ public class PublicController : ControllerBase
 
             await _context.SaveChangesAsync();
 
-            return StatusCode(200, new HttpDefaultResponse<int[]>(Array.Empty<int>(), "Dados atualizados com sucesso"));
+            return StatusCode(200, ApiHelper.Ok());
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao adicionar item");
-            return StatusCode(400, new HttpDefaultResponse<object[]>(Array.Empty<object>(), "Falha ao alterar nome", false));
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 

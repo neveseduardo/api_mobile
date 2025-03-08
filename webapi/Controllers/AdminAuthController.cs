@@ -3,11 +3,9 @@ using WebApi.Repositories;
 using WebApi.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApi.Models.ViewModels;
 using WebApi.Models;
 using WebApi.Helpers;
-using System.Text.Json;
 
 namespace WebApi.Controllers;
 
@@ -72,51 +70,42 @@ public class AdminAuthController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(dto.RefreshToken))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Refresh token é obrigatório");
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var principal = _repository.ValidateRefreshToken(dto.RefreshToken);
 
             if (principal == null)
             {
-                return Unauthorized("Refresh token inválido ou expirado");
+                return StatusCode(401, ApiHelper.Unauthorized("Refresh token inválido ou expirado"));
             }
 
             var UserIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (UserIdClaim == null || !int.TryParse(UserIdClaim, out int UserId))
             {
-                return Unauthorized("Token inválido");
+                return StatusCode(401, ApiHelper.Unauthorized("Token inválido"));
             }
 
             var administrator = await _repository.GetUserAsync(UserId);
 
             if (administrator == null)
             {
-                return NotFound("Usuário não encontrado");
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             var newAccessToken = _repository.CreateToken(administrator);
             var newRefreshToken = _repository.CreateRefreshToken(administrator);
+            var tokens = new { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Login efetuado com sucesso!",
-                data = new { AccessToken = newAccessToken, RefreshToken = newRefreshToken },
-            });
+            return StatusCode(200, ApiHelper.Ok(tokens));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-
-            return Problem(
-                detail: ex.Message,
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "Internal Server Error"
-            );
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -137,42 +126,26 @@ public class AdminAuthController : ControllerBase
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
-                return StatusCode(401, new
-                {
-                    success = false,
-                    message = "Token inválido",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(401, ApiHelper.Unauthorized("Token inválido"));
             }
 
             var user = await _repository.GetUserAsync(userId);
 
             if (user == null)
             {
-                return StatusCode(404, new
-                {
-                    success = false,
-                    message = "Usuário não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             var viewModel = GetViewModel(user);
 
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados retornados com sucesso",
-                data = viewModel,
-            });
+            return StatusCode(200, ApiHelper.Ok(viewModel));
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao carregar dados de usuário");
-            throw;
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
-
     }
 
     [HttpPost("register")]
@@ -182,24 +155,14 @@ public class AdminAuthController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(422, new
-                {
-                    success = false,
-                    message = "Formulário inválido!",
-                    data = ModelState,
-                });
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var existingUser = await _repository.FindUserByEmailAsync(dto.Email);
 
             if (existingUser)
             {
-                return StatusCode(422, new
-                {
-                    success = false,
-                    message = "Já existe um usuário com este email.",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(422, ApiHelper.UnprocessableEntity(Array.Empty<int>(), "Já existe um usuário com este email"));
             }
 
             var user = new Administrator
@@ -220,12 +183,11 @@ public class AdminAuthController : ControllerBase
 
             return result;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao criar usuário");
-            throw;
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
-
     }
 
 }

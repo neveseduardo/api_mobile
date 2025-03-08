@@ -3,11 +3,9 @@ using WebApi.Repositories;
 using WebApi.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApi.Models.ViewModels;
 using WebApi.Models;
 using WebApi.Helpers;
-using System.Text.Json;
 
 namespace WebApi.Controllers;
 
@@ -23,6 +21,20 @@ public class UserAuthController : ControllerBase
         _logger = logger;
     }
 
+    protected UserViewModel GetViewModel(User user)
+    {
+        var viewModel = new UserViewModel
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+        };
+
+        return viewModel;
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> AuthenticateUser([FromBody] LoginDto dto)
     {
@@ -30,40 +42,26 @@ public class UserAuthController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
-            if (dto == null || string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Password))
+            var model = await _repository.ValidateUserAsync(dto.Email, dto.Password);
+
+            if (model == null)
             {
-                return BadRequest("Invalid client request");
+                return StatusCode(401, ApiHelper.Unauthorized());
             }
 
-            var user = await _repository.ValidateUserAsync(dto.Email, dto.Password);
+            var accessToken = _repository.CreateToken(model);
+            var refreshToken = _repository.CreateRefreshToken(model);
+            var tokens = new { AccessToken = accessToken, RefreshToken = refreshToken };
 
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var accessToken = _repository.CreateToken(user);
-            var refreshToken = _repository.CreateRefreshToken(user);
-
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Login efetuado com sucesso!",
-                data = new { AccessToken = accessToken, RefreshToken = refreshToken },
-            });
+            return StatusCode(200, ApiHelper.Ok(tokens));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-
-            return Problem(
-                detail: ex.Message,
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "Internal Server Error"
-            );
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -72,51 +70,42 @@ public class UserAuthController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(dto.RefreshToken))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Refresh token é obrigatório");
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var principal = _repository.ValidateRefreshToken(dto.RefreshToken);
 
             if (principal == null)
             {
-                return Unauthorized("Refresh token inválido ou expirado");
+                return StatusCode(401, ApiHelper.Unauthorized("Refresh token inválido ou expirado"));
             }
 
             var UserIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (UserIdClaim == null || !int.TryParse(UserIdClaim, out int UserId))
             {
-                return Unauthorized("Token inválido");
+                return StatusCode(401, ApiHelper.Unauthorized("Token inválido"));
             }
 
             var user = await _repository.GetUserAsync(UserId);
 
             if (user == null)
             {
-                return NotFound("Usuário não encontrado");
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
             var newAccessToken = _repository.CreateToken(user);
             var newRefreshToken = _repository.CreateRefreshToken(user);
+            var tokens = new { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
 
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Login efetuado com sucesso!",
-                data = new { AccessToken = newAccessToken, RefreshToken = newRefreshToken },
-            });
+            return StatusCode(200, ApiHelper.Ok(tokens));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-
-            return Problem(
-                detail: ex.Message,
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "Internal Server Error"
-            );
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
 
@@ -124,7 +113,7 @@ public class UserAuthController : ControllerBase
     [Authorize(Policy = "UserPolicy")]
     public IActionResult Logout()
     {
-        return Ok(new { Message = "Logout realizado com sucesso" });
+        return StatusCode(200, ApiHelper.Ok(Array.Empty<int>(), "Logout efetuado com sucesso"));
     }
 
     [HttpGet("usuario")]
@@ -137,41 +126,19 @@ public class UserAuthController : ControllerBase
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
-                return StatusCode(401, new
-                {
-                    success = false,
-                    message = "Token inválido",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(401, ApiHelper.Unauthorized("Token inválido"));
             }
 
             var user = await _repository.GetUserAsync(userId);
 
             if (user == null)
             {
-                return StatusCode(404, new
-                {
-                    success = false,
-                    message = "Usuário não encontrado",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(404, ApiHelper.NotFound());
             }
 
-            var viewModel = new UserViewModel
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Cpf = user.Cpf,
-            };
+            var viewModel = GetViewModel(user);
 
-
-            return StatusCode(200, new
-            {
-                success = true,
-                message = "Dados retornados com sucesso",
-                data = viewModel,
-            });
+            return StatusCode(200, ApiHelper.Ok(viewModel));
         }
         catch (System.Exception ex)
         {
@@ -188,25 +155,14 @@ public class UserAuthController : ControllerBase
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Erros de validação encontrados ao criar cliente.");
-                return StatusCode(422, new
-                {
-                    success = false,
-                    message = "Formulário inválido!",
-                    data = ModelState,
-                });
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }
 
             var existingUser = await _repository.FindUserByEmailAsync(dto.Email);
 
             if (existingUser)
             {
-                return StatusCode(422, new
-                {
-                    success = false,
-                    message = "Já existe um usuário com este email.",
-                    data = Array.Empty<object>(),
-                });
+                return StatusCode(422, ApiHelper.UnprocessableEntity(Array.Empty<int>(), "Já existe um usuário com este email"));
             }
 
             var user = new User
@@ -228,12 +184,11 @@ public class UserAuthController : ControllerBase
 
             return result;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao criar usuário");
-            throw;
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, ApiHelper.InternalServerError());
         }
-
     }
 
 }

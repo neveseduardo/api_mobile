@@ -21,13 +21,16 @@ public class DoctorRepository : IRepository<Doctor>
     public async Task<IEnumerable<Doctor>> GetAllAsync()
     {
         return await _context.Doctors
+            .Include(u => u.Especialization)
             .OrderByDescending(a => a.Id)
             .ToListAsync();
     }
 
     public async Task<Doctor?> GetByIdAsync(int id)
     {
-        return await _context.Doctors.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Doctors
+            .Include(u => u.Especialization)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Doctor?> AddAsync(Doctor doctor)
@@ -56,7 +59,7 @@ public class DoctorRepository : IRepository<Doctor>
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, ex.Message);
             throw;
         }
     }
@@ -70,7 +73,7 @@ public class DoctorRepository : IRepository<Doctor>
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao deletar item");
+            _logger.LogError(ex, ex.Message);
             throw;
         }
     }

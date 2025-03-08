@@ -22,22 +22,33 @@ public class DoctorController : ControllerBase
         _logger = logger;
     }
 
-    protected DoctorViewModel? GetViewModel(Doctor? doctor)
+    protected DoctorViewModel GetViewModel(Doctor doctor)
     {
-        DoctorViewModel? viewModel = null;
+        EspecializationViewModel? especializationViewModel = null;
 
-        if (doctor != null)
+        if (doctor.Especialization != null)
         {
-            viewModel = new DoctorViewModel
+            especializationViewModel = new EspecializationViewModel
             {
-                Id = doctor.Id,
-                Name = doctor.Name,
-                Email = doctor.Email,
-                CRM = doctor.CRM,
-                CreatedAt = doctor.CreatedAt,
-                UpdatedAt = doctor.UpdatedAt,
+                Id = doctor.Especialization.Id,
+                Name = doctor.Especialization.Name,
+                Description = doctor.Especialization.Description,
+                CreatedAt = doctor.Especialization.CreatedAt,
+                UpdatedAt = doctor.Especialization.UpdatedAt,
             };
         }
+
+        var viewModel = new DoctorViewModel
+        {
+            Id = doctor.Id,
+            Name = doctor.Name,
+            Email = doctor.Email,
+            CRM = doctor.CRM,
+            Especialization = especializationViewModel,
+            CreatedAt = doctor.CreatedAt,
+            UpdatedAt = doctor.UpdatedAt,
+        };
+
         return viewModel;
     }
 
@@ -98,7 +109,7 @@ public class DoctorController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao criar item");
+            _logger.LogError(ex, ex.Message);
             return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
@@ -131,7 +142,7 @@ public class DoctorController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, ex.Message);
             return StatusCode(500, ApiHelper.InternalServerError());
         }
     }
@@ -154,7 +165,7 @@ public class DoctorController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Falha ao deletar item");
+            _logger.LogError(ex, ex.Message);
             return StatusCode(500, ApiHelper.InternalServerError());
         }
     }

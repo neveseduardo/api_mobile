@@ -59,7 +59,7 @@ public class MedicalCenterRepository : IRepository<MedicalCenter>
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao atualizar item");
+            _logger.LogError(ex, ex.Message);
             throw;
         }
     }
@@ -73,7 +73,7 @@ public class MedicalCenterRepository : IRepository<MedicalCenter>
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Falha ao deletar item");
+            _logger.LogError(ex, ex.Message);
             throw;
         }
     }
