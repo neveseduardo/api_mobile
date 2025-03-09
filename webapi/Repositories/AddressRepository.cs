@@ -3,6 +3,7 @@ using WebApi.Database;
 using WebApi.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WebApi.Models.ViewModels;
 
 namespace WebApi.Repositories;
 
@@ -39,7 +40,7 @@ public class AddressRepository : IRepository<Address>
 
             return address;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Falha ao adicionar item");
             throw;
@@ -54,7 +55,7 @@ public class AddressRepository : IRepository<Address>
             _context.Entry(address).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
             throw;
@@ -68,7 +69,7 @@ public class AddressRepository : IRepository<Address>
             _context.Addresses.Remove(address);
             await _context.SaveChangesAsync();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
             throw;

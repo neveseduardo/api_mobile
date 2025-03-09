@@ -6,6 +6,8 @@ public class UpdateAppointmentDto
 {
     public DateTime? Date { get; set; }
 
+    public string? Protocol { get; set; } = string.Empty;
+
     [StringLength(500, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
     public string? Notes { get; set; }
 

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 namespace WebApi.Helpers;
 
 public class ApiResponse
@@ -89,5 +91,16 @@ public static class ApiHelper
     public static ApiResponse DeleteSuccess(string message = Messages.DeleteSuccess)
     {
         return Response(message, Array.Empty<object>(), true, 200);
+    }
+
+    public static string[] GetErrorMessages(ModelStateDictionary modelState)
+    {
+        var errors = modelState
+            .Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage)
+            .ToArray();
+
+        return errors;
     }
 }

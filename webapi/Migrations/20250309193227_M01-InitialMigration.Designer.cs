@@ -11,7 +11,7 @@ using WebApi.Database;
 namespace webapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250307170520_M01-InitialMigration")]
+    [Migration("20250309193227_M01-InitialMigration")]
     partial class M01InitialMigration
     {
         /// <inheritdoc />
@@ -110,6 +110,10 @@ namespace webapi.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Protocol")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
@@ -288,7 +292,7 @@ namespace webapi.Migrations
 
                     b.HasIndex("HealthPlanId");
 
-                    b.ToTable("convênios");
+                    b.ToTable("convenios");
                 });
 
             modelBuilder.Entity("WebApi.Models.MedicalCenter", b =>

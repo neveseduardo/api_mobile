@@ -76,9 +76,11 @@ public class AppointmentRatingController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = new AppointmentRating
@@ -113,9 +115,11 @@ public class AppointmentRatingController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(Id);
@@ -127,7 +131,6 @@ public class AppointmentRatingController : ControllerBase
 
             model.Rating = dto.Rating ?? model.Rating;
             model.Comment = dto.Comment ?? model.Comment;
-            model.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(model);
 

@@ -23,17 +23,6 @@ public class DoctorController : ControllerBase
         _logger = logger;
     }
 
-    protected string[] GetErrorMessages(ModelStateDictionary modelState)
-    {
-        var errors = modelState
-            .Values
-            .SelectMany(v => v.Errors)
-            .Select(e => e.ErrorMessage)
-            .ToArray();
-
-        return errors;
-    }
-
     protected DoctorViewModel GetViewModel(Doctor doctor)
     {
         EspecializationViewModel? especializationViewModel = null;
@@ -97,7 +86,7 @@ public class DoctorController : ControllerBase
 
             if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(GetErrorMessages(ModelState)));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = new Doctor
@@ -137,7 +126,7 @@ public class DoctorController : ControllerBase
 
             if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(GetErrorMessages(ModelState)));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(Id);
@@ -150,7 +139,6 @@ public class DoctorController : ControllerBase
             model.Name = dto.Name ?? model.Name;
             model.Email = dto.Email ?? model.Email;
             model.CPF = dto.CPF ?? model.CPF;
-            model.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(model);
 

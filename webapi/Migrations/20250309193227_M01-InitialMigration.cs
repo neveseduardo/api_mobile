@@ -173,7 +173,7 @@ namespace webapi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "convênios",
+                name: "convenios",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -188,9 +188,9 @@ namespace webapi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_convênios", x => x.Id);
+                    table.PrimaryKey("PK_convenios", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_convênios_planos_saude_HealthPlanId",
+                        name: "FK_convenios_planos_saude_HealthPlanId",
                         column: x => x.HealthPlanId,
                         principalTable: "planos_saude",
                         principalColumn: "Id");
@@ -203,6 +203,7 @@ namespace webapi.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Protocol = table.Column<string>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", nullable: true),
                     Status = table.Column<string>(type: "TEXT", nullable: false),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
@@ -290,8 +291,8 @@ namespace webapi.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_convênios_HealthPlanId",
-                table: "convênios",
+                name: "IX_convenios_HealthPlanId",
+                table: "convenios",
                 column: "HealthPlanId");
 
             migrationBuilder.CreateIndex(
@@ -330,7 +331,7 @@ namespace webapi.Migrations
                 name: "centros_medicos");
 
             migrationBuilder.DropTable(
-                name: "convênios");
+                name: "convenios");
 
             migrationBuilder.DropTable(
                 name: "exames");

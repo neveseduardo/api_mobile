@@ -109,6 +109,10 @@ namespace webapi.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Protocol")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -285,7 +289,7 @@ namespace webapi.Migrations
 
                     b.HasIndex("HealthPlanId");
 
-                    b.ToTable("convênios");
+                    b.ToTable("convenios");
                 });
 
             modelBuilder.Entity("WebApi.Models.MedicalCenter", b =>

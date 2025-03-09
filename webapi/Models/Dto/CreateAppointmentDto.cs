@@ -7,6 +7,9 @@ public class CreateAppointmentDto
     [Required(ErrorMessage = "Campo {0} obrigatório.")]
     public DateTime Date { get; set; }
 
+    [StringLength(250, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
+    public string? Protocol { get; set; } = string.Empty;
+
     [StringLength(500, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres.")]
     public string? Notes { get; set; }
 

@@ -67,9 +67,11 @@ public class HealthPlansController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var HealthPlan = new HealthPlan
@@ -102,9 +104,11 @@ public class HealthPlansController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(id);
@@ -116,7 +120,6 @@ public class HealthPlansController : ControllerBase
 
             model.Name = dto.Name!;
             model.Coverage = dto.Coverage!;
-            model.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(model);
 

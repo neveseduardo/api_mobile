@@ -68,7 +68,7 @@ public class UsersController : ControllerBase
 
             if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = new User
@@ -76,7 +76,7 @@ public class UsersController : ControllerBase
                 Name = dto.Name,
                 Email = dto.Email,
                 Cpf = dto.Cpf,
-                Password = PasswordHelper.HashPassword(dto.Password),
+                Password = dto.Password,
             };
 
             await _repository.AddAsync(model);
@@ -103,9 +103,11 @@ public class UsersController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(Id);
@@ -118,7 +120,6 @@ public class UsersController : ControllerBase
             model.Name = dto.Name ?? model.Name;
             model.Email = dto.Email ?? model.Email;
             model.Cpf = dto.Cpf ?? model.Cpf;
-            model.UpdatedAt = DateTime.Now;
 
 
             await _repository.UpdateAsync(model);

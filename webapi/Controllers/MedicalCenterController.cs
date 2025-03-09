@@ -90,9 +90,11 @@ public class MedicalCenterController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var address = new Address
@@ -145,9 +147,11 @@ public class MedicalCenterController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(Id);
@@ -160,7 +164,6 @@ public class MedicalCenterController : ControllerBase
             model.Name = dto.Name ?? model.Name;
             model.Email = dto.Email ?? model.Email;
             model.PhoneNumber = dto.PhoneNumber ?? model.PhoneNumber;
-            model.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(model);
 

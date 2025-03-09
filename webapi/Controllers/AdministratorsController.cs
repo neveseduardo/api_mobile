@@ -65,16 +65,18 @@ public class AdministratorController : Controller
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = new Administrator
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Password = PasswordHelper.HashPassword(dto.Password),
+                Password = dto.Password,
             };
 
             await _repository.AddAsync(model);
@@ -101,9 +103,11 @@ public class AdministratorController : Controller
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(Id);
@@ -115,7 +119,6 @@ public class AdministratorController : Controller
 
             model.Name = dto.Name ?? model.Name;
             model.Email = dto.Email ?? model.Email;
-            model.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(model);
 

@@ -54,7 +54,7 @@ public class AdministratorRepository : IRepository<Administrator>
             _context.Entry(administrator).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
             throw;

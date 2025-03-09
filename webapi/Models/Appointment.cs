@@ -11,7 +11,9 @@ public class Appointment
 
     public DateTime Date { get; set; }
 
-    public string? Notes { get; set; } = "";
+    public string Protocol { get; set; } = string.Empty;
+
+    public string? Notes { get; set; } = string.Empty;
 
     public string Status { get; set; } = "Agendado";
 

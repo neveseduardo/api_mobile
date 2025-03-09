@@ -4,6 +4,7 @@ using WebApi.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebApi.Models.ViewModels;
+using WebApi.Helpers;
 
 namespace WebApi.Repositories;
 
@@ -42,6 +43,7 @@ public class AppointmentRepository : IRepository<Appointment>
     {
         try
         {
+            appointment.Protocol = ProtocolHelper.GenerateProtocol();
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
