@@ -64,7 +64,9 @@ public class UsersController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
                 return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
             }

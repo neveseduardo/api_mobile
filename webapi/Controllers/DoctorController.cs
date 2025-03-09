@@ -5,6 +5,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Helpers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace WebApi.Controllers;
 
@@ -20,6 +21,17 @@ public class DoctorController : ControllerBase
     {
         _repository = repository;
         _logger = logger;
+    }
+
+    protected string[] GetErrorMessages(ModelStateDictionary modelState)
+    {
+        var errors = modelState
+            .Values
+            .SelectMany(v => v.Errors)
+            .Select(e => e.ErrorMessage)
+            .ToArray();
+
+        return errors;
     }
 
     protected DoctorViewModel GetViewModel(Doctor doctor)
@@ -81,9 +93,11 @@ public class DoctorController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(GetErrorMessages(ModelState)));
             }
 
             var model = new Doctor
@@ -119,9 +133,11 @@ public class DoctorController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(422, ApiHelper.UnprocessableEntity(ModelState));
+                return StatusCode(422, ApiHelper.UnprocessableEntity(GetErrorMessages(ModelState)));
             }
 
             var model = await _repository.GetByIdAsync(Id);

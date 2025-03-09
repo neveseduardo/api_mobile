@@ -7,8 +7,6 @@ obj/*
 appsettings.json
 !appsettings.Development.json
 
-*.db
-
 # IDEs
 .idea/
 *.vs/

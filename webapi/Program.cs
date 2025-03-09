@@ -4,7 +4,10 @@ using WebApi.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCustomAuthentication(builder.Configuration);
-builder.Services.AddControllers();
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 builder.Services.AddRazorPages();
 builder.Services.AddMvc();
 builder.Services.AddDbContext<ApplicationDbContext>();
