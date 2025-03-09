@@ -13,7 +13,7 @@ const UserLogoutButton = () => {
 	}
 	return (
 		<Button color="primary" className="flex flex-row w-full gap-2" onPress={onPressLogout}>
-			<Ionicons name="log-out-outline" className="text-white" size={16} />
+			<Ionicons name="log-out-outline" className="!text-white" size={16} />
 			<Text className="text-white">Logout</Text>
 		</Button>
 	);

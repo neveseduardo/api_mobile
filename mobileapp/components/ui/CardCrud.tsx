@@ -16,10 +16,10 @@ const CardCrud = ({ item, onDelete, onEdit, children, disabledEdit = false, disa
 				{children}
 			</View>
 
-			<View className="grid grid-cols-2 border-t border-slate-300 dark:border-slate-600">
+			<View className="flex flex-row border-t border-slate-300 dark:border-slate-600">
 				<TouchableOpacity
 					disabled={disabledEdit}
-					className="flex flex-row w-full gap-2 h-[40px] justify-center items-center border-r border-slate-300 dark:border-slate-600"
+					className="flex flex-row w-full flex-1 gap-2 h-[40px] justify-center items-center border-r border-slate-300 dark:border-slate-600"
 					onPress={() => onEdit(item)}
 				>
 					<Ionicons name="pencil-outline" className="!text-slate-600" size={14} />
@@ -28,10 +28,10 @@ const CardCrud = ({ item, onDelete, onEdit, children, disabledEdit = false, disa
 
 				<TouchableOpacity
 					disabled={disabledDelete}
-					className="flex flex-row w-full gap-2 h-[40px] justify-center items-center"
+					className="flex flex-row w-full flex-1 gap-2 h-[40px] justify-center items-center"
 					onPress={() => onDelete(item)}
 				>
-					<Ionicons name="trash-outline" className="text-red-500" size={14} />
+					<Ionicons name="trash-outline" className="!text-red-500" size={14} />
 					<Text className="font-semibold text-red-500">Remover</Text>
 				</TouchableOpacity>
 			</View>

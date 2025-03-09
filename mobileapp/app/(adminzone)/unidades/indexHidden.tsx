@@ -5,13 +5,13 @@ import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useEffect, useState } from 'react';
 import { HttpClient } from '@/services/HttpClient';
+import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
 import { ActivityIndicator, FlatList, RefreshControl, Text, View, Modal } from 'react-native';
-import CardCrud from '@/components/ui/CardCrud';
-import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
-import { UserAddressService } from '@/services/userservices/UserAddressService';
+import { UnitService } from '@/services/UnitService';
+import CardCrud from '../../../components/ui/CardCrud';
 
 const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
-const service = new UserAddressService(client);
+const service = new UnitService(client);
 
 const AddressListScreen = () => {
 	const router = useRouter();
@@ -25,10 +25,8 @@ const AddressListScreen = () => {
 	const fetchAddresses = useCallback(async () => {
 		try {
 			setLoading(true);
-			const { data: response } = await service.getAllFromUserAsync();
-			const enderecos = Array.isArray(response.data) ? null : response.data;
-
-			setList(enderecos ? [enderecos] : []);
+			const { data: response } = await service.getAllFromAdminAsync();
+			setList(response.data);
 			setError(null);
 		} catch (err) {
 			console.error('Erro ao buscar endereços:', err);
@@ -37,6 +35,7 @@ const AddressListScreen = () => {
 		} finally {
 			setLoading(false);
 		}
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -61,7 +60,7 @@ const AddressListScreen = () => {
 	const confirmDelete = async () => {
 		if (selectedItem) {
 			try {
-				await service.deleteFromUserAsync(selectedItem.id);
+				await service.deleteFromAdminAsync(selectedItem.id);
 				fetchAddresses();
 			} catch (err) {
 				console.error('Erro ao deletar endereço:', err);
@@ -77,7 +76,7 @@ const AddressListScreen = () => {
 		const addressData = { ...address, ...rest, editable: true };
 
 		router.push({
-			pathname: '/(userzone)/perfil/enderecos/address',
+			pathname: '/(adminzone)/unidades/address',
 			params: { ...addressData },
 		});
 	}
@@ -91,11 +90,12 @@ const AddressListScreen = () => {
 
 				<FlatList
 					data={list}
-					keyExtractor={(item) => item?.id.toString()}
+					keyExtractor={(item) => item.id.toString()}
 					renderItem={({ item }) => (
 						<CardCrud item={item} onDelete={openDeleteModal} onEdit={handleEdit}>
-							<Text className="text-sm font-semibold text-slate-600 dark:text-slate-100">{item.cep} - {item.logradouro}, {item.numero}</Text>
-							<Text className="text-sm uppercase text-slate-600 dark:text-slate-100">{item.cidade} - {item.estado}</Text>
+							<Text className="text-lg font-semibold uppercase text-slate-600 dark:text-slate-100">{item.name}</Text>
+							<Text className="text-sm font-semibold text-slate-600 dark:text-slate-100">{item.address.cep} - {item.address.logradouro}, {item.address.numero}</Text>
+							<Text className="text-sm uppercase text-slate-600 dark:text-slate-100">{item.address.cidade} - {item.address.estado}</Text>
 						</CardCrud>
 					)}
 					contentContainerStyle={{ paddingBottom: 50, width: '100%', gap: 10 }}
@@ -145,11 +145,10 @@ const AddressListScreen = () => {
 			</Modal>
 
 			<Button
-				onPress={() => router.push('/(userzone)/perfil/enderecos/postalcode')}
+				onPress={() => router.push('/(adminzone)/unidades/postalcode')}
 				circular
 				color="primary"
 				className="!w-[50px] !h-[50px] absolute right-0 bottom-0 m-5 shadow"
-				disabled={!!list.length}
 			>
 				<Ionicons size={25} name="add" color={'#FFFFFF'} />
 			</Button>

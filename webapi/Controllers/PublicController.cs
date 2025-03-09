@@ -229,25 +229,25 @@ public class PublicController : ControllerBase
         }
     }
 
-    [HttpPut("nome")]
-    public async Task<ActionResult> AlterUserNameAsync(UpdateUserDto dto)
+    [HttpPut("usuario")]
+    public async Task<ActionResult> AlterUserData(UpdateUserDto dto)
     {
         try
         {
-            if (!ModelState.IsValid)
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(dto))
             {
-                return StatusCode(404, ApiHelper.NotFound());
+                return StatusCode(422, ApiHelper.UnprocessableEntity(ApiHelper.GetErrorMessages(ModelState)));
             }
 
             var user = await GetAuthenticatedUserAsync();
 
-            if (user == null)
-            {
-                return StatusCode(404, ApiHelper.NotFound());
-            }
+            user!.Name = dto.Name ?? user.Name;
+            user!.Email = dto.Email ?? user.Email;
+            user!.Cpf = dto.Cpf ?? user.Cpf;
+            user!.UpdatedAt = DateTime.UtcNow;
 
-            user.Name = dto.Name;
-            user.UpdatedAt = DateTime.UtcNow;
             _context.Entry(user).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
@@ -257,9 +257,7 @@ public class PublicController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            return StatusCode(500, ApiHelper.InternalServerError());
+            throw;
         }
     }
-
-
 }

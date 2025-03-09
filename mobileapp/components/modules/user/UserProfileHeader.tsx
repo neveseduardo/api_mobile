@@ -7,19 +7,23 @@ interface Props {
 }
 
 const UserProfileHeader = ({ username = 'USER NAME', email }: Props) => {
-	const initialLetters = username.split(' ').map((l) => l.charAt(0));
+	const splitedName = username.split(' ');
+	const initialLetters = [splitedName.shift()?.charAt(0), splitedName.pop()?.charAt(0)].join('');
 
 	return (
 		<View className="w-full min-h-[80px] flex flex-row gap-4 items-center">
-			<View className="w-[70px] h-[70px] rounded-full bg-gray-600 flex justify-center items-center">
+			<View className="w-[50px] h-[50px] rounded-full bg-gray-800 flex justify-center items-center">
 				<View className="text-2xl font-semibold text-white">
-					<Text>{initialLetters}</Text>
+					<Text className="font-bold text-white">{initialLetters}</Text>
 				</View>
 			</View>
-			<View>
-				<ThemedText className="font-semibold">Bem vindo!</ThemedText>
-				<ThemedText className="uppercase">{username}</ThemedText>
-				<ThemedText>{email}</ThemedText>
+			<View className="flex flex-col gap-2">
+				<ThemedText className="font-bold">Olá,</ThemedText>
+
+				<View className="">
+					<ThemedText className="text-lg font-semibold">{username}</ThemedText>
+					<ThemedText>{email}</ThemedText>
+				</View>
 			</View>
 		</View>
 	);

@@ -64,7 +64,7 @@ export default function AddressScreen() {
 			if (routeParams.editable) {
 				await service.updateFromUserAsync(Number(routeParams.id), payload);
 			}
-			router.push('/(userzone)/perfil/enderecos');
+			router.replace('/(userzone)/perfil/enderecos', { withAnchor: false });
 		} catch (error: any) {
 			console.error(error);
 		} finally {

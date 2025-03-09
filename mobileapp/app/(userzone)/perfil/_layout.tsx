@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Button from '@/components/ui/Button';
+// import Ionicons from '@expo/vector-icons/Ionicons';
+// import Button from '@/components/ui/Button';
 
 
 export default function RootLayout() {
@@ -11,14 +11,15 @@ export default function RootLayout() {
 				options={{
 					headerShown: true,
 					headerTitle: 'Meu perfil',
-					headerRight: ({ tintColor }) => (
-						<Button className="mr-[16px] w-[40px] !bg-transparent" circular onPress={() => { }}>
-							<Ionicons name="settings-outline" size={18} color={tintColor} />
-						</Button>
-					),
+					// headerRight: ({ tintColor }) => (
+					// 	<Button className="mr-[16px] w-[40px] !bg-transparent" circular onPress={() => { }}>
+					// 		<Ionicons name="settings-outline" size={18} color={tintColor} />
+					// 	</Button>
+					// ),
 				}}
 			/>
 			<Stack.Screen name="enderecos" options={{ headerShown: false }} />
+			<Stack.Screen name="meusdados" options={{ headerShown: false }} />
 		</Stack>
 	);
 }

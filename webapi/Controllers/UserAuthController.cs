@@ -28,6 +28,7 @@ public class UserAuthController : ControllerBase
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
+            Cpf = user.Cpf,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
         };

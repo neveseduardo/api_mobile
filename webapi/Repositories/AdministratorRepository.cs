@@ -21,6 +21,7 @@ public class AdministratorRepository : IRepository<Administrator>
     public async Task<IEnumerable<Administrator>> GetAllAsync()
     {
         return await _context.Administrators
+            .Where(u => u.Email != "administrador@administrador.com")
             .OrderByDescending(a => a.Id)
             .ToListAsync();
     }

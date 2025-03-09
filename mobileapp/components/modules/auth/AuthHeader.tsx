@@ -14,7 +14,7 @@ const AuthHeader = ({ title, description, icon }: AuthHeaderProps) => {
 		<ThemedView>
 			<View className="w-full flex justify-center items-center h-[200px]">
 				<View className="w-[70px] h-[70px] bg-primary-500 rounded-full flex justify-center items-center">
-					<Ionicons name={icon as 'search'} size={32} className="text-white" />
+					<Ionicons name={icon as 'search'} size={32} className="!text-white" />
 				</View>
 			</View>
 

@@ -1,23 +1,26 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import { UserAuthenticationService } from '@/services/UserAuthenticationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, AuthProviderProps, IUser } from '@/@types';
 import { HttpClient } from '../services/HttpClient';
 
-const defaultValue: AuthContextType<IUser> = {
+type InnerAuthContextType = AuthContextType<IUser> & { updateUserData: (data: any) => void };
+
+const defaultValue: InnerAuthContextType = {
 	access_token: '',
 	refresh_token: '',
 	userData: null,
 	login: async () => { },
 	register: async () => { },
 	logout: async () => { },
+	updateUserData: () => { },
 };
 
 export const USER_ACCESS_TOKEN_NAME = 'user_access_token';
 const USER_REFRESH_TOKEN_NAME = 'user_refresh_token';
 const USER_DATA_NAME = 'user_userData';
 
-const UserAuthenticationContext = createContext<AuthContextType<IUser>>(defaultValue);
+const UserAuthenticationContext = createContext<InnerAuthContextType>(defaultValue);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
@@ -54,9 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			const user = await service.userData();
 
-			await AsyncStorage.setItem(USER_DATA_NAME, JSON.stringify(user));
-
-			setUserData(user);
+			await updateUserData(user);
 
 			return { accessToken, user };
 		} catch (error) {
@@ -89,6 +90,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
+	const updateUserData = async (user: IUser) => {
+		await AsyncStorage.setItem(USER_DATA_NAME, JSON.stringify(user));
+		setUserData(user);
+	};
+
 	return (
 		<UserAuthenticationContext.Provider
 			value={{
@@ -98,6 +104,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				register,
 				login,
 				logout,
+				updateUserData,
 			}}
 		>
 			{children}

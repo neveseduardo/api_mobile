@@ -30,7 +30,7 @@ export default function PostalCodeScreen() {
 	const { control, handleSubmit, formState: { errors } } = useForm<CepFormData>({
 		resolver: zodResolver(cepSchema),
 		defaultValues: {
-			cep: '30730540',
+			cep: '30840-020',
 		},
 	});
 
