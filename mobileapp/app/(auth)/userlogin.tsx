@@ -10,7 +10,8 @@ import AuthHeader from '@/components/modules/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Toast from 'react-native-root-toast';
 import { z } from 'zod';
 
 const formSchema = z.object({
@@ -35,12 +36,20 @@ export default function LoginScreen() {
 	const { login } = useUserAuth();
 
 	const onSubmit = async (data: InnerFormData) => {
+
+
 		try {
 			setLoading(true);
 
 			const { accessToken, user } = await login(data.email, data.password);
 
 			if (accessToken && user) {
+				Toast.show('Autenticado com sucesso!', {
+					duration: Toast.durations.SHORT,
+					position: Toast.positions.BOTTOM,
+					animation: true,
+				});
+
 				router.replace('/(userzone)' as Href);
 			}
 		} catch (error: any) {

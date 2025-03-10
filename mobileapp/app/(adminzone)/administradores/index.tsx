@@ -10,6 +10,7 @@ import { ActivityIndicator, FlatList, RefreshControl, Text } from 'react-native'
 import CardCrud from '@/components/ui/CardCrud';
 import { AdminService } from '@/services/restrict/AdminService';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import Toast from 'react-native-root-toast';
 
 const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 const service = new AdminService(client);
@@ -19,7 +20,6 @@ export default function AdminListScreen() {
 	const [list, setList] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-	const [selectedItem, setSelectedItem] = useState<any>(null);
 	const { showActionSheetWithOptions } = useActionSheet();
 
 	const fetchAddresses = useCallback(async () => {
@@ -47,19 +47,22 @@ export default function AdminListScreen() {
 		fetchAddresses();
 	}, [fetchAddresses]);
 
-	const deleteItem = useCallback(async () => {
+	const deleteItem = useCallback(async (item: any) => {
 		try {
-			await service.deleteFromAdminAsync(selectedItem.id);
+			await service.deleteFromAdminAsync(item.id);
+			Toast.show('Operação realizada com sucesso!', {
+				duration: Toast.durations.SHORT,
+				position: Toast.positions.BOTTOM,
+				animation: true,
+			});
 			fetchAddresses();
 		} catch (err) {
 			console.error('Erro ao deletar item:', err);
 			setError('Erro ao deletar item.');
 		}
-	}, [fetchAddresses, selectedItem]);
+	}, [fetchAddresses]);
 
 	const onPressDelete = useCallback((item: any) => {
-		setSelectedItem(item);
-
 		const options = ['Deletar', 'Cancelar'];
 		const destructiveButtonIndex = 0;
 		const cancelButtonIndex = 1;
@@ -70,7 +73,7 @@ export default function AdminListScreen() {
 			destructiveButtonIndex,
 		}, (selected) => {
 			if (selected === destructiveButtonIndex) {
-				deleteItem();
+				deleteItem(item);
 			}
 		});
 	}, [deleteItem, showActionSheetWithOptions]);
@@ -94,7 +97,7 @@ export default function AdminListScreen() {
 					data={list}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={({ item }) => (
-						<CardCrud item={item} onDelete={onPressDelete} onEdit={() => handleEdit(item)}>
+						<CardCrud item={item} onDelete={onPressDelete} onEdit={handleEdit}>
 							<Text className="text-lg font-semibold uppercase text-slate-600 dark:text-slate-100">{item.name}</Text>
 							<Text className="text-sm font-semibold text-slate-600 dark:text-slate-100">{item.email}</Text>
 							<Text className="text-sm font-semibold text-slate-600 dark:text-slate-100">{item.cpf}</Text>

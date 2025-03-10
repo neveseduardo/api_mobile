@@ -11,6 +11,7 @@ import { HttpClient } from '@/services/restrict/HttpClient';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
 import { UnitService } from '@/services/restrict/UnitService';
 import { z } from 'zod';
+import Toast from 'react-native-root-toast';
 
 const loginSchema = z.object({
 	name: z.string().min(1, 'Campo obrigatório!!'),
@@ -61,6 +62,12 @@ export default function UnidadeScreen() {
 			if (routeParams.editable) {
 				await service.updateFromAdminAsync(Number(routeParams.id), payload);
 			}
+
+			Toast.show('Operação realizada com sucesso!', {
+				duration: Toast.durations.SHORT,
+				position: Toast.positions.BOTTOM,
+				animation: true,
+			});
 
 			router.dismissAll();
 			router.replace('/(adminzone)/unidades');

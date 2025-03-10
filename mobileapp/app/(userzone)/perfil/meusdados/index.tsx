@@ -14,6 +14,7 @@ import { HttpClient } from '@/services/restrict/HttpClient';
 import { router } from 'expo-router';
 import { UserAuthenticationService } from '@/services/authentication/UserAuthenticationService';
 import { useUserAuth } from '@/hooks/useUserAuth';
+import Toast from 'react-native-root-toast';
 
 const formSchema = z.object({
 	name: z.string().min(1, 'Campo obrigatório'),
@@ -55,6 +56,12 @@ export default function MeusDadosScreen() {
 			const user = await userAuthService.userData();
 
 			updateUserData(user);
+
+			Toast.show('Operação realizada com sucesso!', {
+				duration: Toast.durations.SHORT,
+				position: Toast.positions.BOTTOM,
+				animation: true,
+			});
 
 			router.dismissAll();
 			router.replace('/(userzone)/perfil');

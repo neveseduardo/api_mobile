@@ -12,6 +12,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { z } from 'zod';
+import Toast from 'react-native-root-toast';
 
 const formSchema = z.object({
 	email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
@@ -41,6 +42,11 @@ export default function LoginScreen() {
 			const { accessToken, user } = await login(data.email, data.password);
 
 			if (accessToken && user) {
+				Toast.show('Autenticado com sucesso!', {
+					duration: Toast.durations.SHORT,
+					position: Toast.positions.BOTTOM,
+					animation: true,
+				});
 				router.replace('/(adminzone)' as Href);
 			}
 		} catch (error: any) {

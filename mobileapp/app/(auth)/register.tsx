@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { isCPF } from '@/utils/helpers';
+import Toast from 'react-native-root-toast';
 
 const formSchema = z.object({
 	name: z.string().min(1, 'Campo obrigatório'),
@@ -67,6 +68,11 @@ export default function RegisterScreen() {
 			const { accessToken, user } = await login(data.email, data.password);
 
 			if (accessToken && user) {
+				Toast.show('Usuário cadastrado com sucesso!', {
+					duration: Toast.durations.SHORT,
+					position: Toast.positions.BOTTOM,
+					animation: true,
+				});
 				router.replace('/(userzone)' as Href);
 			}
 		} catch (error: any) {

@@ -11,6 +11,7 @@ import { HttpClient } from '@/services/restrict/HttpClient';
 import { AdminService } from '@/services/restrict/AdminService';
 import { z } from 'zod';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
+import Toast from 'react-native-root-toast';
 
 const formSchema = z.object({
 	name: z.string().min(1, 'Campo obrigatório'),
@@ -49,6 +50,11 @@ export default function UsuarioCreateScreen() {
 				await service.updateFromAdminAsync(Number(routeParams.id), { ...data, password: 'Senh@123' });
 			}
 
+			Toast.show('Operação realizada com sucesso!', {
+				duration: Toast.durations.SHORT,
+				position: Toast.positions.BOTTOM,
+				animation: true,
+			});
 			router.dismissAll();
 			router.replace('/(adminzone)/administradores');
 		} catch (error: any) {

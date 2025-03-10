@@ -7,6 +7,7 @@ import { Suspense, useEffect } from 'react';
 import { ActivityIndicator, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { RootSiblingParent } from 'react-native-root-siblings';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
 
@@ -34,15 +35,17 @@ export default function RootLayout() {
 
 				<StatusBar style="auto" />
 				<SafeAreaProvider>
-					<ActionSheetProvider>
-						<Stack initialRouteName="index">
-							<Stack.Screen name="index" options={{ headerShown: false }} />
-							<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-							<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
-							<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
-							<Stack.Screen name="+not-found" />
-						</Stack>
-					</ActionSheetProvider>
+					<RootSiblingParent>
+						<ActionSheetProvider>
+							<Stack initialRouteName="index">
+								<Stack.Screen name="index" options={{ headerShown: false }} />
+								<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+								<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
+								<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
+								<Stack.Screen name="+not-found" />
+							</Stack>
+						</ActionSheetProvider>
+					</RootSiblingParent>
 				</SafeAreaProvider>
 			</ThemeProvider>
 		</Suspense>

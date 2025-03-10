@@ -6,9 +6,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useEffect, useState } from 'react';
 import { HttpClient } from '@/services/restrict/HttpClient';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View, Modal } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, Text } from 'react-native';
 import { UnitService } from '@/services/restrict/UnitService';
 import CardCrud from '@/components/ui/CardCrud';
+import Toast from 'react-native-root-toast';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 const service = new UnitService(client);
@@ -18,9 +20,7 @@ const AddressListScreen = () => {
 	const [list, setList] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-
-	const [isModalVisible, setModalVisible] = useState(false);
-	const [selectedItem, setSelectedItem] = useState<any>(null);
+	const { showActionSheetWithOptions } = useActionSheet();
 
 	const fetchAddresses = useCallback(async () => {
 		try {
@@ -47,29 +47,36 @@ const AddressListScreen = () => {
 		fetchAddresses();
 	}, [fetchAddresses]);
 
-	const openDeleteModal = (item: any) => {
-		setSelectedItem(item);
-		setModalVisible(true);
-	};
-
-	const closeDeleteModal = () => {
-		setModalVisible(false);
-		setSelectedItem(null);
-	};
-
-	const confirmDelete = async () => {
-		if (selectedItem) {
-			try {
-				await service.deleteFromAdminAsync(selectedItem.id);
-				fetchAddresses();
-			} catch (err) {
-				console.error('Erro ao deletar endereço:', err);
-				setError('Erro ao deletar endereço.');
-			} finally {
-				closeDeleteModal();
-			}
+	const deleteItem = useCallback(async (item: any) => {
+		try {
+			await service.deleteFromAdminAsync(item.id);
+			Toast.show('Operação realizada com sucesso!', {
+				duration: Toast.durations.SHORT,
+				position: Toast.positions.BOTTOM,
+				animation: true,
+			});
+			fetchAddresses();
+		} catch (err) {
+			console.error('Erro ao deletar item:', err);
+			setError('Erro ao deletar item.');
 		}
-	};
+	}, [fetchAddresses]);
+
+	const onPressDelete = useCallback((item: any) => {
+		const options = ['Deletar', 'Cancelar'];
+		const destructiveButtonIndex = 0;
+		const cancelButtonIndex = 1;
+
+		showActionSheetWithOptions({
+			options,
+			cancelButtonIndex,
+			destructiveButtonIndex,
+		}, (selected) => {
+			if (selected === destructiveButtonIndex) {
+				deleteItem(item);
+			}
+		});
+	}, [deleteItem, showActionSheetWithOptions]);
 
 	function handleEdit(item: any) {
 		const { address, ...rest } = item;
@@ -92,7 +99,7 @@ const AddressListScreen = () => {
 					data={list}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={({ item }) => (
-						<CardCrud item={item} onDelete={openDeleteModal} onEdit={handleEdit}>
+						<CardCrud item={item} onDelete={onPressDelete} onEdit={handleEdit}>
 							<Text className="text-lg font-semibold uppercase text-slate-600 dark:text-slate-100">{item.name}</Text>
 							<Text className="text-sm font-semibold text-slate-600 dark:text-slate-100">{item.address.cep} - {item.address.logradouro}, {item.address.numero}</Text>
 							<Text className="text-sm uppercase text-slate-600 dark:text-slate-100">{item.address.cidade} - {item.address.estado}</Text>
@@ -109,40 +116,6 @@ const AddressListScreen = () => {
 					}
 				/>
 			</ThemedView>
-
-			<Modal
-				visible={isModalVisible}
-				transparent={true}
-				animationType="slide"
-				onRequestClose={closeDeleteModal}
-			>
-				<View className="items-center justify-center flex-1 bg-black/50">
-					<View className="p-6 bg-white rounded-lg w-80 dark:bg-slate-800">
-						<Text className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">
-							{selectedItem?.cep} - {selectedItem?.logradouro}, {selectedItem?.numero}
-						</Text>
-						<Text className="mb-4 text-lg text-slate-800 dark:text-slate-100">
-							Tem certeza que deseja deletar este endereço?
-						</Text>
-						<View className="grid grid-cols-2">
-							<Button
-								className="w-full"
-								color="default"
-								onPress={closeDeleteModal}
-							>
-								<Text className="text-sm font-semibold text-white uppercase">Cancelar</Text>
-							</Button>
-							<Button
-								className="w-full"
-								color="danger"
-								onPress={confirmDelete}
-							>
-								<Text className="text-sm font-semibold text-white uppercase">Deletar</Text>
-							</Button>
-						</View>
-					</View>
-				</View>
-			</Modal>
 
 			<Button
 				onPress={() => router.push('/(adminzone)/unidades/postalcode')}

@@ -4,12 +4,13 @@ import Button from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useEffect, useState } from 'react';
-import { HttpClient } from '@/services/restrict/HttpClient';
 import { ActivityIndicator, FlatList, RefreshControl, Text } from 'react-native';
 import CardCrud from '@/components/ui/CardCrud';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
-import { UserAddressService } from '@/services/public/UserAddressService';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import Toast from 'react-native-root-toast';
+import { HttpClient } from '@/services/restrict/HttpClient';
+import { UserAddressService } from '@/services/public/UserAddressService';
 
 const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 const service = new UserAddressService(client);
@@ -19,7 +20,6 @@ export default function AddressListScreen() {
 	const [list, setList] = useState<any[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-	const [selectedItem, setSelectedItem] = useState<any>(null);
 	const { showActionSheetWithOptions } = useActionSheet();
 
 	const fetchAddresses = useCallback(async () => {
@@ -48,19 +48,22 @@ export default function AddressListScreen() {
 		fetchAddresses();
 	}, [fetchAddresses]);
 
-	const deleteItem = useCallback(async () => {
+	const deleteItem = useCallback(async (item: any) => {
 		try {
-			await service.deleteFromUserAsync(selectedItem.id);
+			await service.deleteFromUserAsync(item.id);
+			Toast.show('Operação realizada com sucesso!', {
+				duration: Toast.durations.SHORT,
+				position: Toast.positions.BOTTOM,
+				animation: true,
+			});
 			fetchAddresses();
 		} catch (err) {
 			console.error('Erro ao deletar item:', err);
 			setError('Erro ao deletar item.');
 		}
-	}, [fetchAddresses, selectedItem]);
+	}, [fetchAddresses]);
 
 	const onPressDelete = useCallback((item: any) => {
-		setSelectedItem(item);
-
 		const options = ['Deletar', 'Cancelar'];
 		const destructiveButtonIndex = 0;
 		const cancelButtonIndex = 1;
@@ -71,7 +74,7 @@ export default function AddressListScreen() {
 			destructiveButtonIndex,
 		}, (selected) => {
 			if (selected === destructiveButtonIndex) {
-				deleteItem();
+				deleteItem(item);
 			}
 		});
 	}, [deleteItem, showActionSheetWithOptions]);
