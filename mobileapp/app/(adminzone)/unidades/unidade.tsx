@@ -61,7 +61,9 @@ export default function UnidadeScreen() {
 			if (routeParams.editable) {
 				await service.updateFromAdminAsync(Number(routeParams.id), payload);
 			}
-			router.push('/(adminzone)/unidades');
+
+			router.dismissAll();
+			router.replace('/(adminzone)/unidades');
 		} catch (error: any) {
 			console.error(error);
 		} finally {

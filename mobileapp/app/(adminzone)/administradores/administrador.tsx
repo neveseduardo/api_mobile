@@ -50,6 +50,7 @@ export default function UsuarioCreateScreen() {
 				await service.updateFromAdminAsync(Number(routeParams.id), { ...data, password: 'Senh@123' });
 			}
 
+			router.dismissAll();
 			router.replace('/(adminzone)/administradores');
 		} catch (error: any) {
 			console.error('Erro de Authenticação', error);
