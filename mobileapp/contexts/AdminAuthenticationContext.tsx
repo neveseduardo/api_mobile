@@ -18,7 +18,7 @@ export const USER_ACCESS_TOKEN_NAME = 'admin_access_token';
 const USER_REFRESH_TOKEN_NAME = 'admin_refresh_token';
 const USER_DATA_NAME = 'admin_userData';
 
-const UserAuthenticationContext = createContext<AdminContextType>(defaultValue);
+export const UserAuthenticationContext = createContext<AdminContextType>(defaultValue);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
@@ -95,5 +95,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		</UserAuthenticationContext.Provider>
 	);
 };
-
-export const useAdminAuth = () => useContext(UserAuthenticationContext);

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { useAdminAuth } from '@/contexts/AdminAuthenticationContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { ThemedText } from './ThemedText';
 
 const AdminDrawerContent = () => {

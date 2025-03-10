@@ -1,4 +1,4 @@
-import { useUserAuth } from '@/contexts/UserAuthenticationContext';
+import { useUserAuth } from '@/hooks/useUserAuth';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Href, router } from 'expo-router';
 import { ThemedView } from '@/components/ui/ThemedView';

@@ -1,4 +1,4 @@
-import { useAdminAuth } from '@/contexts/AdminAuthenticationContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text } from 'react-native';
 import Button from './Button';

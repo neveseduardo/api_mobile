@@ -1,4 +1,4 @@
-import { useAdminAuth } from '@/contexts/AdminAuthenticationContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Href, router } from 'expo-router';
 import { ThemedView } from '@/components/ui/ThemedView';
@@ -10,7 +10,7 @@ import AuthHeader from '@/components/modules/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 
 const formSchema = z.object({

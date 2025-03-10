@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
 import PasswordInput from '@/components/ui/PasswordInput';
-import { useUserAuth } from '@/contexts/UserAuthenticationContext';
+import { useUserAuth } from '@/hooks/useUserAuth';
 import AuthHeader from '@/components/modules/auth/AuthHeader';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

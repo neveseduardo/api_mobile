@@ -1,6 +1,6 @@
 import { ThemedView } from '@/components/ui/ThemedView';
 import UserProfileHeader from '@/components/modules/user/UserProfileHeader';
-import { useUserAuth } from '@/contexts/UserAuthenticationContext';
+import { useUserAuth } from '@/hooks/useUserAuth';
 import UserLogoutButton from '@/components/ui/UserLogoutButton';
 import ScreenOptionButton from '@/components/ui/ScreenOptionButton';
 import { View } from 'react-native';

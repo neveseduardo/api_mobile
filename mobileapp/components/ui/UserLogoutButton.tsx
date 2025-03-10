@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text } from 'react-native';
 import Button from './Button';
 import { router } from 'expo-router';
-import { useUserAuth } from '@/contexts/UserAuthenticationContext';
+import { useUserAuth } from '@/hooks/useUserAuth';
 
 const UserLogoutButton = () => {
 	const { logout } = useUserAuth();

@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { ThemedView } from '@/components/ui/ThemedView';
 import Button from '@/components/ui/Button';
 import TextInput from '@/components/ui/TextInput';
-import { USER_ACCESS_TOKEN_NAME, useUserAuth } from '@/contexts/UserAuthenticationContext';
+import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,7 +12,8 @@ import { isCPF } from '@/utils/helpers';
 import { UserService } from '@/services/userservices/UserService';
 import { HttpClient } from '@/services/HttpClient';
 import { router } from 'expo-router';
-import { UserAuthenticationService } from '../../../../services/UserAuthenticationService';
+import { UserAuthenticationService } from '@/services/UserAuthenticationService';
+import { useUserAuth } from '@/hooks/useUserAuth';
 
 const formSchema = z.object({
 	name: z.string().min(1, 'Campo obrigatório'),
@@ -31,7 +32,7 @@ const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 const service = new UserService(client);
 const userAuthService = new UserAuthenticationService(client);
 
-export default function RegisterScreen() {
+export default function MeusDadosScreen() {
 	const { userData, updateUserData } = useUserAuth();
 	const { control, handleSubmit, formState: { errors } } = useForm<InnerFormData>({
 		resolver: zodResolver(formSchema),
@@ -55,6 +56,7 @@ export default function RegisterScreen() {
 
 			updateUserData(user);
 
+			router.dismissAll();
 			router.replace('/(userzone)/perfil');
 		} catch (error: any) {
 			console.error('Erro de Authenticação', error);

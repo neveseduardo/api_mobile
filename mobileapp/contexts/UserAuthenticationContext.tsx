@@ -20,7 +20,7 @@ export const USER_ACCESS_TOKEN_NAME = 'user_access_token';
 const USER_REFRESH_TOKEN_NAME = 'user_refresh_token';
 const USER_DATA_NAME = 'user_userData';
 
-const UserAuthenticationContext = createContext<InnerAuthContextType>(defaultValue);
+export const UserAuthenticationContext = createContext<InnerAuthContextType>(defaultValue);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [access_token, setAccessToken] = useState<string>(defaultValue.access_token);
@@ -111,5 +111,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		</UserAuthenticationContext.Provider>
 	);
 };
-
-export const useUserAuth = () => useContext(UserAuthenticationContext);

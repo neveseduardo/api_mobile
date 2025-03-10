@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ui/ThemedView';
 import TextInput from '@/components/ui/TextInput';
 import Button from '@/components/ui/Button';
@@ -12,6 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { HttpClient } from '@/services/HttpClient';
 import { UserAddressService } from '@/services/userservices/UserAddressService';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
+import Toast from 'react-native-toast-message';
 
 const loginSchema = z.object({
 	cep: z.string().min(1, 'Campo obrigatório!!'),
@@ -32,6 +33,7 @@ export default function AddressScreen() {
 	const router = useRouter();
 	const params = useLocalSearchParams();
 	const { ...routeParams } = params;
+	const navigation = useNavigation();
 
 	const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
@@ -64,7 +66,8 @@ export default function AddressScreen() {
 			if (routeParams.editable) {
 				await service.updateFromUserAsync(Number(routeParams.id), payload);
 			}
-			router.replace('/(userzone)/perfil/enderecos', { withAnchor: false });
+			router.dismissAll();
+			router.replace('/(userzone)/perfil/enderecos');
 		} catch (error: any) {
 			console.error(error);
 		} finally {
