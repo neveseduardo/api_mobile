@@ -15,7 +15,7 @@ export default function Layout() {
 				<Drawer
 					drawerContent={(props) => (
 						<View className="flex-1">
-							<SafeAreaView className="flex-1 gap-4 p-5">
+							<SafeAreaView className="flex-1 gap-4 !p-5">
 								<AdminDrawerContent />
 
 								<View className="flex-1">

@@ -8,10 +8,10 @@ import AuthHeader from '@/components/modules/auth/AuthHeader';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { HttpClient } from '@/services/HttpClient';
+import { HttpClient } from '@/services/restrict/HttpClient';
 import { z } from 'zod';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/UserAuthenticationContext';
-import { UserAddressService } from '@/services/userservices/UserAddressService';
+import { UserAddressService } from '@/services/public/UserAddressService';
 
 const cepSchema = z.object({
 	cep: z

@@ -8,8 +8,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { isCPF } from '@/utils/helpers';
-import { HttpClient } from '@/services/HttpClient';
-import { UserService } from '@/services/UserService';
+import { HttpClient } from '@/services/restrict/HttpClient';
+import { UserService } from '@/services/restrict/UserService';
 import { z } from 'zod';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
 

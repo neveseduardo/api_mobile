@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Suspense, useEffect } from 'react';
 import { ActivityIndicator, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
 
@@ -31,16 +31,18 @@ export default function RootLayout() {
 	return (
 		<Suspense fallback={<ActivityIndicator size={'small'} />}>
 			<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-				<Toast />
+
 				<StatusBar style="auto" />
 				<SafeAreaProvider>
-					<Stack initialRouteName="index">
-						<Stack.Screen name="index" options={{ headerShown: false }} />
-						<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-						<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
-						<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
-						<Stack.Screen name="+not-found" />
-					</Stack>
+					<ActionSheetProvider>
+						<Stack initialRouteName="index">
+							<Stack.Screen name="index" options={{ headerShown: false }} />
+							<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+							<Stack.Screen name="(userzone)" options={{ headerShown: false }} />
+							<Stack.Screen name="(adminzone)" options={{ headerShown: false }} />
+							<Stack.Screen name="+not-found" />
+						</Stack>
+					</ActionSheetProvider>
 				</SafeAreaProvider>
 			</ThemeProvider>
 		</Suspense>

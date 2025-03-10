@@ -4,11 +4,11 @@ import Button from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useEffect, useState } from 'react';
-import { HttpClient } from '@/services/HttpClient';
+import { HttpClient } from '@/services/restrict/HttpClient';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
 import { ActivityIndicator, FlatList, RefreshControl, Text, View, Modal } from 'react-native';
-import { UnitService } from '@/services/UnitService';
-import CardCrud from '../../../components/ui/CardCrud';
+import { UnitService } from '@/services/restrict/UnitService';
+import CardCrud from '@/components/ui/CardCrud';
 
 const { client } = HttpClient(USER_ACCESS_TOKEN_NAME);
 const service = new UnitService(client);

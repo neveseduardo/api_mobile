@@ -1,8 +1,8 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-import { UserAuthenticationService } from '@/services/UserAuthenticationService';
+import { createContext, useState, useEffect } from 'react';
+import { UserAuthenticationService } from '@/services/authentication/UserAuthenticationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, AuthProviderProps, IUser } from '@/@types';
-import { HttpClient } from '../services/HttpClient';
+import { HttpClient } from '@/services/restrict/HttpClient';
 
 type InnerAuthContextType = AuthContextType<IUser> & { updateUserData: (data: any) => void };
 

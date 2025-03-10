@@ -1,8 +1,8 @@
-import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, AuthProviderProps, IAdmin } from '@/@types';
-import { AdminAuthenticationService } from '@/services/AdminAuthenticationService';
-import { HttpClient } from '../services/HttpClient';
+import { AdminAuthenticationService } from '@/services/authentication/AdminAuthenticationService';
+import { HttpClient } from '@/services/restrict/HttpClient';
 
 type AdminContextType = Omit<AuthContextType<IAdmin>, 'register'>;
 

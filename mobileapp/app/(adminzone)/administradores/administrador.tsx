@@ -7,9 +7,8 @@ import TextInput from '@/components/ui/TextInput';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { isCPF } from '@/utils/helpers';
-import { HttpClient } from '@/services/HttpClient';
-import { AdminService } from '@/services/AdminService';
+import { HttpClient } from '@/services/restrict/HttpClient';
+import { AdminService } from '@/services/restrict/AdminService';
 import { z } from 'zod';
 import { USER_ACCESS_TOKEN_NAME } from '@/contexts/AdminAuthenticationContext';
 

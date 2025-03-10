@@ -9,10 +9,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { isCPF } from '@/utils/helpers';
-import { UserService } from '@/services/userservices/UserService';
-import { HttpClient } from '@/services/HttpClient';
+import { UserService } from '@/services/public/UserService';
+import { HttpClient } from '@/services/restrict/HttpClient';
 import { router } from 'expo-router';
-import { UserAuthenticationService } from '@/services/UserAuthenticationService';
+import { UserAuthenticationService } from '@/services/authentication/UserAuthenticationService';
 import { useUserAuth } from '@/hooks/useUserAuth';
 
 const formSchema = z.object({
