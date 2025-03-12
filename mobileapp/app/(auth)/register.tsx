@@ -46,8 +46,6 @@ export default function RegisterScreen() {
 	});
 
 	const router = useRouter();
-	const params = useLocalSearchParams();
-	const { addressId } = params;
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 
@@ -62,7 +60,6 @@ export default function RegisterScreen() {
 				data.email,
 				data.cpf,
 				data.password,
-				!isNaN(Number(addressId)) ? Number(addressId) : undefined,
 			);
 
 			const { accessToken, user } = await login(data.email, data.password);

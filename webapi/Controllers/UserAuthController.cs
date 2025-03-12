@@ -182,14 +182,9 @@ public class UserAuthController : ControllerBase
 
             await _repository.CreateUserAsync(user);
 
-            var result = await GetUserData();
+            var viewModel = GetViewModel(user);
 
-            if (result is ObjectResult objectResult)
-            {
-                objectResult.StatusCode = 201;
-            }
-
-            return result;
+            return StatusCode(201, ApiHelper.Created(viewModel));
         }
         catch (Exception ex)
         {

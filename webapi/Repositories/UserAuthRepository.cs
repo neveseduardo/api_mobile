@@ -186,6 +186,7 @@ public class UserAuthRepository : IAuthenticationRepository<User>
     {
         try
         {
+            user.Password = PasswordHelper.HashPassword(user.Password);
             _context.Users.Add(user);
 
             await _context.SaveChangesAsync();
