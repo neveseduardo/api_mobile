@@ -5,6 +5,7 @@ using WebApi.Repositories;
 using WebApi.Models;
 using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
+using WebApi.Extensions.ModelExtensions;
 
 namespace WebApi.Controllers;
 
@@ -22,25 +23,11 @@ public class AdministratorController : Controller
         _logger = logger;
     }
 
-    protected AdministratorViewModel GetViewModel(Administrator administrator)
-    {
-        var viewModel = new AdministratorViewModel
-        {
-            Id = administrator.Id,
-            Name = administrator.Name,
-            Email = administrator.Email,
-            CreatedAt = administrator.CreatedAt,
-            UpdatedAt = administrator.UpdatedAt,
-        };
-
-        return viewModel;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AdministratorViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModels = list.Select(u => GetViewModel(u));
+        var viewModels = list.Select(u => u.ToViewModel());
 
         return StatusCode(200, ApiHelper.Ok(viewModels));
     }
@@ -55,9 +42,7 @@ public class AdministratorController : Controller
             return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(model);
-
-        return StatusCode(200, ApiHelper.Ok(viewModel));
+        return StatusCode(200, ApiHelper.Ok(model.ToViewModel()));
     }
 
     [HttpPost]

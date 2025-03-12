@@ -1,5 +1,6 @@
 using WebApi.Models;
 using WebApi.Database;
+using WebApi.Helpers;
 
 namespace WebApi.Database.Seeders;
 
@@ -20,60 +21,70 @@ public class AppointmentSeeder
             {
                 new Appointment {
                     Date = DateTime.Parse("2025-03-02T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-03T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-04T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-05T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-06T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-07T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-08T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-09T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-10T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,
                 },
                 new Appointment {
                     Date = DateTime.Parse("2025-03-11T19:00"),
+                    Protocol = ProtocolHelper.GenerateProtocol(),
                     Notes = "Adicionado no seeder",
                     UserId = 1,
                     DoctorId = 1,

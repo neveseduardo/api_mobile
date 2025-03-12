@@ -6,6 +6,7 @@ using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using WebApi.Extensions.ModelExtensions;
 
 namespace WebApi.Controllers;
 
@@ -23,41 +24,11 @@ public class DoctorController : ControllerBase
         _logger = logger;
     }
 
-    protected DoctorViewModel GetViewModel(Doctor doctor)
-    {
-        EspecializationViewModel? especializationViewModel = null;
-
-        if (doctor.Especialization != null)
-        {
-            especializationViewModel = new EspecializationViewModel
-            {
-                Id = doctor.Especialization.Id,
-                Name = doctor.Especialization.Name,
-                Description = doctor.Especialization.Description,
-                CreatedAt = doctor.Especialization.CreatedAt,
-                UpdatedAt = doctor.Especialization.UpdatedAt,
-            };
-        }
-
-        var viewModel = new DoctorViewModel
-        {
-            Id = doctor.Id,
-            Name = doctor.Name,
-            Email = doctor.Email,
-            CRM = doctor.CRM,
-            Especialization = especializationViewModel,
-            CreatedAt = doctor.CreatedAt,
-            UpdatedAt = doctor.UpdatedAt,
-        };
-
-        return viewModel;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DoctorViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModels = list.Select(u => GetViewModel(u)).ToList();
+        var viewModels = list.Select(u => u.ToViewModel()).ToList();
 
         return StatusCode(200, ApiHelper.Ok(viewModels));
     }
@@ -72,9 +43,7 @@ public class DoctorController : ControllerBase
             return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(model);
-
-        return StatusCode(200, ApiHelper.Ok(viewModel!));
+        return StatusCode(200, ApiHelper.Ok(model.ToViewModel()));
     }
 
     [HttpPost]

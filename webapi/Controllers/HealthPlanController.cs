@@ -5,6 +5,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Helpers;
+using WebApi.Extensions.ModelExtensions;
 
 namespace WebApi.Controllers;
 
@@ -22,27 +23,12 @@ public class HealthPlansController : ControllerBase
         _logger = logger;
     }
 
-    protected HealthPlanViewModel GetViewModel(HealthPlan healthPlan)
-    {
-        var viewModel = new HealthPlanViewModel
-        {
-            Id = healthPlan.Id,
-            Name = healthPlan.Name,
-            Coverage = healthPlan.Coverage,
-            MedicalAgreements = healthPlan.MedicalAgreements,
-            CreatedAt = healthPlan.CreatedAt,
-            UpdatedAt = healthPlan.UpdatedAt,
-        };
-
-        return viewModel;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<HealthPlanViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
 
-        var viewModels = list.Select(u => GetViewModel(u)).ToList();
+        var viewModels = list.Select(u => u.ToViewModel()).ToList();
 
         return StatusCode(200, ApiHelper.Ok(viewModels));
     }
@@ -57,9 +43,7 @@ public class HealthPlansController : ControllerBase
             return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(model);
-
-        return StatusCode(200, ApiHelper.Ok(viewModel));
+        return StatusCode(200, ApiHelper.Ok(model.ToViewModel()));
     }
 
     [HttpPost]

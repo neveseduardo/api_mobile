@@ -5,6 +5,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Helpers;
+using WebApi.Extensions.ModelExtensions;
 
 namespace WebApi.Controllers;
 
@@ -22,29 +23,11 @@ public class EspecializationController : ControllerBase
         _logger = logger;
     }
 
-    protected EspecializationViewModel? GetViewModel(Especialization? especialization)
-    {
-        EspecializationViewModel? viewModel = null;
-
-        if (especialization != null)
-        {
-            viewModel = new EspecializationViewModel
-            {
-                Id = especialization.Id,
-                Name = especialization.Name,
-                Description = especialization.Description,
-                CreatedAt = especialization.CreatedAt ?? DateTime.Now,
-                UpdatedAt = especialization.UpdatedAt ?? DateTime.Now,
-            };
-        }
-        return viewModel;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EspecializationViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModels = list.Select(u => GetViewModel(u)).ToList();
+        var viewModels = list.Select(u => u.ToViewModel()).ToList();
 
         return StatusCode(200, ApiHelper.Ok(viewModels));
     }
@@ -59,9 +42,7 @@ public class EspecializationController : ControllerBase
             return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(model);
-
-        return StatusCode(200, ApiHelper.Ok(viewModel!));
+        return StatusCode(200, ApiHelper.Ok(model.ToViewModel()));
     }
 
     [HttpPost]

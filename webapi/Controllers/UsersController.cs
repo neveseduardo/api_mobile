@@ -5,6 +5,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Helpers;
+using WebApi.Extensions.ModelExtensions;
 
 namespace WebApi.Controllers;
 
@@ -22,24 +23,11 @@ public class UsersController : ControllerBase
         _logger = logger;
     }
 
-    protected UserViewModel GetViewModel(User user)
-    {
-        var viewModel = new UserViewModel
-        {
-            Id = user.Id,
-            Name = user.Name,
-            Email = user.Email,
-            Cpf = user.Cpf,
-        };
-
-        return viewModel;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModels = list.Select(u => GetViewModel(u)).ToList();
+        var viewModels = list.Select(u => u.ToViewModel()).ToList();
 
         return StatusCode(200, ApiHelper.Ok(viewModels));
     }
@@ -54,9 +42,7 @@ public class UsersController : ControllerBase
             return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(model);
-
-        return StatusCode(200, ApiHelper.Ok(viewModel));
+        return StatusCode(200, ApiHelper.Ok(model.ToViewModel()));
     }
 
     [HttpPost]

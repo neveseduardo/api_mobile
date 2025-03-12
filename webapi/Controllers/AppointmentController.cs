@@ -5,6 +5,7 @@ using WebApi.Models.Dto;
 using WebApi.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Helpers;
+using WebApi.Extensions.ModelExtensions;
 
 namespace WebApi.Controllers;
 
@@ -23,67 +24,12 @@ public class AppointmentController : ControllerBase
         _logger = logger;
     }
 
-    protected AppointmentViewModel? GetViewModel(Appointment? appointment)
-    {
-        if (appointment != null)
-        {
-            UserViewModel? user = null;
-            DoctorViewModel? doctor = null;
-            AppointmentRatingViewModel? appointmentRating = null;
-
-            if (appointment?.User != null)
-            {
-                user = new UserViewModel
-                {
-                    Id = appointment.User.Id,
-                    Name = appointment.User.Name,
-                    Email = appointment.User.Email,
-                };
-            }
-
-            if (appointment?.Doctor != null)
-            {
-                doctor = new DoctorViewModel
-                {
-                    Id = appointment.Doctor.Id,
-                    Name = appointment.Doctor.Name,
-                    Email = appointment.Doctor.Email,
-                };
-            }
-
-            if (appointment!.AppointmentRating != null)
-            {
-                appointmentRating = new AppointmentRatingViewModel
-                {
-                    Id = appointment.AppointmentRating.Id,
-                    Rating = appointment.AppointmentRating.Rating,
-                    Comment = appointment.AppointmentRating.Comment,
-                };
-            }
-
-            var viewModel = new AppointmentViewModel
-            {
-                Id = appointment!.Id,
-                Date = appointment.Date,
-                Notes = appointment.Notes,
-                Status = appointment.Status,
-                User = user,
-                Doctor = doctor,
-                AppointmentRating = appointmentRating,
-                CreatedAt = appointment.CreatedAt ?? DateTime.Now,
-                UpdatedAt = appointment.UpdatedAt ?? DateTime.Now,
-            };
-
-            return viewModel;
-        }
-        return null;
-    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AppointmentViewModel>>> GetAllAsync()
     {
         var list = await _repository.GetAllAsync();
-        var viewModels = list.Select(u => GetViewModel(u)).ToList();
+        var viewModels = list.Select(u => u.ToViewModel()).ToList();
 
         return StatusCode(200, ApiHelper.Ok(viewModels));
     }
@@ -98,9 +44,7 @@ public class AppointmentController : ControllerBase
             return StatusCode(404, ApiHelper.NotFound());
         }
 
-        var viewModel = GetViewModel(model);
-
-        return StatusCode(200, ApiHelper.Ok(viewModel!));
+        return StatusCode(200, ApiHelper.Ok(model.ToViewModel()));
     }
 
     [HttpPost]
